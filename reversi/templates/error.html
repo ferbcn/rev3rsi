@@ -1,0 +1,17 @@
+{% extends "users/base.html" %}
+
+{% block title %}
+    Error
+{% endblock %}
+
+{% block body %}
+  <div class="container">
+      <h1>Error</h1>
+
+      {{ message }}
+
+      <hr>
+
+      <a href="{% url 'index' %}">Return to Index.</a>
+  </div>
+{% endblock %}

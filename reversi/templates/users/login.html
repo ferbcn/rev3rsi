@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+<div class="container">
+  <br>
+  <h2>Login</h2>
+  {% if message %}
+  <br>
+    {{ message }}
+  {% endif %}
+  <br>
+  <br>
+
+  <form action="{% url 'login' %}" method="post">
+    {% csrf_token %}
+      Username:<input class="form-control" name="username" type="text" placeholder="username">
+      Password:<input class="form-control" name="password" type="password" placeholder="password">
+      <br>
+      <button class="btn btn-danger">Login</button>
+  </form>
+
+  <br>
+  Not registered yet? <a href="{% url 'register' %}">Register here</a>
+</div>
+
+
+{% endblock %}

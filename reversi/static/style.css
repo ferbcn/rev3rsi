@@ -1,0 +1,251 @@
+a {
+  color: red;
+}
+
+a:hover {
+  color: green;
+}
+
+div {
+
+}
+
+body {
+
+}
+
+h4 {
+
+}
+
+.nav-item {
+    padding-left: 10px;
+}
+
+#board{
+  margin-top: 10%;
+  height:90%;
+  width: 100%;
+  max-width: 1000px;
+
+}
+
+html, body {
+   height:80%;
+   width: 100%;
+}
+
+#savedgames {
+  margin-top: 3%;
+  color: white;
+}
+
+.comm-box {
+    padding-top: 5%;
+    height: 10%;
+}
+
+#message_box {
+  color: white;
+}
+
+#player_box {
+
+}
+
+#score_box {
+  color: white;
+  text-align: right;
+}
+
+#machine_type_box{
+  color: orange;
+}
+
+
+.padding-0{
+    padding-right:0;
+    padding-left:0;
+}
+
+.navbar-right {
+  margin-right: 10px;
+  margin-left: 0px;
+}
+
+.navbar-light{
+  font-weight: bold;
+}
+
+.dot_empty {
+  height: 95%;
+  width: 95%;
+  background: rgba(255,255,255,0.8);
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.dot_possible {
+  height: 95%;
+  width: 95%;
+  background: rgba(255,255,255,1);
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.dot_p1 {
+  height: 95%;
+  width: 95%;
+  background-color: green;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.dot_p2 {
+  height: 95%;
+  width: 95%;
+  background-color: blue;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.fadeIn {
+  animation-name: fadeIn;
+}
+
+@keyframes fadeIn {
+   from {opacity: 0;}
+   to {opacity: 1;}
+}
+
+@keyframes fadeOut {
+   0% {opacity: 1;}
+   100% {opacity: 0;}
+}
+
+.gameover-box{
+  font-weight: bold;
+  text-align: center;
+  font-size: 12vw;
+  background: rgba(0,0,0,0.8);
+  color: orange;
+  position: absolute;
+  float: left;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+#gameovertext{
+  opacity: 1;
+}
+
+.savegamerow {
+  color: white;
+  background: rgba(255,255,255,0.2);
+  height: 50px;
+  text-align: center;
+  padding-top: 12px;
+}
+
+.savegamerow:hover {
+  color: green;
+  background: rgba(255,255,255,0.8);
+  text-align: center;
+  padding-top: 12px;
+}
+
+.savegameheader{
+  height: 50px;
+  padding-top: 12px;
+  background-color: lightgrey;
+  color: black;
+  font-weight: bold;
+  text-align: center;
+}
+
+a.divlink {
+    color: white;
+    display:block;
+    width:100%;
+    height:50px;
+}
+
+a.divlink:hover {
+    color: green;
+    display:block;
+    width:100%;
+    height:50px;
+}
+
+.lds-grid {
+  position: relative;
+  position: absolute;
+  top: 50%;
+  left: 45%;
+  z-index: 2;
+  width: 64px;
+  height: 64px;
+}
+.lds-grid div {
+  position: absolute;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: #fff;
+  animation: lds-grid 1.2s linear infinite;
+}
+.lds-grid div:nth-child(1) {
+  top: 6px;
+  left: 6px;
+  animation-delay: 0s;
+}
+.lds-grid div:nth-child(2) {
+  top: 6px;
+  left: 26px;
+  animation-delay: -0.4s;
+}
+.lds-grid div:nth-child(3) {
+  top: 6px;
+  left: 45px;
+  animation-delay: -0.8s;
+}
+.lds-grid div:nth-child(4) {
+  top: 26px;
+  left: 6px;
+  animation-delay: -0.4s;
+}
+.lds-grid div:nth-child(5) {
+  top: 26px;
+  left: 26px;
+  animation-delay: -0.8s;
+}
+.lds-grid div:nth-child(6) {
+  top: 26px;
+  left: 45px;
+  animation-delay: -1.2s;
+}
+.lds-grid div:nth-child(7) {
+  top: 45px;
+  left: 6px;
+  animation-delay: -0.8s;
+}
+.lds-grid div:nth-child(8) {
+  top: 45px;
+  left: 26px;
+  animation-delay: -1.2s;
+}
+.lds-grid div:nth-child(9) {
+  top: 45px;
+  left: 45px;
+  animation-delay: -1.6s;
+}
+@keyframes lds-grid {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}

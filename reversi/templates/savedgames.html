@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block heading %}
+
+{% endblock %}
+
+
+{% block body %}
+
+<div class="container" id="savedgames">
+
+    <br>
+    <h3>Game History</h3>
+    <br>
+          <div class="row savegameheader">
+              <div class="col-2">
+                Game
+              </div>
+              <div class="col-3">
+                Level
+              </div>
+              <div class="col-3">
+                Ended
+              </div>
+              <div class="col-3">
+                Scores
+              </div>
+              <div class="col-1">
+                X
+              </div>
+          </div>
+          <div class="row" style="height: 5px;">
+          </div>
+        {% for game in saved_games %}
+
+          <div class="row savegamerow">
+              <div class="col-2">
+                <a class="divlink" href="{% url 'loadgame'%}?game_id={{ game.id }}" title="{{ game.id }}">
+                <span class="oi oi-grid-four-up"></span>
+                </a>
+              </div>
+              <div class="col-3">
+                <a class="divlink" href="{% url 'loadgame'%}?game_id={{ game.id }}">
+                {{ game.player2 }}
+                </a>
+              </div>
+              <div class="col-3">
+                <a class="divlink" href="{% url 'loadgame'%}?game_id={{ game.id }}">
+                {% if game.game_over %}
+                    {% if game.score_p1 > game.score_p2 %}
+                      <span style="color: green";>
+                      Win
+                      </span>
+                    {% endif %}
+                    {% if game.score_p1 < game.score_p2 %}
+                      <span style="color: red";>
+                      Lose
+                      </span>
+                    {% endif %}
+                    {% if game.score_p1 == game.score_p2 %}
+                      <span style="color: orange";>
+                      Draw
+                      </span>
+                    {% endif %}
+                {% else %}
+                  -
+                {% endif %}
+                </a>
+              </div>
+              <div class="col-3">
+                <a class="divlink" href="{% url 'loadgame'%}?game_id={{ game.id }}">
+                    {{ game.score_p1 }} / {{ game.score_p2 }}
+                  </a>
+              </div>
+                <div class="col-1">
+                  <a class="divlink" href="{% url 'deletegame' %}?game_id={{ game.id }}">
+                  <span class="oi oi-delete" title="delete game"></span>
+                  </a>
+                </div>
+          </div>
+        <div class="row" style="height: 5px;">
+        </div>
+        {% endfor %}
+    </div>
+
+      <script>
+          // set bg color black
+          document.body.style.backgroundColor = "black";
+      </script>
+
+{% endblock %}
