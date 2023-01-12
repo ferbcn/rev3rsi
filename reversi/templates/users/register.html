@@ -11,17 +11,19 @@
   {% endif %}
   <br>
   <br>
-
-  <form action="{% url 'register' %}" method="post">
-      {% csrf_token %}
-      Username: <input class="form-control" name="username" type="text" placeholder="username">
-      Password: <input class="form-control" name="password" type="password" placeholder="password">
+  <div id="login_parent">
+    <div id="login_child">
+      <form action="{% url 'register' %}" method="post">
+          {% csrf_token %}
+          Username: <input class="form-control" name="username" type="text" placeholder="username">
+          Password: <input class="form-control" name="password" type="password" placeholder="password">
+          <br>
+          <button class="btn btn-danger">Register</button>
+      </form>
       <br>
-      <button class="btn btn-danger">Register</button>
-  </form>
-
-  <br>
-  Already singed-up? <a href="{% url 'login' %}">Login here</a>
+      Already singed-up? <a href="{% url 'login' %}">Login here</a>
+    </div>
   </div>
+</div>
 
 {% endblock %}

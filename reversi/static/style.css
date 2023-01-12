@@ -22,6 +22,7 @@ h4 {
     padding-left: 10px;
 }
 
+
 #board{
   margin-top: 10%;
   height:90%;
@@ -53,6 +54,7 @@ html, body {
 
 }
 
+
 #score_box {
   color: white;
   text-align: right;
@@ -60,6 +62,18 @@ html, body {
 
 #machine_type_box{
   color: orange;
+}
+
+#login_parent{
+   display: flex;
+   align-items: center;
+   justify-content: left;
+   position: relative;
+   width: 100%;
+   height: 100%;
+}
+#login_child{
+   position: relative;
 }
 
 
