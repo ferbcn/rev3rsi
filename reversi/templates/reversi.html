@@ -22,9 +22,10 @@
 <!-- spinninig animation -->
 <!--  <div class="lds-grid"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div> -->
 
+<div class="container" id="board_parent">
+
 <!-- container for the game board -->
     <div class="container" id="board">
-
       {% for line in board %}
         <div class="row" style="height: 12%">
           {% for cell in line %}
@@ -34,19 +35,20 @@
           {% endfor %}
         </div>
       {% endfor %}
+    </div>
+</div>
 
-  </div>
-
-  <div class="container comm-box">
-      <div class="row">
-          <div class="col-9">
-              <div id='message_box'></div>
-          </div>
-          <div class="col-2">
-              <div id='machine_type_box'>Level: {{ machine_type }}</div>
+      <div class="container comm-box">
+          <div class="row">
+              <div class="col-9">
+                  <div id='message_box'></div>
+              </div>
+              <div class="col-2">
+                  <div id='machine_type_box'>Level: {{ machine_type }}</div>
+              </div>
           </div>
       </div>
-  </div>
+
 
 <div class="container">
   <div id="gameoverbox"><span id="gameovertext"></span></div>
