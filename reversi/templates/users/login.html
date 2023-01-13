@@ -3,17 +3,14 @@
 {% block body %}
 
 <div class="container">
-  <br>
-  <h2>Login</h2>
-  {% if message %}
-  <br>
-    {{ message }}
-  {% endif %}
-  <br>
-  <br>
-
   <div id="login_parent">
     <div id="login_child">
+      <h2>Login</h2>
+      {% if message %}
+        {{ message }}
+      {% endif %}
+      <br>
+      <br>
       <form action="{% url 'login' %}" method="post">
         {% csrf_token %}
           Username:<input class="form-control" name="username" type="text" placeholder="username">
