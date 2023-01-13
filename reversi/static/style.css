@@ -1,3 +1,7 @@
+html, body {
+
+}
+
 a {
   color: red;
 }
@@ -12,38 +16,24 @@ a:hover {
 
 
 #board_parent{
-   margin-top: 5%;
+   display: flex;
+   margin-top: 10px;
    align-items: center;
    justify-content: center;
    position: relative;
    width: 100%;
-   height: 90%;
+   height: 70vh;
 }
 
+#board_child{
+   position: relative;
+}
 
 #board{
-   position: relative;
-   width: 100%;
+   width: 70vh;
    height: 70vw;
-   max-height: 60vh;
-}
-
-html, body {
-
-}
-
-#savedgames {
-  margin-top: 3%;
-  color: white;
-}
-
-.comm-box {
-    padding-top: 5%;
-    height: 10%;
-}
-
-#message_box {
-  color: white;
+   max-height: 70vh;
+   max-width: 70vw;
 }
 
 #player_box {
@@ -53,10 +43,28 @@ html, body {
 #score_box {
   color: white;
   text-align: right;
+
+}
+
+.comm-box {
+  margin-top: 2vh;
+  font-size: 2vw;
+  width: 70vw;
+}
+
+#message_box {
+
 }
 
 #machine_type_box{
   color: orange;
+  width: 20vw;
+}
+
+#savedgames {
+  margin-top: 1%;
+  color: white;
+
 }
 
 #login_parent{

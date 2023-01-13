@@ -11,10 +11,10 @@
     <div class="container comm-box">
         <div class="row">
             <div class="col-6">
-                <h4><div class='fadeIn' id='player_box'></div></h4>
+                <div class='fadeIn' id='player_box'></div>
             </div>
             <div class="col-6">
-                <h5><div id='score_box'></div></h5>
+                <div id='score_box'></div>
             </div>
         </div>
     </div>
@@ -22,19 +22,20 @@
 <!-- spinninig animation -->
 <!--  <div class="lds-grid"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div> -->
 
-<div class="container" id="board_parent">
-
-<!-- container for the game board -->
-    <div class="container" id="board">
-      {% for line in board %}
-        <div class="row" style="height: 12%">
-          {% for cell in line %}
-            <div class="col padding-0" style="background-color: black;">
-                <a href="#"><span class="dot_empty" id="{{forloop.parentloop.counter0}}{{forloop.counter0}}" onclick="move({{forloop.parentloop.counter0}}, {{forloop.counter0}});return false;"></span></a>
+<div id="board_parent">
+    <div id="board_child">
+        <!-- container for the game board -->
+        <div class="container" id="board">
+          {% for line in board %}
+            <div class="row" style="height: 12%">
+              {% for cell in line %}
+                <div class="col padding-0" style="background-color: black;">
+                    <a href="#"><span class="dot_empty" id="{{forloop.parentloop.counter0}}{{forloop.counter0}}" onclick="move({{forloop.parentloop.counter0}}, {{forloop.counter0}});return false;"></span></a>
+                </div>
+              {% endfor %}
             </div>
           {% endfor %}
         </div>
-      {% endfor %}
     </div>
 </div>
 
@@ -50,9 +51,7 @@
       </div>
 
 
-<div class="container">
-  <div id="gameoverbox"><span id="gameovertext"></span></div>
-</div>
+<div id="gameoverbox"></div>
 
   <script>
 

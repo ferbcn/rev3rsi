@@ -2,21 +2,19 @@ import copy
 import random
 
 from django.contrib.auth import authenticate, login, logout
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse
 
 from django.shortcuts import render
 from django.urls import reverse
 
 from django.contrib.auth.models import User
-from django.contrib.auth.decorators import login_required
-from django.contrib.admin.views.decorators import staff_member_required
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 # from django.core import serializers
 
 from .models import GameDB, GameState
 
-#from test_games import TestGameP1LastMoveToDraw
+from reversi.test_games import *
 
 class Game():
     def __init__(self):
@@ -290,6 +288,7 @@ def newgame(request):
     difficulty = request.GET["difficulty"]
 
     newgame = Game()
+
     # Test boards
     # newgame = TestGameP1LastMoveToDraw()
     # newgame = TestGameP1LastMoveToWin()
