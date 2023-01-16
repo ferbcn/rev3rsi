@@ -3,8 +3,8 @@ import random
 
 class Game():
 
-    def __init__(self, board):
-        if board == None:
+    def __init__(self, board=None):
+        if board is None:
             self.board = [[0, 0, 0, 0, 0, 0, 0, 0] for x in range(8)]
             self.board[3][3] = 2
             self.board[4][4] = 2
@@ -13,12 +13,13 @@ class Game():
         else:
             self.board = board
 
-        self.player1 = "human"
-        self.player2 = "machine"
-        self.machine_type = "greedy"
+        # self.player1 = "human"
+        # self.player2 = "machine"
+        # self.machine_type = "greedy"
+
         self.human_player = 1
 
-        # dictionary used for navbar and redirection of used method to the game logic loop
+        # dictionary used for navbar and redirection of used to select machine type AI in the game logic loop
         self.difficulty_options = {
             "easy": {"name": "easy", "type": "random", "method": self.random_machine_move, "disabled": ""},
             "medium": {"name": "medium", "type": "greedy", "method": self.greedy_machine_move, "disabled": ""},
@@ -32,7 +33,7 @@ class Game():
         oponent_inside = False
         col_iter = col + col_dir
         row_iter = row + row_dir
-        while col_iter >= 0 and col_iter <= 7 and row_iter >= 0 and row_iter <= 7:
+        while 0 <= col_iter <= 7 and 0 <= row_iter <= 7:
             # print(col_iter, row_iter, board[row_iter][col_iter], oponent_inside)
             if oponent_inside and board[row_iter][col_iter] == player:
                 return True
@@ -48,7 +49,7 @@ class Game():
         oponent_inside = False
         col_iter = col + col_dir
         row_iter = row + row_dir
-        while col_iter >= 0 and col_iter <= 7 and row_iter >= 0 and row_iter <= 7:
+        while 0 <= col_iter <= 7 and 0 <= row_iter <= 7:
             # print("iterating:", col_iter, row_iter)
             if oponent_inside and board[row_iter][col_iter] == player:
                 # bingo! fill this direction
@@ -84,7 +85,7 @@ class Game():
 
         oponent = self.set_oponent(player)
 
-        # try west, east, nort, sout, northwest, ...
+        # try west, east, north, south, northwest, ...
         col_row_dir = [(-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (1, -1), (1, 1), (-1, 1)]
         for col_row in col_row_dir:
             col_dir, row_dir = col_row
@@ -205,11 +206,12 @@ class Game():
         # No power moves, just go for greedy
         return move
 
-
+    """
     # return a list of links (and if they are disabled) for the base html navbar
     # this happens when you have hacky solutions
     def make_difficulties(self):
         options = self.difficulty_options.keys()
         disabled = [self.difficulty_options[key]["disabled"] for key in options]
         return zip(disabled, options)
+    """
 

@@ -14,6 +14,7 @@ from .models import GameDB, GameState
 from reversi.test_games import *
 from reversi.reversi_game import Game
 
+
 #####################
 ### DB operations ###
 #####################
@@ -47,10 +48,13 @@ def removegame_db(game_id, user):
         return False
 
 
-
 ####################
 ### DJANGO VIEWS ###
 ####################
+
+# Game difficulties and which of thema are available
+# Hardest Level is disabled by default
+difficulties = [((), 'easy'), ((), 'hard'), ((), 'harder'), ('disabled', 'hardest')]
 
 # default view which renders an animation
 def index(request):
@@ -58,20 +62,20 @@ def index(request):
         user = request.user
     else:
         user = False
-    game = Game(None)
-    return render(request, "index.html", {"user": user, "difficulties": game.make_difficulties()})
+
+    return render(request, "index.html", {"user": user, "difficulties": difficulties})
 
 
 # game board initialization
 def newgame(request):
-    newgame = Game(None)
     if request.user.is_authenticated:
         user = request.user
     else:
         return render(request, "users/login.html", {"message": "Please login first to start a new game!", "user": False,
-                                                    "difficulties": newgame.make_difficulties()})
+                                                    "difficulties": difficulties})
 
     difficulty = request.GET["difficulty"]
+    newgame = Game()
 
     # Test boards
     # newgame = TestGameP1LastMoveToDraw()
@@ -115,7 +119,7 @@ def reversi(request):
     game = Game(board)
 
     return render(request, "reversi.html", {"user": user, "board": board, "player": player, "machine_type": machine,
-                                            "difficulties": game.make_difficulties(),
+                                            "difficulties": difficulties,
                                             "possible_moves": game.get_possible_moves(board, player)})
 
 
@@ -141,7 +145,6 @@ def move(request):
         player = 1
         oponent = game.set_oponent(player)
         machine_move = None
-
 
         # no real move, just querying board status
         if move == (-1, -1):
@@ -285,9 +288,8 @@ def savedgames(request):
 
     saved_games = reversed(GameDB.objects.all().filter(user=user)[:100])
 
-    game = Game(None)
     return render(request, "savedgames.html",
-                  {"user": user, "difficulties": game.make_difficulties(), "saved_games": saved_games})
+                  {"user": user, "difficulties": difficulties, "saved_games": saved_games})
 
 
 def deletegame(request):
@@ -307,12 +309,10 @@ def deletegame(request):
 
 
 def login_view(request):
-    game = Game(None)
-
     if request.method == "GET":
         return render(request, "users/login.html",
                       {"message": "Please enter your username and password.", "user": False,
-                       "difficulties": game.make_difficulties()})
+                       "difficulties": difficulties})
     username = request.POST["username"]
     password = request.POST["password"]
     user = authenticate(request, username=username, password=password)
@@ -321,7 +321,7 @@ def login_view(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "users/login.html",
-                      {"message": "Invalid credentials.", "user": False, "difficulties": game.make_difficulties()})
+                      {"message": "Invalid credentials.", "user": False, "difficulties": difficulties})
 
 
 def logout_view(request):
@@ -330,15 +330,13 @@ def logout_view(request):
 
 
 def register(request):
-    game = Game(None)
-
     if request.user.is_authenticated:
         return HttpResponseRedirect(reverse("index"))
 
     if request.method == "GET":
         return render(request, "users/register.html",
                       {"message": "Please choose a username and password to register a new player.", "user": False,
-                       "difficulties": game.make_difficulties()})
+                       "difficulties": difficulties})
 
     if request.method == "POST":
         username = request.POST["username"]
