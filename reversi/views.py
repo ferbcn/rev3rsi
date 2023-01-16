@@ -19,6 +19,7 @@ from reversi.reversi_game import Game
 ### DB operations ###
 #####################
 
+
 def save_gamestate(board, game_id):
     flat_board = [item for row in board for item in row]
     board_string = ""
@@ -46,6 +47,32 @@ def removegame_db(game_id, user):
         return True
     else:
         return False
+
+
+def load_gamestate(game_id):
+    gameDB_object = GameDB.objects.get(pk=game_id)
+    print("Game object: ", gameDB_object)
+
+    # game_state_objects = GameState.objects.all().filter(game_id=gameDB_object)[::-1]
+    # game_state = game_state_objects[0]
+    game_state = GameState.objects.all().filter(game_id=gameDB_object).last()
+    print("Got GameState object from DB:", game_state)
+
+    # deserialize board and save it to session variable
+    board_string = game_state.board
+    print(board_string)
+    game_board = [[0, 0, 0, 0, 0, 0, 0, 0] for x in range(8)]
+
+    cell = 0
+    for r in range(8):
+        for c in range(8):
+            game_board[r][c] = int(board_string[cell])
+            cell += 1
+    print("Game Board loaded!")
+    player1 = gameDB_object.player1
+    player2 = gameDB_object.player2
+
+    return game_board, player1, player2
 
 
 ####################
@@ -136,15 +163,16 @@ def move(request):
         col = int(request.POST["col"])
         move = (row, col)
 
-        board = request.session['board']
-
-        game = Game(board)
-
         machine_type = request.session['machine_type']
         game_id = request.session['game_id']
         player = 1
-        oponent = game.set_oponent(player)
         machine_move = None
+
+        # board = request.session['board']  # this seems unsafe
+        # better retrieve gamestate from DB
+        board = load_gamestate(game_id)[0]
+        game = Game(board)
+        oponent = game.set_oponent(player)
 
         # no real move, just querying board status
         if move == (-1, -1):
@@ -248,33 +276,14 @@ def loadgame(request):
     request.session['game_id'] = game_id
     print("Game ID: ", game_id)
 
-    gameDB_object = GameDB.objects.get(pk=game_id)
-    print("Game object: ", gameDB_object)
-
-    # game_state_objects = GameState.objects.all().filter(game_id=gameDB_object)[::-1]
-    # game_state = game_state_objects[0]
-    game_state = GameState.objects.all().filter(game_id=gameDB_object).last()
-    print("Got GameState object from DB:", game_state)
-
-    # deserialize board and save it to session variable
-    board_string = game_state.board
-    print(board_string)
-    game_board = [[0, 0, 0, 0, 0, 0, 0, 0] for x in range(8)]
-
-    cell = 0
-    for r in range(8):
-        for c in range(8):
-            game_board[r][c] = int(board_string[cell])
-            cell += 1
-
-    print("Game Board loaded!")
+    game_board, player1, player2 = load_gamestate(game_id)
 
     for line in game_board: print(line)
 
     # save game state variables to session variables
     request.session['board'] = game_board
-    request.session['human_player'] = gameDB_object.player1
-    request.session['machine_type'] = gameDB_object.player2
+    request.session['human_player'] = player1
+    request.session['machine_type'] = player2
 
     return HttpResponseRedirect(reverse("reversi"))
 
