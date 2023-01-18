@@ -144,7 +144,6 @@ class AiGreedyPlus(AiGreedy):
 
 
 class Game:
-
     def __init__(self, player1, player2, difficulty, board=None):
         if board is None:
             self.board = [[0, 0, 0, 0, 0, 0, 0, 0] for x in range(8)]
