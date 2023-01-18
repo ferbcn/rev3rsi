@@ -2,7 +2,7 @@
 
 ## Project Name: Rev3rsi
 
-##Description
+## Description
 Reversi is a classic board game for two players just like chess, checkers and go...
 Rules and details: https://www.yourturnmyturn.com/rules/reversi.php
 
