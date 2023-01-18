@@ -8,7 +8,6 @@ Rules and details: https://www.yourturnmyturn.com/rules/reversi.php
 
 The Game has been implemented using Django as the backend where games, game states and scores are saved to an sqlite3 data base.
 
-
 ## Features
 ### Landing Page:
 - mobile responsive JS animation using svg objects and D3JS library
@@ -27,7 +26,6 @@ Players can select different machine players (difficulty) and therefore play aga
 
 ## Requirements
 - Django
-
 
 ## Future improvements
 - implement alpha-beta algorithm for machine player (will yield a huge increase in performance, and defacto unbeatable by regular players)
