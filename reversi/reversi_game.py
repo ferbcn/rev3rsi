@@ -155,6 +155,7 @@ class Game:
         else:
             self.board = board
 
+
         self.player1 = player1
         self.player2 = player2
         self.difficulty = difficulty
