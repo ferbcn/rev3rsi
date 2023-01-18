@@ -14,11 +14,7 @@ from reversi.reversi_game import *
 from reversi.db_operations_orm import *
 
 
-####################
-### DJANGO VIEWS ###
-####################
-
-# Game difficulties and which of thema are available
+# Game difficulties and which are available
 # Hardest Level is disabled by default
 difficulties = [((), 'easy'), ((), 'hard'), ((), 'harder'), ('disabled', 'hardest')]
 
@@ -41,31 +37,35 @@ def newgame(request):
                                                     "difficulties": difficulties})
 
     # Test boards
-    # newgame = TestGameP1LastMoveToDraw()
-    # newgame = TestGameP1LastMoveToWin()
-    # newgame = TestGameP1LastMoveToLose()
-    # newgame = TestGameP1MoveP2LastMoveToWin()
-    # newgame = TestGameP1MoveP2LastMoveToLose()
+    # new_game = TestGameP1LastMoveToDraw()
+    # new_game = TestGameP1LastMoveToWin()
+    # new_game = TestGameP1LastMoveToLose()
+    # new_game = TestGameP1MoveP2LastMoveToWin()
+    # new_game = TestGameP1MoveP2LastMoveToLose()
 
+    # Game level is passed as url parameter http://localhost/newgame?difficulty=...
     difficulty = request.GET["difficulty"]
-    newgame = Game()
-    newgame.machine_type = difficulty
+    # Define game parameters
+    # p1 == 1 and p2 == 2 --> p1 is green and p2 is blue, green always starts
+    player1 = "human"
+    player2 = difficulty
+    new_game = Game(player1, player2, difficulty)
 
     print("NEW GAME STARTED! Difficulty: ", difficulty)
-    for line in newgame.board: print(line)
+    for line in new_game.board: print(line)
 
     # save game state variables to session variables
-    request.session['board'] = newgame.board
-    request.session['human_player'] = newgame.human_player
-    request.session['machine_type'] = newgame.machine_type
+    request.session['board'] = new_game.board
+    request.session['human_player'] = new_game.current_player
+    request.session['game_level'] = new_game.difficulty
 
     # save game to DB
-    game_db_entry = GameDB(user=user, player1="human", player2=newgame.machine_type, game_over=False)
+    game_db_entry = GameDB(user=user, player1=player1, player2=player2, game_over=False)
     game_db_entry.save()
     request.session["game_id"] = game_db_entry.id
 
     # save game to DB
-    save_gamestate(newgame.board, game_db_entry.id)
+    save_gamestate(new_game.board, game_db_entry.id)
 
     return HttpResponseRedirect(reverse("reversi"))
 
@@ -77,16 +77,17 @@ def reversi(request):
     else:
         return HttpResponseRedirect(reverse("login"))
 
+    # Restore Gamestate from DB
     game_id = request.session['game_id']
-    board = load_gamestate(game_id)[0]
-    player = 1
-    machine = request.session['machine_type']
+    board, player1, player2 = load_gamestate(game_id)
 
-    game = Game(board)
+    difficulty = request.session['game_level']
 
-    return render(request, "reversi.html", {"user": user, "board": board, "player": player, "machine_type": machine,
+    game = Game(player1, player2, difficulty, board=board)
+
+    return render(request, "reversi.html", {"user": user, "board": board, "player": player1, "game_level": difficulty,
                                             "difficulties": difficulties,
-                                            "possible_moves": game.get_possible_moves(board, player)})
+                                            "possible_moves": game.get_possible_moves(board, player1)})
 
 
 # Main Game Logic is executed in this view every time Player1 makes a move via browser input
@@ -102,18 +103,22 @@ def move(request):
         col = int(request.POST["col"])
         move = (row, col)
 
-        machine_type = request.session['machine_type']
+        difficulty = request.session['game_level']
         game_id = request.session['game_id']
 
         human = Player()
 
         machine_move = None
 
-        # board = request.session['board']  # this seems unsafe
-        # better retrieve gamestate from DB
-        board = load_gamestate(game_id)[0]
-        game = Game(board)
-        oponent = game.get_oponent(human.player)
+        # Restore Gamestate from DB
+        game_id = request.session['game_id']
+        board, player1, player2 = load_gamestate(game_id)
+
+        difficulty = player2
+
+        game = Game(player1, player2, difficulty, board=board)
+
+        opponent = game.get_opponent(human.player)
 
         # no real move, just querying board status
         if move == (-1, -1):
@@ -139,30 +144,30 @@ def move(request):
                 for line in board: print(line)
 
                 # switch to machine players after move is made
-                possible_moves = game.get_possible_moves(board, oponent)
+                possible_moves = game.get_possible_moves(board, opponent)
                 print("### MACHINE PLAYER ###")
                 print("Possible moves: ", possible_moves)
 
                 # is able to move?
                 if len(possible_moves) > 0:
-                    if machine_type == "easy":
+                    if difficulty == "easy":
                         ai = AiRandom()
-                    elif machine_type == "hard":
+                    elif difficulty == "hard":
                         ai = AiGreedy()
-                    elif machine_type == "harder":
+                    elif difficulty == "harder":
                         ai = AiGreedyPlus()
                     else:
                         print("ERROR: wrong machine player!")
                     machine_move = ai.machine_move(game, possible_moves)
-                    board = ai.make_move(board, oponent, machine_move)
-                    print(f"AI ({machine_type}) MOVE: {machine_move}")
+                    board = ai.make_move(board, opponent, machine_move)
+                    print(f"AI ({difficulty}) MOVE: {machine_move}")
                 else:
                     print("AI can't move")
 
                 # is game over?
                 while len(game.get_possible_moves(board, human.player)) == 0:
                     print("Human can't move")
-                    if len(game.get_possible_moves(board, oponent)) == 0:
+                    if len(game.get_possible_moves(board, opponent)) == 0:
                         print("AI can't move either. Game Over!")
                         scores = game.get_scores(board)
 
@@ -177,11 +182,11 @@ def move(request):
                     else:
                         print("Human has to pass. Machine moves...")
                         try:
-                            machine_move = game.difficulty_options[machine_type]["method"](board, oponent)
+                            machine_move = game.difficulty_options[difficulty]["method"](board, opponent)
                         except KeyError:
                             print("ERROR: wrong machine player!")
-                        board = game.make_move(board, oponent, machine_move)
-                        print(f"AI ({machine_type}) MOVE: {machine_move}")
+                        board = game.make_move(board, opponent, machine_move)
+                        print(f"AI ({difficulty}) MOVE: {machine_move}")
 
                 scores = game.get_scores(board)
 
@@ -217,7 +222,7 @@ def loadgame(request):
     if request.user.is_authenticated:
         user = request.user
     else:
-        user = False
+        return HttpResponseRedirect(reverse("login"))
 
     game_id = int(request.GET["game_id"])
     request.session['game_id'] = game_id
@@ -230,7 +235,7 @@ def loadgame(request):
     # save game state variables to session variables
     request.session['board'] = game_board
     request.session['human_player'] = player1
-    request.session['machine_type'] = player2
+    request.session['game_level'] = player2
 
     return HttpResponseRedirect(reverse("reversi"))
 
@@ -240,7 +245,7 @@ def savedgames(request):
     if request.user.is_authenticated:
         user = request.user
     else:
-        user = False
+        return HttpResponseRedirect(reverse("login"))
 
     saved_games = reversed(GameDB.objects.all().filter(user=user)[:100])
 
@@ -252,7 +257,7 @@ def deletegame(request):
     if request.user.is_authenticated:
         user = request.user
     else:
-        user = False
+        return HttpResponseRedirect(reverse("login"))
 
     game_id = request.GET["game_id"]
 

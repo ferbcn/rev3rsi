@@ -1,13 +1,16 @@
 import copy
 import random
 
+###############################
+### GAME AND PLAYER CLASSES ###
+###############################
 
 class Player:
     def __init__(self, is_human=True, player=1):
         self.is_human = is_human
         self.player = player
 
-    def get_oponent(self, player):
+    def get_opponent(self, player):
         if player == 1:
             return 2
         else:
@@ -17,38 +20,38 @@ class Player:
     def make_move(self, board, player, move):
         # print(f"Player: {player}, makes move: {move}")
         row, col = move
-        oponent = self.get_oponent(player)
+        opponent = self.get_opponent(player)
 
-        # try west, east, nort, sout, northwest, ...
+        # try west, east, north, south, northwest, ...
         col_row_dir = [(-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (1, -1), (1, 1), (-1, 1)]
 
         for col_row in col_row_dir:
             col_dir, row_dir = col_row
             # print("filling dir... ", col_row)
-            board = self.fill_dir(board, player, oponent, row, col, row_dir, col_dir)
+            board = self.fill_dir(board, player, opponent, row, col, row_dir, col_dir)
 
         return board
 
-    def fill_dir(self, board, player, oponent, row, col, row_dir, col_dir):
-        oponent_inside = False
+    def fill_dir(self, board, player, opponent, row, col, row_dir, col_dir):
+        opponent_inside = False
         col_iter = col + col_dir
         row_iter = row + row_dir
         while 0 <= col_iter <= 7 and 0 <= row_iter <= 7:
             # print("iterating:", col_iter, row_iter)
-            if oponent_inside and board[row_iter][col_iter] == player:
+            if opponent_inside and board[row_iter][col_iter] == player:
                 # bingo! fill this direction
                 # print("filling dir found! (col/row):", col_dir, row_dir)
                 col_fill = col + col_dir
                 row_fill = row + row_dir
-                while board[row_fill][col_fill] == oponent:
+                while board[row_fill][col_fill] == opponent:
                     board[row_fill][col_fill] = player
                     col_fill = col_fill + col_dir
                     row_fill = row_fill + row_dir
                 board[row][col] = player
                 # print("dir filled succsfully!")
                 break
-            elif board[row_iter][col_iter] == oponent:
-                oponent_inside = True
+            elif board[row_iter][col_iter] == opponent:
+                opponent_inside = True
             col_iter = col_iter + col_dir
             row_iter = row_iter + row_dir
         return board
@@ -93,9 +96,9 @@ class AiGreedy(AiRandom):
         top_move_score = 0
         top_move = 0
         for move in possible_moves:
-            new_board = self.make_move(copy.deepcopy(game.board), game.human_player, move)
+            new_board = self.make_move(copy.deepcopy(game.board), game.current_player, move)
             score_p1, score_p2 = self.get_scores(new_board)
-            if game.human_player == 1:
+            if game.current_player == 1:
                 move_score = score_p1
             else:
                 move_score = score_p2
@@ -135,14 +138,14 @@ class AiGreedyPlus(AiGreedy):
         # in case all moves are bad and where elminated
         if not move:
             print("No moves left after bad moves clean up! Regular greedy move.")
-            move = self.greedy_machine_move(game.board, game.human_player)
+            move = self.greedy_machine_move(game.board, game.current_player)
         # No power moves, just go for greedy
         return move
 
 
-class Game():
+class Game:
 
-    def __init__(self, board=None):
+    def __init__(self, player1, player2, difficulty, board=None):
         if board is None:
             self.board = [[0, 0, 0, 0, 0, 0, 0, 0] for x in range(8)]
             self.board[3][3] = 2
@@ -152,13 +155,12 @@ class Game():
         else:
             self.board = board
 
-        # self.player1 = "human"
-        # self.player2 = "machine"
-        # self.machine_type = "greedy"
+        self.player1 = player1
+        self.player2 = player2
+        self.difficulty = difficulty
+        self.current_player = 1
 
-        self.human_player = 1
-
-    def get_oponent(self, player):
+    def get_opponent(self, player):
         if player == 1:
             return 2
         else:
@@ -186,16 +188,16 @@ class Game():
 
 
     # checks for a legal move by going in the direction determined by col_dir and row_dir
-    def check_dir(self, board, player, oponent, row, col, row_dir, col_dir):
-        oponent_inside = False
+    def check_dir(self, board, player, opponent, row, col, row_dir, col_dir):
+        opponent_inside = False
         col_iter = col + col_dir
         row_iter = row + row_dir
         while 0 <= col_iter <= 7 and 0 <= row_iter <= 7:
-            # print(col_iter, row_iter, board[row_iter][col_iter], oponent_inside)
-            if oponent_inside and board[row_iter][col_iter] == player:
+            # print(col_iter, row_iter, board[row_iter][col_iter], opponent_inside)
+            if opponent_inside and board[row_iter][col_iter] == player:
                 return True
-            elif board[row_iter][col_iter] == oponent:
-                oponent_inside = True
+            elif board[row_iter][col_iter] == opponent:
+                opponent_inside = True
                 col_iter = col_iter + col_dir
                 row_iter = row_iter + row_dir
             else:
@@ -207,13 +209,13 @@ class Game():
         if not board[row][col] == 0:
             return False
 
-        oponent = self.get_oponent(player)
+        opponent = self.get_opponent(player)
 
         # try west, east, north, south, northwest, ...
         col_row_dir = [(-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (1, -1), (1, 1), (-1, 1)]
         for col_row in col_row_dir:
             col_dir, row_dir = col_row
-            if self.check_dir(board, player, oponent, row, col, row_dir, col_dir):
+            if self.check_dir(board, player, opponent, row, col, row_dir, col_dir):
                 # print(f"Legal move.")
                 return True
         # print(f"Illegal move.")
