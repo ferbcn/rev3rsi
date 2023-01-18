@@ -15,13 +15,16 @@ from reversi.db_operations_orm import *
 
 # Game difficulties and which are available
 # Hardest Level is disabled by default
-difficulties = [((), 'easy'), ((), 'hard'), ((), 'harder'), ('disabled', 'hardest')]
+difficulties = [('', 'easy'), ('', 'hard'), ('', 'harder'), ('disabled', 'hardest')]
+difficulties_extra = [('', 'easy'), ('', 'hard'), ('', 'harder'), ('disabled', 'draw')]
 
 
 # default view which renders an animation
 def index(request):
     if request.user.is_authenticated:
         user = request.user
+        if user.is_superuser == True:
+            return render(request, "index.html", {"user": user, "difficulties": difficulties_extra})
     else:
         user = False
 
@@ -35,7 +38,6 @@ def newgame(request):
     else:
         return render(request, "users/login.html", {"message": "Please login first to start a new game!", "user": False,
                                                     "difficulties": difficulties})
-
 
     # Game level is passed as url parameter http://localhost/newgame?difficulty=...
     difficulty = request.GET["difficulty"]
