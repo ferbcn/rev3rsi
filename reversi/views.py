@@ -12,7 +12,7 @@ from django.utils.decorators import method_decorator
 from .models import GameDB, GameState
 
 from reversi.test_games import *
-from reversi.reversi_game import Game
+from reversi.reversi_game import *
 
 
 #####################
@@ -101,9 +101,6 @@ def newgame(request):
         return render(request, "users/login.html", {"message": "Please login first to start a new game!", "user": False,
                                                     "difficulties": difficulties})
 
-    difficulty = request.GET["difficulty"]
-    newgame = Game()
-
     # Test boards
     # newgame = TestGameP1LastMoveToDraw()
     # newgame = TestGameP1LastMoveToWin()
@@ -111,6 +108,8 @@ def newgame(request):
     # newgame = TestGameP1MoveP2LastMoveToWin()
     # newgame = TestGameP1MoveP2LastMoveToLose()
 
+    difficulty = request.GET["difficulty"]
+    newgame = Game()
     newgame.machine_type = difficulty
 
     print("NEW GAME STARTED! Difficulty: ", difficulty)
@@ -139,7 +138,8 @@ def reversi(request):
     else:
         return HttpResponseRedirect(reverse("login"))
 
-    board = request.session['board']
+    game_id = request.session['game_id']
+    board = load_gamestate(game_id)[0]
     player = 1
     machine = request.session['machine_type']
 
@@ -165,55 +165,63 @@ def move(request):
 
         machine_type = request.session['machine_type']
         game_id = request.session['game_id']
-        player = 1
+
+        human = Player()
+
         machine_move = None
 
         # board = request.session['board']  # this seems unsafe
         # better retrieve gamestate from DB
         board = load_gamestate(game_id)[0]
         game = Game(board)
-        oponent = game.set_oponent(player)
+        oponent = game.get_oponent(human.player)
 
         # no real move, just querying board status
         if move == (-1, -1):
             message = f""
             scores = game.get_scores(board)
-            data = {"board": board, "message": {"message": message, "color": "white"}, "player": player,
-                    "scores": scores, "possible_moves": game.get_possible_moves(board, player)}
+            data = {"board": board, "message": {"message": message, "color": "white"}, "player": human.player,
+                    "scores": scores, "possible_moves": game.get_possible_moves(board, human.player)}
             return JsonResponse(data, safe=False)
 
         # make a real move
         else:
-            if game.is_legal_move(board, player, move):
+            if game.is_legal_move(board, human.player, move):
                 # human players move
                 print("")
                 print("### HUMAN PLAYER ###")
-                print("Possible moves: ", game.get_possible_moves(board, player))
+                print("Possible moves: ", game.get_possible_moves(board, human.player))
 
                 # make move and save board
-                board = game.make_move(board, player, move)
+                board = human.make_move(board, human.player, move)
 
                 request.session['board'] = board
                 print("New board state:")
                 for line in board: print(line)
 
                 # switch to machine players after move is made
+                possible_moves = game.get_possible_moves(board, oponent)
                 print("### MACHINE PLAYER ###")
-                print("Possible moves: ", game.get_possible_moves(board, oponent))
+                print("Possible moves: ", possible_moves)
 
                 # is able to move?
-                if len(game.get_possible_moves(board, oponent)) > 0:
-                    try:
-                        machine_move = game.difficulty_options[machine_type]["method"](board, oponent)
-                    except KeyError:
+                if len(possible_moves) > 0:
+                    if machine_type == "easy":
+                        ai = AiRandom()
+                    elif machine_type == "hard":
+                        ai = AiGreedy()
+                    elif machine_type == "harder":
+                        ai = AiGreedyPlus()
+                    else:
                         print("ERROR: wrong machine player!")
-                    board = game.make_move(board, oponent, machine_move)
+                    machine_move = ai.machine_move(game, possible_moves)
+                    board = ai.make_move(board, oponent, machine_move)
                     print(f"AI ({machine_type}) MOVE: {machine_move}")
                 else:
                     print("AI can't move")
 
                 # is game over?
-                while len(game.get_possible_moves(board, player)) == 0:
+                while len(game.get_possible_moves(board, human.player)) == 0:
                     print("Human can't move")
                     if len(game.get_possible_moves(board, oponent)) == 0:
                         print("AI can't move either. Game Over!")
@@ -253,16 +261,16 @@ def move(request):
                     color = "white"
 
                 # return data
-                data = {"board": board, "message": {"message": message, "color": color}, "player": player,
-                        "scores": scores, "possible_moves": game.get_possible_moves(board, player)}
+                data = {"board": board, "message": {"message": message, "color": color}, "player": human.player,
+                        "scores": scores, "possible_moves": game.get_possible_moves(board, human.player)}
                 return JsonResponse(data, safe=False)
 
             # not a legal move
             else:
                 message = f"illegal move!"
                 scores = game.get_scores(board)
-                data = {"board": board, "message": {"message": message, "color": "red"}, "player": player,
-                        "scores": scores, "possible_moves": game.get_possible_moves(board, player)}
+                data = {"board": board, "message": {"message": message, "color": "red"}, "player": human.player,
+                        "scores": scores, "possible_moves": game.get_possible_moves(board, human.player)}
                 return JsonResponse(data, safe=False)
 
 
