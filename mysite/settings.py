@@ -1,5 +1,7 @@
 """
-Django settings for rev3rsi project.
+Django settings for rev3rsi project
+
+PRODUCTION SETTINGS !!!
 
 """
 
