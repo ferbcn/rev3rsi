@@ -9,11 +9,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 # from django.core import serializers
 
-from .models import GameDB, GameState
-
 from reversi.test_games import *
 from reversi.reversi_game import *
-from db_operations_orm import *
+from reversi.db_operations_orm import *
 
 
 ####################

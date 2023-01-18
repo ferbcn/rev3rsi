@@ -2,6 +2,9 @@
 ### DB operations ###
 #####################
 
+from .models import GameDB, GameState
+
+
 def save_gamestate(board, game_id):
     flat_board = [item for row in board for item in row]
     board_string = ""
