@@ -13,10 +13,10 @@ from reversi.test_games import *
 from reversi.reversi_game import *
 from reversi.db_operations_orm import *
 
-
 # Game difficulties and which are available
 # Hardest Level is disabled by default
 difficulties = [((), 'easy'), ((), 'hard'), ((), 'harder'), ('disabled', 'hardest')]
+
 
 # default view which renders an animation
 def index(request):
@@ -36,12 +36,6 @@ def newgame(request):
         return render(request, "users/login.html", {"message": "Please login first to start a new game!", "user": False,
                                                     "difficulties": difficulties})
 
-    # Test boards
-    # new_game = TestGameP1LastMoveToDraw()
-    # new_game = TestGameP1LastMoveToWin()
-    # new_game = TestGameP1LastMoveToLose()
-    # new_game = TestGameP1MoveP2LastMoveToWin()
-    # new_game = TestGameP1MoveP2LastMoveToLose()
 
     # Game level is passed as url parameter http://localhost/newgame?difficulty=...
     difficulty = request.GET["difficulty"]
@@ -49,10 +43,19 @@ def newgame(request):
     # p1 == 1 and p2 == 2 --> p1 is green and p2 is blue, green always starts
     player1 = "human"
     player2 = difficulty
-    new_game = Game(player1, player2, difficulty)
 
+    # Test boards
+    # new_game = TestGameP1LastMoveToDraw(player1, player2, difficulty)
+    # new_game = TestGameP1LastMoveToLose(player1, player2, difficulty)
+    # new_game = TestGameP1MoveP2LastMoveToWin(player1, player2, difficulty)
+    # new_game = TestGameP1MoveP2LastMoveToLose(player1, player2, difficulty)
+    # new_game = TestGameP1LastMoveToWin(player1, player2, difficulty)
+
+    # Game and board initialization
+    new_game = Game(player1, player2, difficulty)
     print("NEW GAME STARTED! Difficulty: ", difficulty)
-    for line in new_game.board: print(line)
+    for line in new_game.board:
+        print(line)
 
     # save game state variables to session variables
     request.session['board'] = new_game.board
