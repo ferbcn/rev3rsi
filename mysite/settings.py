@@ -74,6 +74,9 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 # Get DB URL from config vars
 #DATABASES['default'] = dj_database_url.config(conn_max_age=600)
 
+DB_PASSWORD = os.getenv('DB_PASSWORD')
+DB_URL = os.getenv('DB_URL')
+
 """
 DATABASES = {
     'default': {
@@ -89,8 +92,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'postgres',
         'USER': 'postgres',
-        'PASSWORD': 'akak4753',
-        'HOST': 'rev3rsi-db.cupzq3ukaedu.us-east-2.rds.amazonaws.com',
+        'PASSWORD': DB_PASSWORD,
+        'HOST': DB_URL,
         'PORT': '5432',
         }
     }
