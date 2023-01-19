@@ -48,7 +48,7 @@ a:hover {
 
 .comm-box {
   margin-top: 2vh;
-  font-size: calc(12px + 1.5vw);
+  font-size: calc(6px + 1.5vw);
   width: 70vw;
 }
 
@@ -58,7 +58,7 @@ a:hover {
 
 #machine_type_box{
   color: orange;
-  font-size: calc(12px + 1.5vw);
+  font-size: calc(6px + 1.5vw);
   width: 20vw;
 }
 
