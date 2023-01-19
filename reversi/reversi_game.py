@@ -96,14 +96,15 @@ class AiGreedy(AiRandom):
         top_move_score = 0
         top_move = 0
         for move in possible_moves:
-            new_board = self.make_move(copy.deepcopy(game.board), game.current_player, move)
+            new_board = self.make_move(copy.deepcopy(game.board), self.player, move)
             score_p1, score_p2 = self.get_scores(new_board)
-            if game.current_player == 1:
+            if self.player == 1:
                 move_score = score_p1
             else:
                 move_score = score_p2
             if move_score > top_move_score:
                 top_move = move
+        print("Top move yields: ", top_move_score)
         return top_move
 
 
@@ -159,7 +160,7 @@ class Game:
         self.player1 = player1
         self.player2 = player2
         self.difficulty = difficulty
-        self.current_player = 1
+
 
     def get_opponent(self, player):
         if player == 1:

@@ -5,7 +5,7 @@
 from .models import GameDB, GameState
 
 
-def save_gamestate(board, game_id):
+def save_gamestate_db(board, game_id):
     flat_board = [item for row in board for item in row]
     board_string = ""
     for num in flat_board:
@@ -16,7 +16,7 @@ def save_gamestate(board, game_id):
     game_state_entry.save()
 
 
-def save_game(game_id, score_p1, score_p2, end):
+def save_game_db(game_id, score_p1, score_p2, end):
     gameDB_object = GameDB.objects.get(pk=game_id)
     gameDB_object.game_over = end
     gameDB_object.score_p1 = score_p1
@@ -25,7 +25,7 @@ def save_game(game_id, score_p1, score_p2, end):
     return True
 
 
-def removegame_db(game_id, user):
+def remove_game_db(game_id, user):
     gameDB_object = GameDB.objects.get(pk=game_id)
     if gameDB_object.user == user:
         gameDB_object.delete()
@@ -34,8 +34,10 @@ def removegame_db(game_id, user):
         return False
 
 
-def load_gamestate(game_id):
+def load_gamestate_db(game_id, user):
     gameDB_object = GameDB.objects.get(pk=game_id)
+    if not gameDB_object.user == user:
+        return None, None, None
     print("Game object: ", gameDB_object)
 
     # game_state_objects = GameState.objects.all().filter(game_id=gameDB_object)[::-1]
@@ -47,7 +49,6 @@ def load_gamestate(game_id):
     board_string = game_state.board
     print(board_string)
     game_board = [[0, 0, 0, 0, 0, 0, 0, 0] for x in range(8)]
-
     cell = 0
     for r in range(8):
         for c in range(8):
@@ -58,4 +59,3 @@ def load_gamestate(game_id):
     player2 = gameDB_object.player2
 
     return game_board, player1, player2
-
