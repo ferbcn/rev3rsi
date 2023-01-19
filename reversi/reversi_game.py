@@ -9,12 +9,16 @@ class Player:
     def __init__(self, is_human=True, player=1):
         self.is_human = is_human
         self.player = player
+        self.move = None
 
     def get_opponent(self, player):
         if player == 1:
             return 2
         else:
             return 1
+
+    def next_move(self):
+        return self.move
 
     # method needed to calculate theoretical possible outcomes of every move
     def make_move(self, board, player, move):
@@ -69,10 +73,11 @@ class Player:
 
 
 class AiRandom(Player):
-    def __init__(self, is_human=False):
+    def __init__(self, is_human=False, player=2):
         self.is_human = is_human
+        self.player = player
 
-    def machine_move(self, game, possible_moves):
+    def next_move(self, game, possible_moves):
         return self.random_move(possible_moves)
 
         # Random move
@@ -83,10 +88,11 @@ class AiRandom(Player):
 
 
 class AiGreedy(AiRandom):
-    def __init__(self, is_human=False):
+    def __init__(self, is_human=False, player=2):
         self.is_human = is_human
+        self.player = player
 
-    def machine_move(self, game, possible_moves):
+    def next_move(self, game, possible_moves):
         return self.greedy_move(game, possible_moves)
 
     # Greedy move
@@ -94,7 +100,7 @@ class AiGreedy(AiRandom):
         print("greedy move ...")
         # print("Possible moves: ", possible_moves)
         top_move_score = 0
-        top_move = 0
+        top_move = None
         for move in possible_moves:
             new_board = self.make_move(copy.deepcopy(game.board), self.player, move)
             score_p1, score_p2 = self.get_scores(new_board)
@@ -104,15 +110,17 @@ class AiGreedy(AiRandom):
                 move_score = score_p2
             if move_score > top_move_score:
                 top_move = move
-        print("Top move yields: ", top_move_score)
+                top_move_score = move_score
+        print("Best greedy move yields a score: ", top_move_score)
         return top_move
 
 
 class AiGreedyPlus(AiGreedy):
-    def __init__(self, is_human=False):
+    def __init__(self, is_human=False, player=2):
         self.is_human = is_human
+        self.player = player
 
-    def machine_move(self, game, possible_moves):
+    def next_move(self, game, possible_moves):
         return self.greedy_plus_move(game, possible_moves)
 
     # Greedy move plus power and bad spots
@@ -187,7 +195,6 @@ class Game:
                 if self.is_legal_move(board, player, move):
                     possible_moves.append(move)
         return possible_moves
-
 
     # checks for a legal move by going in the direction determined by col_dir and row_dir
     def check_dir(self, board, player, opponent, row, col, row_dir, col_dir):

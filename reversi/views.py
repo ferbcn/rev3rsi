@@ -124,7 +124,7 @@ def move(request):
         game = Game(player1, player2, difficulty, board=board)
 
         # Define player1 (player) and player2 (opponent)
-        player1 = Player()
+        player1 = Player(player=1)
 
         # no real move, just querying board status
         if move == (-1, -1):
@@ -135,23 +135,15 @@ def move(request):
             return JsonResponse(data, safe=False)
 
         if difficulty == "easy":
-            player2 = AiRandom()
+            player2 = AiRandom(player=2)
             print("Random Ai initiated")
         elif difficulty == "hard":
-            player2 = AiGreedy()
+            player2 = AiGreedy(player=2)
             print("Greedy Ai initiated")
         elif difficulty == "harder":
-            player2 = AiGreedyPlus()
+            player2 = AiGreedyPlus(player=2)
             print("Greedy Plus Ai initiated")
-        """
-        else:
-            print("ERROR: wrong machine player! Selecting default level: easy!")
-            player2 = AiRandom()
-        """
 
-        player2.player = game.get_opponent(player1.player)
-
-        #machine_move = None
 
         # make a real move
         if game.is_legal_move(board, player1.player, move):
@@ -174,9 +166,9 @@ def move(request):
 
             # is able to move?
             if len(possible_moves) > 0:
-                machine_move = player2.machine_move(game, possible_moves)
-                game.board = player2.make_move(board, player2.player, machine_move)
-                print(f"Player2 MOVE: {machine_move}")
+                next_move = player2.next_move(game, possible_moves)
+                game.board = player2.make_move(board, player2.player, next_move)
+                print(f"Player2 MOVE: {next_move}")
             else:
                 print("Player 2 can't move")
 
@@ -197,9 +189,9 @@ def move(request):
                             "player": winning_player, "scores": scores, "game_over": True}
                     return JsonResponse(data, safe=False)
                 else:
-                    machine_move = player2.machine_move(game, possible_moves)
-                    board = player2.make_move(board, player2.player, machine_move)
-                    print(f"Player2 MOVE: {machine_move}")
+                    next_move = player2.next_move(game, possible_moves)
+                    board = player2.make_move(board, player2.player, next_move)
+                    print(f"Player2 MOVE: {next_move}")
 
 
             scores = game.get_scores(board)
@@ -210,11 +202,11 @@ def move(request):
             request.session['board'] = game.board
 
             # return new board state to browser
-            if not machine_move:
+            if not next_move:
                 message = f"Player2 pass!"
                 color = "orange"
             else:
-                r, c = machine_move
+                r, c = next_move
                 message = f"Player2 move: row {r + 1}, col {c + 1}"
                 color = "white"
 
