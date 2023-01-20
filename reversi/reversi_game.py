@@ -165,8 +165,8 @@ class Game:
             self.board = board
 
 
-        self.player1 = player1
-        self.player2 = player2
+        self.player1_name = player1
+        self.player2_name = player2
         self.difficulty = difficulty
 
 
