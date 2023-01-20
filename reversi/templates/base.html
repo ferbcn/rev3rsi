@@ -23,13 +23,13 @@
               <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
               </button>
-          <div class="collapse navbar-collapse navbar-dark bg-dark" id="navbarNavDropdown">
-            <ul class="navbar-nav navbar-dark">
-                <li class="nav-item dropdown navbar-dark">
-                <a class="nav-link dropdown-toggle navbar-dark" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <div class="collapse navbar-collapse" id="navbarNavDropdown">
+            <ul class="navbar-nav">
+                <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   New Game
                 </a>
-                <div class="dropdown-menu navbar-dark bg-dark" aria-labelledby="navbarDropdownMenuLink">
+                <div class="dropdown-menu bg-dark" aria-labelledby="navbarDropdownMenuLink">
                   {% for disabled, dif in difficulties %}
                   <a class="dropdown-item {{ disabled }}" href="{% url 'newgame'%}?difficulty={{ dif }}">{{ dif }}</a>
                   {% endfor %}
