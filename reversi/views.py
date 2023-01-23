@@ -66,8 +66,8 @@ def newgame(request):
     difficulty = request.GET["difficulty"]
     # Define game parameters
     # p1 == 1 and p2 == 2 --> p1 is green and p2 is blue, green always starts
-    player1 = "human"
-    player2 = difficulty
+    player1_name = "human"
+    player2_name = difficulty
 
     # Test boards
     # new_game = TestGameP1LastMoveToDraw(player1, player2, difficulty)
@@ -77,7 +77,7 @@ def newgame(request):
     # new_game = TestGameP1LastMoveToWin(player1, player2, difficulty)
 
     # New Game and board initialization
-    new_game = Game(player1, player2, difficulty, board=None)
+    new_game = Game(player1_name, player2_name, difficulty, board=None)
     print("NEW GAME STARTED! Difficulty: ", difficulty)
     for line in new_game.board: print(line)
 
@@ -85,11 +85,11 @@ def newgame(request):
     request.session['board'] = new_game.board
     request.session['human_player'] = 1
     request.session['player1'] = 1
-    request.session['player2'] = 1
+    request.session['player2'] = 2
     request.session['game_level'] = new_game.difficulty
 
     # save game to DB
-    game_db_entry = GameDB(user=user, player1=player1, player2=player2, game_over=False)
+    game_db_entry = GameDB(user=user, player1=player1_name, player2=player2_name, game_over=False)
     game_db_entry.save()
     request.session["game_id"] = game_db_entry.id
 
@@ -114,17 +114,37 @@ def move(request):
 
         # Restore gamestate from DB
         game_id = request.session['game_id']
-        board, player1, player2 = load_gamestate_db(game_id, user)
-        difficulty = player2
+        board, player1_name, player2_name = load_gamestate_db(game_id, user)
+        if player1_name == "human":
+            difficulty = player2_name
+        else:
+            difficulty = player1_name
 
         # Something went wrong retrieving board (db error or cheating)
         if board is None:
             return render(request, "index.html", {"user": user, "difficulties": difficulties})
 
-        game = Game(player1, player2, difficulty, board=board)
+        game = Game(player1_name, player2_name, difficulty, board=board)
 
         # Define player1 (player) and player2 (opponent)
-        player1 = Player(player=1)
+        human_player = Player(player=1)
+
+        if difficulty == "easy":
+            machine_player = AiRandom(player=2)
+            print("Random Ai initiated")
+        elif difficulty == "hard":
+            machine_player = AiGreedy(player=2)
+            print("Greedy Ai initiated")
+        elif difficulty == "harder":
+            machine_player = AiGreedyPlus(player=2)
+            print("Greedy Plus Ai initiated")
+
+        if player1_name == "human":
+            player1 = human_player
+            player2 = machine_player
+        else:
+            player1 = machine_player
+            player2 = human_player
 
         # no real move, just querying board status
         if move == (-1, -1):
@@ -133,17 +153,6 @@ def move(request):
             data = {"board": board, "message": {"message": message, "color": "white"}, "player": player1.player,
                     "scores": scores, "possible_moves": game.get_possible_moves(board, player1.player)}
             return JsonResponse(data, safe=False)
-
-        if difficulty == "easy":
-            player2 = AiRandom(player=2)
-            print("Random Ai initiated")
-        elif difficulty == "hard":
-            player2 = AiGreedy(player=2)
-            print("Greedy Ai initiated")
-        elif difficulty == "harder":
-            player2 = AiGreedyPlus(player=2)
-            print("Greedy Plus Ai initiated")
-
 
         # make a real move
         if game.is_legal_move(board, player1.player, move):
