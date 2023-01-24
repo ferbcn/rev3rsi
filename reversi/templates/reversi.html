@@ -12,7 +12,8 @@
     <div class="container comm-box">
         <div class="row">
             <div class="col-6">
-                <div class='fadeIn' id='player_box'></div>
+                <div id='player1_box'>Player 1: {{ player1_name }}</div>
+                <div id='player2_box'>Player 2:  {{ player2_name }}</div>
             </div>
             <div class="col-6">
                 <div id='score_box'></div>
@@ -46,7 +47,7 @@
                   <div id='message_box'></div>
               </div>
               <div class="col-2">
-                  <div id='machine_type_box'>Level: {{ game_level }}</div>
+                  <div id='level_box'>Level: {{ game_level }}</div>
               </div>
           </div>
       </div>
@@ -55,7 +56,7 @@
   <div id="gameoverbox"><span id="gameovertext"></span></div>
 </div>
 
-<--! JS: game board update and click capture and redirect to "move" post method !-->
+<!-- JS: game board update and click capture and redirect to "move" post method -->
 <script src="{% static 'reversi.js' %}"></script>
 
 {% endblock %}

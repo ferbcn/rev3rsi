@@ -43,6 +43,14 @@ a:hover {
 
 }
 
+#player1_box {
+    color: green;
+}
+
+#player2_box {
+    color: blue;
+}
+
 #score_box {
   color: white;
   text-align: right;
@@ -59,7 +67,7 @@ a:hover {
   font-size: calc(6px + 1.5vw);
 }
 
-#machine_type_box{
+#level_box{
   color: orange;
   font-size: calc(6px + 1.5vw);
   width: 20vw;

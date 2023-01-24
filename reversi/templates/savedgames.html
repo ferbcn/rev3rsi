@@ -16,10 +16,13 @@
               <div class="col-2">
                 Game
               </div>
-              <div class="col-3">
-                Level
+              <div class="col-2">
+                Player1
               </div>
-              <div class="col-3">
+              <div class="col-2">
+                Player2
+              </div>
+              <div class="col-2">
                 Ended
               </div>
               <div class="col-3">
@@ -39,12 +42,17 @@
                 <span class="oi oi-grid-four-up"></span>
                 </a>
               </div>
-              <div class="col-3">
+              <div class="col-2">
+                <a class="divlink" href="{% url 'loadgame'%}?game_id={{ game.id }}">
+                {{ game.player1 }}
+                </a>
+              </div>
+              <div class="col-2">
                 <a class="divlink" href="{% url 'loadgame'%}?game_id={{ game.id }}">
                 {{ game.player2 }}
                 </a>
               </div>
-              <div class="col-3">
+              <div class="col-2">
                 <a class="divlink" href="{% url 'loadgame'%}?game_id={{ game.id }}">
                 {% if game.game_over %}
                     {% if game.score_p1 > game.score_p2 %}
