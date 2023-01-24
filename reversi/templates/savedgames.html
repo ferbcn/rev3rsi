@@ -57,12 +57,12 @@
                 {% if game.game_over %}
                     {% if game.score_p1 > game.score_p2 %}
                       <span style="color: green";>
-                      Win
+                      P1 won
                       </span>
                     {% endif %}
                     {% if game.score_p1 < game.score_p2 %}
-                      <span style="color: red";>
-                      Lose
+                      <span style="color: green";>
+                      P2 won
                       </span>
                     {% endif %}
                     {% if game.score_p1 == game.score_p2 %}

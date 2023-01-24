@@ -9,21 +9,25 @@
 {% block body %}
 
 <!-- container for info messages -->
-    <div class="container comm-box">
-        <div class="row">
-            <div class="col-6">
-                <div id='player1_box'>Player 1: {{ player1_name }}</div>
-                <div id='player2_box'>Player 2:  {{ player2_name }}</div>
-            </div>
-            <div class="col-6">
-                <div id='score_box'></div>
-            </div>
+<div class="container comm-box">
+    <div class="row">
+        <div class="col-6">
+            <div id='player1_box'>Player 1: {{ player1_name }}</div>
+            <div id='player2_box'>Player 2:  {{ player2_name }}</div>
+        </div>
+        <div class="col-6">
+            <div id='score_box'></div>
         </div>
     </div>
+</div>
 
-<!-- spinninig animation -->
-<!--  <div class="lds-grid"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div> -->
+<!-- spinner -->
+<div class="d-flex justify-content-center">
+  <div class="spinner-grow text-light" role="status" id="spinner">
+  </div>
+</div>
 
+<!-- game board container -->
 <div id="board_parent">
     <div id="board_child">
         <!-- container for the game board -->
