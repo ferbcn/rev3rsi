@@ -215,31 +215,37 @@ def move(request):
                 color = human_color
                 # switch to human player
                 next_player = machine_player.role
-                # Check for Game Over
-                if len(get_possible_moves(board, next_player)) == 0:
-                    if len(get_possible_moves(board, get_opponent(next_player))) == 0:
-                        game_over = True
             else:
                 print("Illegal move!!!")
                 message = f"Illegal move!"
                 color = 'red'
                 # do nothing with board
+            # Check for Game Over
+            if len(get_possible_moves(board, next_player)) == 0:
+                next_player = get_opponent(next_player)
+                if len(get_possible_moves(board, next_player)) == 0:
+                    game_over = True
+
 
         elif next_player == machine_player.role:
             print("Machine move...")
-            next_move, board = machine_move(board, machine_player)
-            r, c = next_move
-            message = f"Machine move: row {r + 1}, col {c + 1}"
-            color = machine_color
-            if next_move is None:
-                print("Machine can't move...")
-                message = f"AI can't move!"
-            # switch to human player
-            next_player = human_player.role
-            # Check for Game Over
+
+            # Game Over?
             if len(get_possible_moves(board, next_player)) == 0:
-                if len(get_possible_moves(board, get_opponent(next_player))) == 0:
+                next_player = get_opponent(next_player)
+                if len(get_possible_moves(board, next_player)) == 0:
                     game_over = True
+            else:
+                next_move, board = machine_move(board, machine_player)
+                r, c = next_move
+                message = f"Machine move: row {r + 1}, col {c + 1}"
+                color = machine_color
+                if next_move is None:
+                    print("Machine can't move...")
+                    message = f"AI can't move!"
+                # switch to human player
+                next_player = human_player.role
+                # Check for Game Over
 
         scores = get_scores(board)
         # save gamestate to DB and session
