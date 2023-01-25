@@ -2,8 +2,6 @@ document.body.style.backgroundColor = "black";
 var game_over = false;
 // begin by querying the board status and updating its elements
 queryBoard();
-let spinner = document.getElementById("spinner");
-
 
 
 function queryBoard(){
@@ -44,8 +42,6 @@ function move(row, col){
 
         // update everything
         updateAll(data);
-        let spinner = document.getElementById("spinner");
-        spinner.style.visibility = 'hidden'; //'hidden'
 
         check_for_and_make_auto_machine_move(data)
     };
@@ -67,8 +63,6 @@ function move(row, col){
 function check_for_and_make_auto_machine_move(data){
     if (data["machine_role"] == data["next_player"]){
         // dummy move make --> machine move (includes delay for better visualization)
-        let spinner = document.getElementById("spinner");
-        spinner.style.visibility = 'visible';
         setTimeout(function() {
             move(-1, -1);}, 1);
     }
