@@ -16,8 +16,7 @@ from reversi.db_operations_orm import *
 # Game difficulties and which are available
 # Hardest Level is disabled by default
 game_levels = [('', 'easy'), ('', 'hard'), ('', 'harder'), ('disabled', 'hardest')]
-
-game_levels_admin = [('', 'easy'), ('', 'hard'), ('', 'harder'), ('disabled', 'hardest'),
+admin_game_levels = [('', 'easy'), ('', 'hard'), ('', 'harder'), ('disabled', 'hardest'),
                       ('', 'P1-Draw'), ('', 'P1-Win'), ('', 'P1-Lose'), ('', 'P2-Win'), ('', 'P2-Lose')]
 
 
@@ -25,12 +24,15 @@ game_levels_admin = [('', 'easy'), ('', 'hard'), ('', 'harder'), ('disabled', 'h
 def index(request):
     if request.user.is_authenticated:
         user = request.user
-        if user.is_superuser == True:
-            return render(request, "index.html", {"user": user, "game_levels": game_levels_admin})
+        if user.is_superuser:
+            levels = admin_game_levels
+        else:
+            levels = game_levels
     else:
         user = False
+        levels = game_levels
 
-    return render(request, "index.html", {"user": user, "game_levels": game_levels})
+    return render(request, "index.html", {"user": user, "game_levels": levels})
 
 
 # game board initialization
@@ -120,18 +122,17 @@ def reversi(request):
         difficulty = player1
         player1 = "Machine"
 
-    game_levels = [('', 'easy'), ('', 'hard'), ('', 'harder'), ('disabled', 'hardest')]
-    game_levels_admin = [('', 'easy'), ('', 'hard'), ('', 'harder'), ('disabled', 'hardest'),
-                         ('', 'P1-Draw'), ('', 'P1-Win'), ('', 'P1-Lose'), ('', 'P2-Win'), ('', 'P2-Lose')]
     if user.is_superuser == True:
-        game_levels = game_levels_admin
+        levels = admin_game_levels
+    else:
+        levels = game_levels
 
     return render(request, "reversi.html", {"user": user,
                                             "board": board,
                                             "player1_name": player1.capitalize(),
                                             "player2_name": player2.capitalize(),
                                             "game_level": difficulty,
-                                            "game_levels": game_levels,
+                                            "game_levels": levels,
                                             })
 
 
@@ -332,8 +333,13 @@ def savedgames(request):
 
     saved_games = reversed(GameDB.objects.all().filter(user=user)[:100])
 
+    if user.is_superuser == True:
+        levels = admin_game_levels
+    else:
+        levels = game_levels
+
     return render(request, "savedgames.html",
-                  {"user": user, "game_levels": game_levels, "saved_games": saved_games})
+                  {"user": user, "game_levels": levels, "saved_games": saved_games})
 
 
 def deletegame(request):
@@ -365,6 +371,9 @@ def login_view(request):
     user = authenticate(request, username=username, password=password)
     if user is not None:
         login(request, user)
+        # if user selects level and is not logged in he is redirected to login page,
+        # where a hidden value is saved in the form and send together with login data
+        # in order to redirect the user after a successful login... hacky? yes, sir!
         if redirect is not None:
             redirect = "newgame?difficulty=" + redirect
             return HttpResponseRedirect(redirect)
