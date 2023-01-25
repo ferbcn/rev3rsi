@@ -333,7 +333,7 @@ def savedgames(request):
 
     saved_games = reversed(GameDB.objects.all().filter(user=user)[:100])
 
-    if user.is_superuser == True:
+    if user.is_superuser:
         levels = admin_game_levels
     else:
         levels = game_levels
