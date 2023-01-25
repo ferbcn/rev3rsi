@@ -164,7 +164,6 @@ class Game:
         else:
             self.board = board
 
-
         self.player1_name = player1
         self.player2_name = player2
         self.difficulty = difficulty
