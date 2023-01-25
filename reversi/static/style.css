@@ -2,6 +2,11 @@ html, body {
 
 }
 
+body {
+    background-color: black;
+    color: white;
+}
+
 a {
   color: red;
 }
@@ -43,6 +48,14 @@ a:hover {
 
 }
 
+#player1_box {
+    color: green;
+}
+
+#player2_box {
+    color: blue;
+}
+
 #score_box {
   color: white;
   text-align: right;
@@ -59,7 +72,7 @@ a:hover {
   font-size: calc(6px + 1.5vw);
 }
 
-#machine_type_box{
+#level_box{
   color: orange;
   font-size: calc(6px + 1.5vw);
   width: 20vw;
@@ -78,11 +91,23 @@ a:hover {
    width: 100%;
    height: 100%;
 }
+
 #login_child{
    margin-top: 5vh;
    position: relative;
 }
 
+#spinner{
+    visibility: hidden;
+    width: 10vh;
+    height: 10vh;
+    position: absolute;
+    float: left;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+}
 
 .padding-0{
     padding-right:0;

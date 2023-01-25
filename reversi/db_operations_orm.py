@@ -16,11 +16,12 @@ def save_gamestate_db(board, game_id):
     game_state_entry.save()
 
 
-def save_game_db(game_id, score_p1, score_p2, end):
+def save_game_db(game_id, score_p1, score_p2, next_player, end):
     gameDB_object = GameDB.objects.get(pk=game_id)
     gameDB_object.game_over = end
     gameDB_object.score_p1 = score_p1
     gameDB_object.score_p2 = score_p2
+    gameDB_object.next_player = next_player
     gameDB_object.save()
     return True
 
@@ -57,5 +58,8 @@ def load_gamestate_db(game_id, user):
     print("Game Board loaded!")
     player1 = gameDB_object.player1
     player2 = gameDB_object.player2
+    next_player = gameDB_object.next_player
+    score_p1 = gameDB_object.score_p1
+    score_p2 = gameDB_object.score_p2
 
-    return game_board, player1, player2
+    return game_board, player1, player2, next_player
