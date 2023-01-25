@@ -38,8 +38,9 @@ def newgame(request):
     if request.user.is_authenticated:
         user = request.user
     else:
+        level = request.GET["difficulty"]
         return render(request, "users/login.html", {"message": "Please login first to start a new game!", "user": False,
-                                                    "game_levels": game_levels})
+                                                    "game_levels": game_levels, "level": level})
 
     # Game level is passed as url parameter http://localhost/newgame?difficulty=...
     difficulty = request.GET["difficulty"]
@@ -356,11 +357,17 @@ def login_view(request):
         return render(request, "users/login.html",
                       {"message": "Please enter your username and password.", "user": False,
                        "game_levels": game_levels})
+
     username = request.POST["username"]
     password = request.POST["password"]
+    redirect = request.POST["redirect"]
+
     user = authenticate(request, username=username, password=password)
     if user is not None:
         login(request, user)
+        if redirect is not None:
+            redirect = "newgame?difficulty=" + redirect
+            return HttpResponseRedirect(redirect)
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "users/login.html",
