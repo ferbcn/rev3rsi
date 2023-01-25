@@ -94,7 +94,6 @@ def newgame(request):
     return HttpResponseRedirect(reverse("reversi"))
 
 
-
 # initial game view
 def reversi(request):
     if request.user.is_authenticated:
@@ -109,7 +108,7 @@ def reversi(request):
     # Something went wrong retrieving board (db error or cheating)
     except Exception as e:
         print(e)
-        return render(request, "index.html", {"user": user, "game_levels": game_levels})
+        return render(request, "index.html", {"user": user})
 
     if player1 == "human":
         print("P1 is human.")
@@ -304,9 +303,11 @@ def loadgame(request):
     request.session['game_id'] = game_id
     print("Game ID: ", game_id)
 
-    board, player1, player2, next_game = load_gamestate_db(game_id, user)
+    try:
+        board, player1, player2, next_game = load_gamestate_db(game_id, user)
     # Something went wrong retrieving board (db error or cheating)
-    if board is None:
+    except Exception as e:
+        print(f"DB Error: {e}")
         return render(request, "index.html", {"user": user, "game_levels": game_levels})
 
     for line in board: print(line)
