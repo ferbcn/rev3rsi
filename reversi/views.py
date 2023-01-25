@@ -15,7 +15,6 @@ from reversi.db_operations_orm import *
 
 # Game difficulties and which are available
 # Hardest Level is disabled by default
-
 game_levels = [('', 'easy'), ('', 'hard'), ('', 'harder'), ('disabled', 'hardest')]
 
 game_levels_admin = [('', 'easy'), ('', 'hard'), ('', 'harder'), ('disabled', 'hardest'),
@@ -39,8 +38,9 @@ def newgame(request):
     if request.user.is_authenticated:
         user = request.user
     else:
+        level = request.GET["difficulty"]
         return render(request, "users/login.html", {"message": "Please login first to start a new game!", "user": False,
-                                                    "game_levels": game_levels})
+                                                    "game_levels": game_levels, "level": level})
 
     # Game level is passed as url parameter http://localhost/newgame?difficulty=...
     difficulty = request.GET["difficulty"]
@@ -121,7 +121,8 @@ def reversi(request):
         player1 = "Machine"
 
     game_levels = [('', 'easy'), ('', 'hard'), ('', 'harder'), ('disabled', 'hardest')]
-
+    game_levels_admin = [('', 'easy'), ('', 'hard'), ('', 'harder'), ('disabled', 'hardest'),
+                         ('', 'P1-Draw'), ('', 'P1-Win'), ('', 'P1-Lose'), ('', 'P2-Win'), ('', 'P2-Lose')]
     if user.is_superuser == True:
         game_levels = game_levels_admin
 
@@ -276,7 +277,6 @@ def move(request):
         return JsonResponse(data, safe=False)
 
 
-
 def human_move(board, human_player, move):
     # make a human move
     print("Human move: ", move)
@@ -357,11 +357,17 @@ def login_view(request):
         return render(request, "users/login.html",
                       {"message": "Please enter your username and password.", "user": False,
                        "game_levels": game_levels})
+
     username = request.POST["username"]
     password = request.POST["password"]
+    redirect = request.POST["redirect"]
+
     user = authenticate(request, username=username, password=password)
     if user is not None:
         login(request, user)
+        if redirect is not None:
+            redirect = "newgame?difficulty=" + redirect
+            return HttpResponseRedirect(redirect)
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "users/login.html",
