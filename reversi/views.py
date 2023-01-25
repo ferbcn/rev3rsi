@@ -119,6 +119,9 @@ def reversi(request):
         difficulty = player1
         player1 = "Machine"
 
+    game_levels = [('', 'easy'), ('', 'hard'), ('', 'harder'), ('disabled', 'hardest')]
+    game_levels_admin = [('', 'easy'), ('', 'hard'), ('', 'harder'), ('disabled', 'hardest'),
+                         ('', 'P1-Draw'), ('', 'P1-Win'), ('', 'P1-Lose'), ('', 'P2-Win'), ('', 'P2-Lose')]
     if user.is_superuser == True:
         game_levels = game_levels_admin
 
@@ -271,7 +274,6 @@ def move(request):
                 "scores": scores, "possible_moves": get_possible_moves(board, next_player)}
 
         return JsonResponse(data, safe=False)
-
 
 
 def human_move(board, human_player, move):
