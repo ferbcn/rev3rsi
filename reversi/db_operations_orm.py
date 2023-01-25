@@ -28,8 +28,10 @@ def save_game_db(game_id, score_p1, score_p2, next_player, end):
 
 def remove_game_db(game_id, user):
     gameDB_object = GameDB.objects.get(pk=game_id)
+    all_game_states = GameState.objects.all().filter(game_id=gameDB_object)
     if gameDB_object.user == user:
         gameDB_object.delete()
+        all_game_states.delete()
         return True
     else:
         return False

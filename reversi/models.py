@@ -9,7 +9,7 @@ class GameDB(models.Model):
     next_player = models.IntegerField(default=1)
     score_p1 = models.IntegerField(default=0)
     score_p2 = models.IntegerField(default=0)
-    game_over = models.BooleanField()
+    game_over = models.BooleanField(default=False)
 
 
 class GameState(models.Model):
