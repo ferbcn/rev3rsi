@@ -73,8 +73,8 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 # Get DB URL from config vars
 #DATABASES['default'] = dj_database_url.config(conn_max_age=600)
 
-DB_PASSWORD = os.getenv('DB_PASSWORD')
-DB_URL = os.getenv('DB_URL')
+DB_PASSWORD = os.environ.get('DB_PASSWORD')
+DB_URL = os.environ.get('DB_URL')
 
 # Heroku PostgreSQL Database
 DATABASES = {
@@ -82,11 +82,12 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'postgres',
         'USER': 'postgres',
-        'PASSWORD': 'sJL9SGpLDcGVwskeX1lwgFt4y',
-        'HOST': 'rev3rsi-postgresql.cieuq9hclct0.eu-central-1.rds.amazonaws.com',
+        'PASSWORD': DB_PASSWORD,
+        'HOST': DB_URL,
         'PORT': '5432',
         }
 }
+
 print(DATABASES)
 
 # Password validation
