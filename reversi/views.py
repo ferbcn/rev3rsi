@@ -15,6 +15,7 @@ from reversi.db_operations_orm import *
 
 # Game difficulties and which are available
 # Hardest Level is disabled by default
+
 game_levels = [('', 'easy'), ('', 'hard'), ('', 'harder'), ('disabled', 'hardest')]
 
 game_levels_admin = [('', 'easy'), ('', 'hard'), ('', 'harder'), ('disabled', 'hardest'),
@@ -118,6 +119,8 @@ def reversi(request):
         print("P2 is human.")
         difficulty = player1
         player1 = "Machine"
+
+    game_levels = [('', 'easy'), ('', 'hard'), ('', 'harder'), ('disabled', 'hardest')]
 
     if user.is_superuser == True:
         game_levels = game_levels_admin
