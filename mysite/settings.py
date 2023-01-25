@@ -17,7 +17,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*', '127.0.0.1', 'rev3rsi.fun', 'rev3rsi.herokuapp.com']
 
@@ -82,12 +82,12 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'postgres',
         'USER': 'postgres',
-        'PASSWORD': DB_PASSWORD,
-        'HOST': DB_URL,
+        'PASSWORD': 'sJL9SGpLDcGVwskeX1lwgFt4y',
+        'HOST': 'rev3rsi-postgresql.cieuq9hclct0.eu-central-1.rds.amazonaws.com',
         'PORT': '5432',
         }
-    }
-
+}
+print(DATABASES)
 
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
