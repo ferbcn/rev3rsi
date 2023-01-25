@@ -30,7 +30,7 @@
                   New Game
                 </a>
                 <div class="dropdown-menu bg-dark" aria-labelledby="navbarDropdownMenuLink">
-                  {% for disabled, dif in difficulties %}
+                  {% for disabled, dif in game_levels %}
                   <a class="dropdown-item {{ disabled }}" href="{% url 'newgame'%}?difficulty={{ dif }}">{{ dif }}</a>
                   {% endfor %}
                 </div>

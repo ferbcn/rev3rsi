@@ -163,85 +163,11 @@ class Game:
         else:
             self.board = board
 
-
         self.player1_name = player1
         self.player2_name = player2
         self.difficulty = difficulty
 
 
-    def get_opponent(self, player):
-        if player == 1:
-            return 2
-        else:
-            return 1
-
-    def get_scores(self, board):
-        p1 = 0
-        p2 = 0
-        for r in range(8):
-            for c in range(8):
-                if board[r][c] == 1:
-                    p1 += 1
-                elif board[r][c] == 2:
-                    p2 += 1
-        return p1, p2
-
-    def get_possible_moves(self, board, player):
-        possible_moves = []
-        for r in range(8):
-            for c in range(8):
-                move = (r, c)
-                if self.is_legal_move(board, player, move):
-                    possible_moves.append(move)
-        return possible_moves
-
-    # checks for a legal move by going in the direction determined by col_dir and row_dir
-    def check_dir(self, board, player, opponent, row, col, row_dir, col_dir):
-        opponent_inside = False
-        col_iter = col + col_dir
-        row_iter = row + row_dir
-        while 0 <= col_iter <= 7 and 0 <= row_iter <= 7:
-            # print(col_iter, row_iter, board[row_iter][col_iter], opponent_inside)
-            if opponent_inside and board[row_iter][col_iter] == player:
-                return True
-            elif board[row_iter][col_iter] == opponent:
-                opponent_inside = True
-                col_iter = col_iter + col_dir
-                row_iter = row_iter + row_dir
-            else:
-                return False
-
-    def is_legal_move(self, board, player, move):
-        # print(f"Player: {player}, move: {move} is legal?")
-        row, col = move
-        if not board[row][col] == 0:
-            return False
-
-        opponent = self.get_opponent(player)
-
-        # try west, east, north, south, northwest, ...
-        col_row_dir = [(-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (1, -1), (1, 1), (-1, 1)]
-        for col_row in col_row_dir:
-            col_dir, row_dir = col_row
-            if self.check_dir(board, player, opponent, row, col, row_dir, col_dir):
-                # print(f"Legal move.")
-                return True
-        # print(f"Illegal move.")
-        return False
-
-    def build_end_message(self, scores):
-        score1, score2 = scores
-        # Build End message and scores
-        if score1 > score2:
-            message = f"Game Over: Player #1 wins!"
-            winning_player = 1
-        elif score1 < score2:
-            message = f"Game Over: Player #2 wins!"
-            winning_player = 2
-        else:
-            message = f"Game Over: Draw!"
-            winning_player = 0
-        return message, winning_player
 
 def get_opponent(player):
     if player == 1:

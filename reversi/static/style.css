@@ -2,6 +2,11 @@ html, body {
 
 }
 
+body {
+    background-color: black;
+    color: white;
+}
+
 a {
   color: red;
 }

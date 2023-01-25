@@ -15,8 +15,10 @@ from reversi.db_operations_orm import *
 
 # Game difficulties and which are available
 # Hardest Level is disabled by default
-difficulties = [('', 'easy'), ('', 'hard'), ('', 'harder'), ('disabled', 'hardest')]
-difficulties_admin = [('', 'easy'), ('', 'hard'), ('', 'harder'), ('disabled', 'draw')]
+game_levels = [('', 'easy'), ('', 'hard'), ('', 'harder'), ('disabled', 'hardest')]
+
+game_levels_admin = [('', 'easy'), ('', 'hard'), ('', 'harder'), ('disabled', 'hardest'),
+                      ('', 'P1-Draw'), ('', 'P1-Win'), ('', 'P1-Lose'), ('', 'P2-Win'), ('', 'P2-Lose')]
 
 
 # default view which renders an animation
@@ -24,11 +26,11 @@ def index(request):
     if request.user.is_authenticated:
         user = request.user
         if user.is_superuser == True:
-            return render(request, "index.html", {"user": user, "difficulties": difficulties_admin})
+            return render(request, "index.html", {"user": user, "game_levels": game_levels_admin})
     else:
         user = False
 
-    return render(request, "index.html", {"user": user, "difficulties": difficulties})
+    return render(request, "index.html", {"user": user, "game_levels": game_levels})
 
 
 # game board initialization
@@ -37,15 +39,13 @@ def newgame(request):
         user = request.user
     else:
         return render(request, "users/login.html", {"message": "Please login first to start a new game!", "user": False,
-                                                    "difficulties": difficulties})
+                                                    "game_levels": game_levels})
 
     # Game level is passed as url parameter http://localhost/newgame?difficulty=...
     difficulty = request.GET["difficulty"]
-    # Define game parameters
-    # p1 == 1 and p2 == 2 --> p1 is green and p2 is blue, green always starts
 
+    # Define random role of players
     human_is_player1 = random.choice([True, False])
-
     if human_is_player1 == 1:
         player1_name = "human"
         player2_name = difficulty
@@ -54,15 +54,26 @@ def newgame(request):
         player1_name = difficulty
         player2_name = "human"
         human_role = 2
-    # Test boards
-    # new_game = TestGameP1LastMoveToDraw(player1, player2, difficulty)
-    # new_game = TestGameP1LastMoveToLose(player1, player2, difficulty)
-    # new_game = TestGameP1MoveP2LastMoveToWin(player1, player2, difficulty)
-    # new_game = TestGameP1MoveP2LastMoveToLose(player1, player2, difficulty)
-    # new_game = TestGameP1LastMoveToWin(player1, player2, difficulty)
 
-    # New Game and board initialization
-    new_game = Game(player1_name, player2_name, difficulty, board=None)
+    # Launch a test game
+    if user.is_superuser == True:
+        if difficulty == "P1-Draw":
+            new_game = TestGameP1LastMoveToDraw(player1_name, player2_name, difficulty)
+        elif difficulty == "P1-Win":
+            new_game = TestGameP1LastMoveToWin(player1_name, player2_name, difficulty)
+        elif difficulty == "P1-Lose":
+            new_game = TestGameP1LastMoveToLose(player1_name, player2_name, difficulty)
+        elif difficulty == "P2-Win":
+            new_game = TestGameP1MoveP2LastMoveToWin(player1_name, player2_name, difficulty)
+        elif difficulty == "P2-Lose":
+            new_game = TestGameP1MoveP2LastMoveToLose(player1_name, player2_name, difficulty)
+        else:
+            new_game = Game(player1_name, player2_name, difficulty, board=None)
+    else:
+        # Launch a real new game
+        # New Game and board initialization
+        new_game = Game(player1_name, player2_name, difficulty, board=None)
+
     print("NEW GAME STARTED! Difficulty: ", difficulty)
     for line in new_game.board:
         print(line)
@@ -83,7 +94,6 @@ def newgame(request):
     return HttpResponseRedirect(reverse("reversi"))
 
 
-
 # initial game view
 def reversi(request):
     if request.user.is_authenticated:
@@ -98,7 +108,7 @@ def reversi(request):
     # Something went wrong retrieving board (db error or cheating)
     except Exception as e:
         print(e)
-        return render(request, "index.html", {"user": user, "difficulties": difficulties})
+        return render(request, "index.html", {"user": user})
 
     if player1 == "human":
         print("P1 is human.")
@@ -109,12 +119,15 @@ def reversi(request):
         difficulty = player1
         player1 = "Machine"
 
+    if user.is_superuser == True:
+        game_levels = game_levels_admin
+
     return render(request, "reversi.html", {"user": user,
                                             "board": board,
                                             "player1_name": player1.capitalize(),
                                             "player2_name": player2.capitalize(),
                                             "game_level": difficulty,
-                                            "difficulties": difficulties,
+                                            "game_levels": game_levels,
                                             })
 
 
@@ -168,7 +181,7 @@ def move(request):
 
         # Something went wrong retrieving board (db error or cheating)
         if board is None:
-            return render(request, "index.html", {"user": user, "difficulties": difficulties})
+            return render(request, "index.html", {"user": user, "game_levels": game_levels})
 
         if player1_name == "human":
             difficulty = player2_name
@@ -195,6 +208,9 @@ def move(request):
         elif difficulty == "harder":
             machine_player = AiGreedyPlus(role=machine_role)
             print("Greedy Plus Ai initiated")
+        else:
+            machine_player = AiGreedy(role=machine_role)
+            print("Defaulting to Greedy Ai")
 
         message = f""
         color = 'white'
@@ -215,27 +231,31 @@ def move(request):
                 color = human_color
                 # switch to human player
                 next_player = machine_player.role
-                # Check for Game Over
-                if len(get_possible_moves(board, next_player)) == 0:
-                    if len(get_possible_moves(board, get_opponent(next_player))) == 0:
-                        game_over = True
             else:
                 print("Illegal move!!!")
                 message = f"Illegal move!"
                 color = 'red'
                 # do nothing with board
+            # Check for Game Over
+            if len(get_possible_moves(board, next_player)) == 0:
+                next_player = get_opponent(next_player)
+                if len(get_possible_moves(board, next_player)) == 0:
+                    game_over = True
+
 
         elif next_player == machine_player.role:
             print("Machine move...")
-            next_move, board = machine_move(board, machine_player)
-            r, c = next_move
-            message = f"Machine move: row {r + 1}, col {c + 1}"
-            color = machine_color
-            if next_move is None:
-                print("Machine can't move...")
-                message = f"AI can't move!"
-            # switch to human player
-            next_player = human_player.role
+            # Game Over?
+            if len(get_possible_moves(board, next_player)) > 0:
+                next_move, board = machine_move(board, machine_player)
+                r, c = next_move
+                message = f"Machine move: row {r + 1}, col {c + 1}"
+                color = machine_color
+                if next_move is None:
+                    print("Machine can't move...")
+                    message = f"AI can't move!"
+                # switch to human player
+                next_player = human_player.role
             # Check for Game Over
             if len(get_possible_moves(board, next_player)) == 0:
                 if len(get_possible_moves(board, get_opponent(next_player))) == 0:
@@ -283,10 +303,12 @@ def loadgame(request):
     request.session['game_id'] = game_id
     print("Game ID: ", game_id)
 
-    board, player1, player2, next_game = load_gamestate_db(game_id, user)
+    try:
+        board, player1, player2, next_game = load_gamestate_db(game_id, user)
     # Something went wrong retrieving board (db error or cheating)
-    if board is None:
-        return render(request, "index.html", {"user": user, "difficulties": difficulties})
+    except Exception as e:
+        print(f"DB Error: {e}")
+        return render(request, "index.html", {"user": user, "game_levels": game_levels})
 
     for line in board: print(line)
 
@@ -308,7 +330,7 @@ def savedgames(request):
     saved_games = reversed(GameDB.objects.all().filter(user=user)[:100])
 
     return render(request, "savedgames.html",
-                  {"user": user, "difficulties": difficulties, "saved_games": saved_games})
+                  {"user": user, "game_levels": game_levels, "saved_games": saved_games})
 
 
 def deletegame(request):
@@ -331,7 +353,7 @@ def login_view(request):
     if request.method == "GET":
         return render(request, "users/login.html",
                       {"message": "Please enter your username and password.", "user": False,
-                       "difficulties": difficulties})
+                       "game_levels": game_levels})
     username = request.POST["username"]
     password = request.POST["password"]
     user = authenticate(request, username=username, password=password)
@@ -340,7 +362,7 @@ def login_view(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "users/login.html",
-                      {"message": "Invalid credentials.", "user": False, "difficulties": difficulties})
+                      {"message": "Invalid credentials.", "user": False, "game_levels": game_levels})
 
 
 def logout_view(request):
@@ -355,7 +377,7 @@ def register(request):
     if request.method == "GET":
         return render(request, "users/register.html",
                       {"message": "Please choose a username and password to register a new player.", "user": False,
-                       "difficulties": difficulties})
+                       "game_levels": game_levels})
 
     if request.method == "POST":
         username = request.POST["username"]

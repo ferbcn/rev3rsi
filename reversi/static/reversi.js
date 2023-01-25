@@ -70,7 +70,7 @@ function check_for_and_make_auto_machine_move(data){
         let spinner = document.getElementById("spinner");
         spinner.style.visibility = 'visible';
         setTimeout(function() {
-            move(-1, -1);}, 500);
+            move(-1, -1);}, 1);
     }
 }
 
