@@ -2,6 +2,8 @@
 
 ## Project Name: Rev3rsi
 
+![Screenshot](url "rev3rsi.png")
+
 ## Description
 Reversi is a classic board game for two players just like chess, checkers and go...
 Rules and details: https://www.yourturnmyturn.com/rules/reversi.php
@@ -22,7 +24,6 @@ Players can select different machine players (difficulty) and therefore play aga
 - Recover previously initiated games
 - Replay last move of finalized games
 - Delete own games
-
 
 ## Requirements
 - Django
