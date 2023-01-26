@@ -394,7 +394,7 @@ def register(request):
 
     if request.method == "GET":
         return render(request, "users/register.html",
-                      {"message": "Please choose a username and password to register a new player.", "user": False,
+                      {"message": "Please choose a username and password.", "user": False,
                        "game_levels": game_levels})
 
     if request.method == "POST":
