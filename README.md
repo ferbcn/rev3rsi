@@ -1,5 +1,5 @@
-# Project Name: Rev3rsi 
-### Web Programming with Python and JavaScript
+# Rev3rsi 
+Web Programming with Python-Django and JavaScript/CSS.
 
 ![Screenshot](https://github.com/ferbcn/rev3rsi/blob/master/rev3rsi.png?raw=true)
 
