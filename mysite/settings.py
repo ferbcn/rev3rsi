@@ -75,13 +75,14 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 
 DB_PASSWORD = os.environ.get('DB_PASSWORD')
 DB_URL = os.environ.get('DB_URL')
+DB_USER = os.environ.get('DB_USER')
 
 # Heroku PostgreSQL Database
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'postgres',
-        'USER': 'postgres',
+        'USER': DB_USER,
         'PASSWORD': DB_PASSWORD,
         'HOST': DB_URL,
         'PORT': '5432',
