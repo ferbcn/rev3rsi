@@ -1,6 +1,5 @@
-# Web Programming with Python and JavaScript
-
-## Project Name: Rev3rsi
+# Project Name: Rev3rsi 
+### Web Programming with Python and JavaScript
 
 ![Screenshot](https://github.com/ferbcn/rev3rsi/blob/master/rev3rsi.png?raw=true)
 
