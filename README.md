@@ -2,7 +2,7 @@
 
 ## Project Name: Rev3rsi
 
-![Screenshot](url "rev3rsi.png")
+![Screenshot](https://github.com/ferbcn/rev3rsi/blob/master/rev3rsi.png?raw=true)
 
 ## Description
 Reversi is a classic board game for two players just like chess, checkers and go...
