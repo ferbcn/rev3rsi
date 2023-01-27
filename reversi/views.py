@@ -402,7 +402,11 @@ def register(request):
         password = request.POST["password"]
 
         if len(User.objects.all().filter(username=username)) > 0:
-            return render(request, "users/register.html", {"message": "Username already in use.", "user": False})
+            return render(request, "users/register.html", {"message": "Username already in use!", "user": False})
+        elif len(username) < 3:
+            return render(request, "users/register.html", {"message": "Username too short!", "user": False})
+        elif len(password) < 3:
+            return render(request, "users/register.html", {"message": "Password too short!", "user": False})
         else:
             new_user = User.objects.create_user(username=username, password=password)
             new_user.save()
