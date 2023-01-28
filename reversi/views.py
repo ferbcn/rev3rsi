@@ -374,7 +374,7 @@ def login_view(request):
         # if user selects level and is not logged in he is redirected to login page,
         # where a hidden value is saved in the form and send together with login data
         # in order to redirect the user after a successful login... hacky? yes, sir!
-        if redirect is not None:
+        if len(redirect) > 0:
             redirect = "newgame?difficulty=" + redirect
             return HttpResponseRedirect(redirect)
         return HttpResponseRedirect(reverse("index"))
