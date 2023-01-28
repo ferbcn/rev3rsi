@@ -273,7 +273,8 @@ def move(request):
         scores = get_scores(board)
         # save gamestate to DB and session
         save_game_db(game_id, scores[0], scores[1], next_player, game_over)
-        save_gamestate_db(board, game_id)
+        if not game_over:
+            save_gamestate_db(board, game_id)
 
         data = {"board": board, "message": {"message": message, "color": color},
                 "machine_role": machine_player.role, "next_player": next_player, "game_over": game_over,
