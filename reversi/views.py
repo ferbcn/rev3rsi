@@ -87,11 +87,15 @@ def newgame(request):
     request.session['game_level'] = new_game.difficulty
 
     # save game to DB
-    game_db_entry = GameDB(user=user, player1=player1_name, player2=player2_name, next_player=1, game_over=False)
+    scores = get_scores(new_game.board)
+    # save gamestate to DB and session
+
+    game_db_entry = GameDB(user=user, score_p1=scores[0], score_p2=scores[1], player1=player1_name, player2=player2_name, next_player=1, game_over=False)
     game_db_entry.save()
     request.session["game_id"] = game_db_entry.id
 
     # save game to DB
+    #save_game_db(new_game.game_id, scores[0], scores[1], next_player=1, game_over=False)
     save_gamestate_db(new_game.board, game_db_entry.id)
 
     return HttpResponseRedirect(reverse("reversi"))
@@ -269,7 +273,8 @@ def move(request):
         scores = get_scores(board)
         # save gamestate to DB and session
         save_game_db(game_id, scores[0], scores[1], next_player, game_over)
-        save_gamestate_db(board, game_id)
+        if not game_over:
+            save_gamestate_db(board, game_id)
 
         data = {"board": board, "message": {"message": message, "color": color},
                 "machine_role": machine_player.role, "next_player": next_player, "game_over": game_over,
