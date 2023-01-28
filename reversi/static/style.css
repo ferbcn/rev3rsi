@@ -209,6 +209,7 @@ a:hover {
   color: black;
   font-weight: bold;
   text-align: center;
+  font-size: min(4vw, 18px);
 }
 
 a.divlink {
