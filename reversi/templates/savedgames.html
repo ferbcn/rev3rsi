@@ -23,7 +23,7 @@
                 Player2
               </div>
               <div class="col-2">
-                Ended
+                Winner
               </div>
               <div class="col-3">
                 Scores
@@ -56,13 +56,21 @@
                 <a class="divlink" href="{% url 'loadgame'%}?game_id={{ game.id }}">
                 {% if game.game_over %}
                     {% if game.score_p1 > game.score_p2 %}
-                      <span style="color: green";>
-                      P1 won
+                        {% if game.player1 == "human" %}
+                            <span style="color: green";>
+                        {% else %}
+                            <span style="color: red";>
+                        {% endif %}
+                      P1
                       </span>
                     {% endif %}
                     {% if game.score_p1 < game.score_p2 %}
-                      <span style="color: green";>
-                      P2 won
+                      {% if game.player2 == "human" %}
+                            <span style="color: green";>
+                        {% else %}
+                            <span style="color: red";>
+                        {% endif %}
+                      P2
                       </span>
                     {% endif %}
                     {% if game.score_p1 == game.score_p2 %}
