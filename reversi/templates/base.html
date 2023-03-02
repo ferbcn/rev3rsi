@@ -35,6 +35,10 @@
                   {% endfor %}
                 </div>
 
+                <li class="nav-item">
+                    <a class="nav-link" href="/chat"><span title="login" aria-hidden="true"></span> Arena</a>
+                </li>
+
                 {% if user %}
                   <li class="nav-item">
                     <a class="nav-link" href="/savedgames"><span class="oi oi-people" title="savedgames" aria-hidden="true"></span> {{ user.username}}'s Games</a>

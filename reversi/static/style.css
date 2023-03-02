@@ -296,3 +296,12 @@ a.divlink:hover {
     opacity: 0.5;
   }
 }
+
+#chatarena {
+    margin-top: 5%;
+    width: 70%;
+}
+
+.btn-secondary{
+    margin-top: 5%;
+}

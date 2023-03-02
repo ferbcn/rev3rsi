@@ -2,3 +2,6 @@ Django
 gunicorn
 psycopg2-binary
 whitenoise
+channels
+channels_redis
+daphne

@@ -24,6 +24,8 @@ ALLOWED_HOSTS = ['*', 'www.rev3rsi.fun', 'rev3rsi.fun']
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
+    'chat',
     'reversi.apps.ReversiConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -128,7 +130,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-STATICFILES_DIRS = (os.path.join(BASE_DIR, 'reversi/static'),)
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'reversi/static'), os.path.join(BASE_DIR, 'chat/static')]
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
@@ -136,3 +138,14 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 #django_heroku.settings(locals())
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
+# Channels
+ASGI_APPLICATION = "mysite.asgi.application"
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}

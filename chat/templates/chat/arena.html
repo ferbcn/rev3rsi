@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block heading %}
+
+{% endblock %}
+
+{% load static %}
+
+{% block body %}
+
+<div class="container" id="chatarena">
+
+    <br>
+    <h3>Chat Arena</h3>
+    <br>
+    <br>
+
+    <h6>Enter chatroom:</h6>
+
+    <input class="form-control" id="room-name-input" type="text">
+    <br>
+    <button class="btn btn-success" id="room-name-submit">Enter</button>
+    <!--<input id="room-name-submit" type="button" value="Enter">-->
+
+    <script src="{% static 'index.js' %}"></script>
+
+    <script>
+      // set bg color black
+      document.body.style.backgroundColor = "black";
+    </script>
+
+</div>
+
+{% endblock %}

@@ -44,12 +44,18 @@
               </div>
               <div class="col-2">
                 <a class="divlink" href="{% url 'loadgame'%}?game_id={{ game.id }}">
-                {{ game.player1 }}
+                    {% if game.player1 != "human" %}
+                    machine -
+                    {% endif %}
+                    {{ game.player1 }}
                 </a>
               </div>
               <div class="col-2">
                 <a class="divlink" href="{% url 'loadgame'%}?game_id={{ game.id }}">
-                {{ game.player2 }}
+                    {% if game.player2 != "human" %}
+                    machine -
+                    {% endif %}
+                    {{ game.player2 }}
                 </a>
               </div>
               <div class="col-2">

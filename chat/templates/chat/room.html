@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block heading %}
+
+{% endblock %}
+
+{% load static %}
+
+{% block body %}
+{% load static %}
+
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Chat Room</title>
+</head>
+<body>
+    <div class="container" id="chatarena">
+        <h6>Welcome to <i>{{ room_name }}</i>!</h6>
+        <textarea class="form-control" id="chat-log" cols="100" rows="20"></textarea><br>
+        Message: <input class="form-control" id="chat-message-input" type="text"><br>
+        <input class="form-control btn btn-success" id="chat-message-submit" type="button" value="Send">
+        {{ room_name|json_script:"room-name" }}
+        <br>
+        <input class="form-control btn btn-secondary" onclick="window.location.href='../';" value="Exit">
+
+    </div>
+
+    <script src="{% static 'room.js' %}"></script>
+
+</body>
+</html>
+
+{% endblock %}
