@@ -15,14 +15,21 @@
     <title>Chat Room</title>
 </head>
 <body>
-    <div class="container" id="chatarena">
-        <h6>Welcome to <i>{{ room_name }}</i>!</h6>
-        <textarea class="form-control" id="chat-log" cols="100" rows="20"></textarea><br>
-        Message: <input class="form-control" id="chat-message-input" type="text"><br>
-        <input class="form-control btn btn-success" id="chat-message-submit" type="button" value="Send">
+    <div class="container chatarena">
+        <h6>Hi {{ username }}, welcome to <i>{{ room_name }}</i>!</h6>
+        <textarea class="form-control" id="chat-log" rows="20"></textarea><br>
+        Message:
+        <div class="flex-container">
+            <div class="flex-item-left">
+                <input class="form-control" id="chat-message-input" type="text"><br>
+            </div>
+            <div class="flex-item-right">
+                <input class="form-control btn btn-outline-success" id="chat-message-submit" type="button" value="Send">
+            </div>
+        </div>
+        <input class="form-control btn btn-outline-secondary" onclick="javascript: window.location.pathname = '../chat';" type="button" value="Exit">
         {{ room_name|json_script:"room-name" }}
-        <br>
-        <input class="form-control btn btn-secondary" onclick="window.location.href='../';" value="Exit">
+        {{ username|json_script:"json-username" }}
 
     </div>
 

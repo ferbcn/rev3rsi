@@ -11,6 +11,10 @@ a {
   color: red;
 }
 
+h6 {
+    margin-top:3vh;
+}
+
 a:hover {
   color: green;
 }
@@ -93,7 +97,7 @@ a:hover {
 }
 
 #login_child{
-   margin-top: 5vh;
+   margin: 5vh;
    position: relative;
 }
 
@@ -297,11 +301,49 @@ a.divlink:hover {
   }
 }
 
-#chatarena {
+.chatarena {
     margin-top: 5%;
-    width: 70%;
+    width: 80%;
 }
 
-.btn-secondary{
-    margin-top: 5%;
+.btn-outline-secondary{
+    margin-top: 20px;
 }
+
+.flex-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.flex-item-left {
+  padding: 5px;
+  flex: 80%;
+}
+
+.flex-item-right {
+  padding: 5px;
+  flex: 20%;
+}
+
+.chat_room_list {
+    margin-top: 5%;
+    width: 50%;
+}
+
+.flex-item-game {
+  padding: 5px;
+  flex: 40%;
+}
+
+.flex-item-user {
+  padding: 5px;
+  flex: 40%;
+}
+
+.flex-item-btn {
+  padding: 5px;
+  flex: 20%;
+}
+
+
+

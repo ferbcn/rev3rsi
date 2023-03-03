@@ -7,28 +7,52 @@
 {% load static %}
 
 {% block body %}
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Chat Arena</title>
+</head>
+<body>
+    <div class="container chatarena">
 
-<div class="container" id="chatarena">
+        <h3>Chat Arena</h3>
 
-    <br>
-    <h3>Chat Arena</h3>
-    <br>
-    <br>
+        <h6>Enter a chatroom:</h6>
+        <div class="chat_room_list">
+            {% for room in room_list %}
+                <button class="btn btn-outline-success" onclick="javascript:enterRoom('{{ room }}')">{{ room }}</button>
+            {% endfor %}
+        </div>
 
-    <h6>Enter chatroom:</h6>
 
-    <input class="form-control" id="room-name-input" type="text">
-    <br>
-    <button class="btn btn-success" id="room-name-submit">Enter</button>
-    <!--<input id="room-name-submit" type="button" value="Enter">-->
+        <h6>Create chatroom:</h6>
+        <div class="flex-container">
+            <div class="flex-item-left">
+                <input class="form-control" id="room-name-input" type="text">
+            </div>
+            <div class="flex-item-right">
+                <button class="form-control btn btn-outline-success" id="room-name-submit">Go</button>
+            </div>
+        </div>
 
-    <script src="{% static 'index.js' %}"></script>
+        <h6>Games: </h6>
+        <button class="form-control btn btn-outline-warning" id="create-game-submit">New Game</button>
+        <br>
+        <h6>Open games:</h6>
+        <table>
+        <div id="game-list">
 
-    <script>
-      // set bg color black
-      document.body.style.backgroundColor = "black";
-    </script>
+        </div>
+        </table>
 
-</div>
+
+    </div>
+
+
+
+
+</body>
+
+<script src="{% static 'arena.js' %}"></script>
 
 {% endblock %}
