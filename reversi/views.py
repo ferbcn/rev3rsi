@@ -101,6 +101,58 @@ def newgame(request):
     return HttpResponseRedirect(reverse("reversi"))
 
 
+# game board initialization for match (play vs player)
+def newmatch(request):
+
+    if request.user.is_authenticated:
+        user = request.user
+    else:
+        level = request.GET["difficulty"]
+        return render(request, "users/login.html", {"message": "Please login first to start a new game!", "user": False,
+                                                        "game_levels": game_levels, "level": level})
+
+    p1_name = request.GET["p1"]
+    p2_name = request.GET["p2"]
+    difficulty = "match"
+
+    # Define random role of players
+    p1_is_player1 = random.choice([True, False])
+
+    if p1_is_player1 == 1:
+        player1_name = p1_name
+        player2_name = p2_name
+    else:
+        player1_name = p2_name
+        player2_name = p1_name
+
+    # Launch a real new game
+    # New Game and board initialization
+    new_game = Game(player1_name, player2_name, difficulty, board=None)
+
+    print("NEW MATCH STARTED!")
+    print(f'Player1: {player1_name} vs Player2: {player2_name}')
+    for line in new_game.board:
+        print(line)
+
+    # save game state variables to session variables
+    request.session['board'] = new_game.board
+
+    # update scores
+    scores = get_scores(new_game.board)
+    # and save initial gamestate to DB and session
+    game_db_entry = GameDB(user=user, score_p1=scores[0], score_p2=scores[1], player1=player1_name, player2=player2_name, next_player=1, game_over=False)
+    game_db_entry.save()
+    request.session["game_id"] = game_db_entry.id
+
+    # save game to DB
+    #save_game_db(new_game.game_id, scores[0], scores[1], next_player=1, game_over=False)
+    save_gamestate_db(new_game.board, game_db_entry.id)
+
+    json_respones = {"game_id": game_db_entry.id}
+
+    return JsonResponse(json_respones, safe=False)
+
+
 # initial game view
 def reversi(request):
     if request.user.is_authenticated:
@@ -120,11 +172,14 @@ def reversi(request):
     if player1 == "human":
         print("P1 is human.")
         difficulty = player2
-        player2 = "Machine"
-    else:
+        player2 = "machine"
+    elif player2 == "human":
         print("P2 is human.")
         difficulty = player1
-        player1 = "Machine"
+        player1 = "machine"
+    else:
+        difficulty = "match"
+
 
     if user.is_superuser == True:
         levels = admin_game_levels
@@ -133,8 +188,8 @@ def reversi(request):
 
     return render(request, "reversi.html", {"user": user,
                                             "board": board,
-                                            "player1_name": player1.capitalize(),
-                                            "player2_name": player2.capitalize(),
+                                            "player1_name": player1,
+                                            "player2_name": player2,
                                             "game_level": difficulty,
                                             "game_levels": levels,
                                             })
@@ -168,7 +223,7 @@ def queryboard(request):
         return JsonResponse(data, safe=False)
 
 
-# Main Game Logic is executed in this view every time Player1 makes a move via browser input
+# Main Game Logic is executed in this view every time the current Player makes a move via browser input
 # returns a json data object to browser which updates game board, scores and infos with JS
 @method_decorator(csrf_exempt, name='dispatch')
 def move(request):
@@ -198,10 +253,16 @@ def move(request):
             machine_role = 2
             human_color = 'green'
             machine_color = 'blue'
-        else:
+        elif player2_name == "human":
             difficulty = player1_name
             human_role = 2
             machine_role = 1
+            human_color = 'blue'
+            machine_color = 'green'
+        else:
+            difficulty = 'match'
+            human_role = 0
+            machine_role = 0
             human_color = 'blue'
             machine_color = 'green'
 

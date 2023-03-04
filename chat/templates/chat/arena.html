@@ -13,38 +13,41 @@
     <title>Chat Arena</title>
 </head>
 <body>
-    <div class="container chatarena">
+    <div class="container">
 
-        <h3>Chat Arena</h3>
+        {{ username|json_script:"json-username" }}
+        <h3>The Arena</h3>
 
-        <h6>Enter a chatroom:</h6>
-        <div class="chat_room_list">
-            {% for room in room_list %}
-                <button class="btn btn-outline-success" onclick="javascript:enterRoom('{{ room }}')">{{ room }}</button>
-            {% endfor %}
-        </div>
-
-
-        <h6>Create chatroom:</h6>
-        <div class="flex-container">
-            <div class="flex-item-left">
-                <input class="form-control" id="room-name-input" type="text">
+        <div class="container">
+            <h6>Chat:</h6>
+            <!--<div class="chat-board" id="chat-log" type="text"></div>-->
+            <textarea class="form-control" id="chat-log" rows="10"></textarea><br>
+            Message:
+            <div class="flex-container">
+                <div class="flex-item-left">
+                    <input class="form-control" id="chat-message-input" type="text"><br>
+                    <br>
+                </div>
+                <div class="flex-item-right">
+                    <input class="btn btn-outline-success" id="chat-message-submit" type="button" value="Send">
+                </div>
             </div>
-            <div class="flex-item-right">
-                <button class="form-control btn btn-outline-success" id="room-name-submit">Go</button>
+        </div>
+
+        <div class="container">
+            <button class="btn btn-outline-warning" id="create-game-submit">Create New Match</button>
+            <br>
+            <h6>Available Matches:</h6>
+            <div id="game-list">
+                <i>
+                    <div class="flex-container">
+                        <div class="flex-item-game">Game</div>
+                        <div class="flex-item-user">Host</div>
+                        <div class="flex-item-right"></div>
+                    </div>
+                </i>
             </div>
         </div>
-
-        <h6>Games: </h6>
-        <button class="form-control btn btn-outline-warning" id="create-game-submit">New Game</button>
-        <br>
-        <h6>Open games:</h6>
-        <table>
-        <div id="game-list">
-
-        </div>
-        </table>
-
 
     </div>
 

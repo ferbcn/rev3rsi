@@ -1,39 +1,39 @@
-{% extends "base.html" %}
-
-{% block heading %}
-
-{% endblock %}
-
-{% load static %}
-
-{% block body %}
-{% load static %}
-
 <html>
 <head>
     <meta charset="utf-8"/>
     <title>Chat Room</title>
 </head>
+
+{% load static %}
+
+{% block body %}
+
+
 <body>
-    <div class="container chatarena">
-        <h6>Hi {{ username }}, welcome to <i>{{ room_name }}</i>!</h6>
-        <textarea class="form-control" id="chat-log" rows="20"></textarea><br>
-        Message:
-        <div class="flex-container">
-            <div class="flex-item-left">
-                <input class="form-control" id="chat-message-input" type="text"><br>
-            </div>
-            <div class="flex-item-right">
-                <input class="form-control btn btn-outline-success" id="chat-message-submit" type="button" value="Send">
-            </div>
+
+{% block content %}
+    {% include "reversi.html" %}
+{% endblock %}
+
+<div class="container chatarena">
+    <h6>Hi {{ username }}, welcome to <i>{{ room_name }}</i>!</h6>
+    <textarea class="form-control" id="chat-log" rows="20"></textarea><br>
+    Message:
+    <div class="flex-container">
+        <div class="flex-item-left">
+            <input class="form-control" id="chat-message-input" type="text"><br>
         </div>
-        <input class="form-control btn btn-outline-secondary" onclick="javascript: window.location.pathname = '../chat';" type="button" value="Exit">
-        {{ room_name|json_script:"room-name" }}
-        {{ username|json_script:"json-username" }}
-
+        <div class="flex-item-right">
+            <input class="btn btn-outline-success" id="chat-message-submit" type="button" value="Send">
+        </div>
     </div>
+    <input class="btn btn-outline-secondary" onclick="javascript: window.location.pathname = '../chat';" type="button" value="Exit">
+    {{ room_name|json_script:"room-name" }}
+    {{ username|json_script:"json-username" }}
 
-    <script src="{% static 'room.js' %}"></script>
+</div>
+
+<script src="{% static 'room.js' %}"></script>
 
 </body>
 </html>

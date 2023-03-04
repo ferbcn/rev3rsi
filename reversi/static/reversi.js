@@ -1,4 +1,3 @@
-document.body.style.backgroundColor = "black";
 var game_over = false;
 // begin by querying the board status and updating its elements
 queryBoard();

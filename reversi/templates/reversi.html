@@ -29,7 +29,7 @@
           {% for line in board %}
             <div class="row" style="height: 12%">
               {% for cell in line %}
-                <div class="col padding-0" style="background-color: black;">
+                <div class="col padding-0">
                     <a href="#"><span class="dot_empty" id="{{forloop.parentloop.counter0}}{{forloop.counter0}}" onclick="move({{forloop.parentloop.counter0}}, {{forloop.counter0}});return false;"></span></a>
                 </div>
               {% endfor %}

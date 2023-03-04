@@ -27,9 +27,11 @@ document.querySelector('#chat-message-input').onkeyup = function(e) {
 document.querySelector('#chat-message-submit').onclick = function(e) {
     const messageInputDom = document.querySelector('#chat-message-input');
     const message = messageInputDom.value;
-    chatSocket.send(JSON.stringify({
-        'type': 'chat_message',
-        'message': message
-    }));
-    messageInputDom.value = '';
+    if (message.length > 1){
+        chatSocket.send(JSON.stringify({
+            'type': 'chat_message',
+            'message': message
+        }));
+        messageInputDom.value = '';
+    }
 };

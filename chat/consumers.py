@@ -1,5 +1,7 @@
 # chat/consumers.py
 import json
+import uuid
+from datetime import datetime
 
 from channels.generic.websocket import AsyncWebsocketConsumer
 
@@ -26,11 +28,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
         username = self.scope["user"].username
 
         if text_data_json["type"] == "newgame_message":
-            game_name = text_data_json["message"]
-            print(f"New Game creation request with name {game_name}")
+            game_uuid = username + "VS"
+            #game_uuid = str(datetime.now()).replace("-", "").replace(":", "").replace(" ", "").replace(".", "")
+            print(f"New Match creation request, creating match with with id {game_uuid}")
             # Send game request to room group
             await self.channel_layer.group_send(
-                self.room_group_name, {"type": "chat_message", "message_type": "new_game", "message": game_name, "username": username}
+                self.room_group_name, {"type": "chat_message", "message_type": "add_new_match", "message": "", "game_id": game_uuid, "username": username}
             )
         elif text_data_json["type"] == "chat_message":
             message = text_data_json["message"]
@@ -40,17 +43,19 @@ class ChatConsumer(AsyncWebsocketConsumer):
             )
 
         elif text_data_json["type"] == "newgame_accept":
-            message = text_data_json["message"]
+            game_id = text_data_json["game_id"]
+            game_name = text_data_json["game_name"]
             host = text_data_json["host"]
-            print(f'{message} (hosted by: {host}), accepted by {username}!')
+            print(f'{game_name} with game_id {game_id} (hosted by: {host}), accepted by {username}!')
 
 
     # Receive message from room group
     async def chat_message(self, event):
         print("Group Received: ", event)
-        message = event["message"]
-        username = event["username"]
         message_type = event["message_type"]
+        game_id = event.get("game_id")
+        message = event.get("message")
+        username = event.get("username")
 
         # Send message to WebSocket
-        await self.send(text_data=json.dumps({"message": message, "message_type": message_type, "username": username}))
+        await self.send(text_data=json.dumps({"message": message, "message_type": message_type, "username": username, "game_id": game_id}))
