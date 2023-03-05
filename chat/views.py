@@ -5,12 +5,22 @@ from django.urls import reverse
 
 game_levels = [('', 'easy'), ('', 'hard'), ('', 'harder'), ('disabled', 'hardest')]
 
+import redis
+conn = redis.Redis('localhost')
+
 def chatindex(request):
     if request.user.is_authenticated:
         username = request.user.username
-        # dummy list -> get from Redis Chache???
-        room_list = ["TheLobby", "war8oom", "chill0ut"]
-        return render(request, "chat/arena.html", {"room_list": room_list, "username": username, "game_levels": game_levels})
+
+        # Read open matches from Redis DB
+        open_matches = conn.hgetall("openMatches")
+        nice_open_matches = []
+        for match in open_matches:
+            name = match.decode("utf-8")
+            host = open_matches.get(match).decode("utf-8")
+            nice_open_matches.append((name, host))
+        print("Open matches: ", nice_open_matches)
+        return render(request, "chat/arena.html", {"open_matches": nice_open_matches, "username": username, "game_levels": game_levels})
     else:
         return HttpResponseRedirect(reverse("login"))
 

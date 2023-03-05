@@ -315,6 +315,7 @@ a.divlink:hover {
     max-width: 1000px;
 }
 
+
 .flex-container {
   display: flex;
   flex-wrap: wrap;
@@ -351,55 +352,6 @@ a.divlink:hover {
   flex: 40%;
 }
 
-#chat-message-input{
-    background-color: transparent;
-    border-color: lightgrey;
-    color: white;
-}
-
-#chat-log{
-    background: transparent;
-    color: lightgrey;
-    width: 100%;
-    height: 20vh;
-    border-style: solid;
-    border-radius: 5px;
-    border-color: lightgrey;
-    border-size: 1px;
-
-}
-
-.chat-entry {
-    margin-left: 10px;
-    font-size: 1vh;
-}
-
-.newmatch-container {
-    background-color: orange;
-    padding: 10px;
-    animation-name: appear;
-    animation-duration: 0.5s;
-    animation-fill-mode: forwards;
-    animation-play-state: play;
-    border-radius: 5px;
-    border-color: orange;
-}
-
-@keyframes appear {
-    0% {
-        opacity: 1;
-        background-color: transparent;
-    }
-    50% {
-        opacity: 1;
-        background-color: orange;
-    }
-    100% {
-        opacity: 1;
-        background-color: transparent;
-    }
-}
-
 .wave-box {
   display: flex;
   justify-content: center;
@@ -409,7 +361,7 @@ a.divlink:hover {
 .wave {
   width: 5px;
   height: 20px;
-  background: linear-gradient(45deg, orange, orange);
+  background: linear-gradient(45deg, grey, grey);
   margin: 5px;
   animation: wave 1s linear infinite;
   border-radius: 20px;
@@ -467,7 +419,91 @@ a.divlink:hover {
   }
 }
 
-.match-container{
-    height: 50%;
-    overflow:auto
+.match-list-container{
+    margin-top: 10px;
+    height: 40%;
+    overflow:auto;
+    font-size: 1.5vh;
+}
+
+.match-container {
+    margin-top: 5px;
+    padding: 10px;
+    animation-name: appear;
+    animation-duration: 0.5s;
+    animation-fill-mode: forwards;
+    animation-play-state: play;
+    border-radius: 5px;
+    color: lightgrey;
+}
+
+@keyframes appear {
+    0% {
+        opacity: 1;
+        background-color: transparent;
+    }
+    50% {
+        opacity: 1;
+        background-color: orange;
+    }
+    100% {
+        opacity: 1;
+        background: rgba(255,255,255,0.1);
+    }
+}
+
+
+#game-list-container{
+
+}
+
+#chat-log{
+    margin-top: 0px;
+    width: 100%;
+    padding: 10px;
+    overflow:auto;
+    height: 25vh;
+}
+
+.chat-entry-container {
+    margin-top: 10px;
+    font-size: 1.5vh;
+}
+
+.chat-entry {
+    background: rgba(255,255,255,0.1);
+    padding: 10px;
+    color: lightgrey;
+    border-radius: 5px;
+    border-color:lightgrey;
+}
+
+.mesAuthor {
+    font-style: italic;
+    color: darkgrey;
+    font-size: 1vh;
+}
+
+.mesTime {
+    font-style: italic;
+    float: right;
+    color: darkgrey;
+    padding: 5px;
+    font-size: 1vh;
+}
+
+.mesContent {
+    font-style: italic;
+    float: right;
+    color: darkgrey;
+}
+
+.chat-message-input-container{
+
+}
+
+#chat-message-input{
+    background-color: transparent;
+    border-color: lightgrey;
+    color: lightgrey;
 }

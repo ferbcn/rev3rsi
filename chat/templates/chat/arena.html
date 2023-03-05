@@ -16,31 +16,47 @@
     <div class="container">
 
         {{ username|json_script:"json-username" }}
-        <h3>The Arena</h3>
         <br>
-        <div class="container match-container">
-            <button class="btn btn-outline-warning" id="create-game-submit">Open New Match</button>
+        <button class="btn btn-outline-success" id="create-game-submit">Open New Match</button>
+        <div class="container match-list-container" id="match-list-container">
             <br>
-            <h6>Available Matches:</h6>
-            <div id="game-list">
+            <div class="match-list" id="match-list">
+                {% for match, host in open_matches %}
+                <div class="flex-container match-container" id="{{ match }}">
+                    <div class="flex-item-game" id="gameName">
+                        {{ match }}
+                    </div>
+                    <div class="flex-item-user" id="hostName">
+                        {{ host }}
+                    </div>
+                    <div class="wave-box">
+                        <div class="wave"></div>
+                        <div class="wave"></div>
+                        <div class="wave"></div>
+                        <div class="wave"></div>
+                        <div class="wave"></div>
+                        <div class="wave"></div>
+                    </div>
+                </div>
+            {% endfor %}
             </div>
         </div>
 
+        <h6>Live chat:</h6>
         <div class="container">
-            <h6>Chat:</h6>
-            <div class="chat-board" id="chat-log" type="text"></div>
+            <div class="chat-board" id="chat-log"></div>
             <br>
             <!--<textarea class="form-control" id="chat-log" rows="10"></textarea><br>-->
-            Message:
-            <div class="flex-container">
+            <div class="flex-container chat-message-input-container">
                 <div class="flex-item-left">
-                    <input class="form-control" id="chat-message-input" type="text"><br>
+                    <input class="form-control" id="chat-message-input" placeholder="Write a message here..."><br>
                     <br>
                 </div>
                 <div class="flex-item-right">
                     <input class="btn btn-outline-success" id="chat-message-submit" type="button" value="Send">
                 </div>
             </div>
+
         </div>
 
     </div>

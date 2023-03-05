@@ -16,41 +16,69 @@ chatSocket.onmessage = function(e) {
     if (data.message_type == "chat"){
         const data = JSON.parse(e.data);
         //document.querySelector('#chat-log').value += (data.username + ": " + data.message + '\n');
-        var newMes = document.createElement('div');
+        var mesTime = document.createElement('div');
+        mesTime.classList.add("mesTime");
+        var timeString = document.createTextNode(new Date().toLocaleTimeString());
+        mesTime.appendChild(timeString);
+
+        var newMesContainer = document.createElement('div')
+        newMesContainer.classList.add("chat-entry-container");
+
+        var newMes = document.createElement('div')
         newMes.classList.add("chat-entry");
-        var text = document.createTextNode(data.username + ": " + data.message);
-        newMes.appendChild(text);
-        var chat = document.querySelector('#chat-log');
-        chat.appendChild(newMes);
+
+        var mesAuthor = document.createElement('div');
+        mesAuthor.classList.add("mesAuthor");
+        var author = document.createTextNode(data.username+":");
+        mesAuthor.appendChild(author);
+
+        var mesContent = document.createElement('div');
+        var content = document.createTextNode(data.message);
+        mesContent.appendChild(content);
+
+
+        newMes.appendChild(mesTime);
+        newMes.appendChild(mesAuthor);
+        newMes.appendChild(mesContent);
+
+        newMesContainer.appendChild(mesAuthor);
+        newMesContainer.appendChild(newMes);
+
+        var chatLog = document.querySelector('#chat-log');
+        chatLog.appendChild(newMesContainer);
+        // scroll to bottom of div
+        chatLog.scrollTop = chatLog.scrollHeight;
     }
     else if (data.message_type == "new_game_confirmed"){
         gameId = data.game_id;
         host = data.host;
+
+        // redirect if we were the host
         if (userName == host){
             window.location.href = '../loadgame?game_id='+gameId;
         }
+        // remove entry from DOM
+        else{
+            var gameList = document.getElementById('match-list');
+            //var entry = document.querySelector('#'+gameId)
+            //gameList.removeChild(entry);
+        }
     }
     else if (data.message_type == "add_new_match"){
-        var game_id = data.game_id;
+        var gameId = data.game_id;
         var host = data.username;
-        var gameList = document.getElementById('game-list');
 
-        var newGame = document.createElement('div');
-        newGame.classList.add("flex-container");
-        newGame.classList.add("newmatch-container");
-        const gameRowId = game_id;
-        newGame.setAttribute("id", gameRowId);
+        var gameList = document.getElementById('match-list');
+
+        var newGameRow = document.createElement('div');
+        newGameRow.classList.add("flex-container");
+        newGameRow.classList.add("match-container");
+        newGameRow.setAttribute("id", gameId);
 
         var flex_elem_game = document.createElement('div');
         flex_elem_game.classList.add("flex-item-game");
-
         flex_elem_game.setAttribute("id", "gameName");
-        /*
-        var img = document.createElement('img');
-        img.src = '../static/images/favicon.ico'
-        flex_elem_game.appendChild(img);
-        */
-        flex_elem_game.appendChild(document.createTextNode(game_id))
+        flex_elem_game.appendChild(document.createTextNode(gameId))
 
         var flex_elem_host = document.createElement('div');
         flex_elem_host.classList.add("flex-item-user");
@@ -70,7 +98,7 @@ chatSocket.onmessage = function(e) {
         }
         else{
             var flex_elem_btn = document.createElement('a');
-            flex_elem_btn.href = "javascript:handleSelectGame('"+gameRowId+"')";
+            flex_elem_btn.href = "javascript:handleSelectGame('"+gameId+"')";
             flex_elem_btn.classList.add("wave-box");
             for (i=0; i<6; i++){
                 var wave_elem = document.createElement('div');
@@ -79,11 +107,16 @@ chatSocket.onmessage = function(e) {
             }
         }
 
-        newGame.appendChild(flex_elem_game);
-        newGame.appendChild(flex_elem_host);
-        newGame.appendChild(flex_elem_btn);
-        gameList.appendChild(newGame);
-        window.scrollTo(0, document.body.scrollHeight);
+        newGameRow.appendChild(flex_elem_game);
+        newGameRow.appendChild(flex_elem_host);
+        newGameRow.appendChild(flex_elem_btn);
+
+        gameList.appendChild(newGameRow);
+
+        console.log(gameList.scrollHeight);
+        //window.scrollTo(0, document.body.scrollHeight);
+        // scroll to bottom of div
+        document.getElementById('match-list').scrollIntoView(false);
 
     }
 };
@@ -127,9 +160,13 @@ document.querySelector('#create-game-submit').onclick = function(e) {
 };
 
 function handleSelectGame(id){
-    var gameRow = document.querySelector('#'+id);
+    //var gameRow = document.querySelector('#'+id);
+    var gameRow = document.getElementById(id);
+
     var name = gameRow.querySelector('#gameName').innerHTML;
     var host = gameRow.querySelector('#hostName').innerHTML;
+    name = name.trim();
+    host = host.trim();
     var gameId;
 
     var url = "/newmatch?p1="+host+"&p2="+userName;
@@ -158,7 +195,7 @@ function handleSelectGame(id){
 
         //window.location.href = '../chat/' + gameId;
         window.location.href = '../reversimatch';
-        chatSocket.close();
+        //chatSocket.close();
       })
       .catch(error => console.log(error))
 

@@ -4,6 +4,7 @@ const matchGameId = JSON.parse(document.getElementById('json-gameId').textConten
 var chatSocket;
 
 function startWebsocket() {
+
   chatSocket = new WebSocket(
     'ws://'
     + window.location.host
@@ -13,8 +14,9 @@ function startWebsocket() {
     );
 
   chatSocket.onopen = function(e) {
-    console.log('Chat socket connected!');
-    };
+        console.log('Chat socket connected!');
+        queryBoard();
+  };
 
     chatSocket.onmessage = function(e) {
         const data = JSON.parse(e.data);
@@ -22,18 +24,16 @@ function startWebsocket() {
 
         if (data.message_type == "game_turn"){
             const data = JSON.parse(e.data);
-            //queryBoard();
-            window.location.reload(true);
+            //window.setTimeout(queryBoard(), 100);
+            //window.setTimeout(window.location.reload(true), 1000);
+            //chatSocket.close();
+            //window.location.reload(true);
+            queryBoard();
         }
     };
 
     chatSocket.onclose = function(e) {
-        console.error('Chat socket closed unexpectedly');
-        //chatSocket = null
-        //setTimeout(startWebsocket, 1000)
-    };
-    chatSocket.onerror = function(e) {
-        console.error('Chat socket error!');
+        console.error('Chat socket closed unexpectedly', e);
         chatSocket = null
         setTimeout(startWebsocket, 1000)
     };
@@ -54,7 +54,7 @@ function queryBoard(){
     request.onload = () => {
         const data = JSON.parse(request.responseText);
         console.log(data);
-        game_over = data["game_over"]
+        //game_over = data["game_over"]
         // update everything
         updateAll(data);
     };
