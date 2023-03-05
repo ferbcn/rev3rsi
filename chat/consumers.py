@@ -31,8 +31,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         username = self.scope["user"].username
 
         if text_data_json["type"] == "new_game_create":
-            #game_uuid = username + "_vs_"
-            game_uuid = str(datetime.now()).replace("-", "").replace(":", "").replace(" ", "").replace(".", "")
+            # game_uuid = str(datetime.now()).replace("-", "").replace(":", "").replace(" ", "").replace(".", "")
+            game_uuid = str(uuid.uuid4())
             print(f"New Match creation request, creating match with with id {game_uuid}")
             open_matches = conn.hgetall("openMatches")
             open_matches.update({game_uuid: username})

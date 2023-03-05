@@ -21,14 +21,15 @@
         <div class="container match-list-container" id="match-list-container">
             <br>
             <div class="match-list" id="match-list">
-                {% for match, host in open_matches %}
-                <div class="flex-container match-container" id="{{ match }}">
+                {% for name, host in open_matches %}
+                <div class="flex-container match-container" id="{{ name }}">
                     <div class="flex-item-game" id="gameName">
-                        {{ match }}
+                        {{ name }}
                     </div>
                     <div class="flex-item-user" id="hostName">
                         {{ host }}
                     </div>
+                    {% if username == host %}
                     <div class="wave-box">
                         <div class="wave"></div>
                         <div class="wave"></div>
@@ -37,6 +38,18 @@
                         <div class="wave"></div>
                         <div class="wave"></div>
                     </div>
+                    {% else %}
+                    <a href="javascript:handleSelectGame('{{ name }}')">
+                    <div class="wave-box">
+                        <div class="wave-good"></div>
+                        <div class="wave-good"></div>
+                        <div class="wave-good"></div>
+                        <div class="wave-good"></div>
+                        <div class="wave-good"></div>
+                        <div class="wave-good"></div>
+                    </div>
+                    </a>
+                    {% endif %}
                 </div>
             {% endfor %}
             </div>

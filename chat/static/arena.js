@@ -163,7 +163,8 @@ function handleSelectGame(id){
     //var gameRow = document.querySelector('#'+id);
     var gameRow = document.getElementById(id);
 
-    var name = gameRow.querySelector('#gameName').innerHTML;
+    //var name = gameRow.querySelector('#gameName').innerHTML;
+    var name = id;
     var host = gameRow.querySelector('#hostName').innerHTML;
     name = name.trim();
     host = host.trim();

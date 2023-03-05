@@ -53,6 +53,7 @@ a:hover {
    height: 70vw;
    max-height: 70vh;
    max-width: 70vh;
+   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
 #player_box {
@@ -77,6 +78,7 @@ a:hover {
   margin-top: 2vh;
   font-size: calc(6px + 1.5vw);
   width: 70vw;
+  padding: 20px;
 }
 
 #message_box {
@@ -433,8 +435,7 @@ a.divlink:hover {
     animation-duration: 0.5s;
     animation-fill-mode: forwards;
     animation-play-state: play;
-    border-radius: 5px;
-    color: lightgrey;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
 @keyframes appear {
@@ -444,11 +445,11 @@ a.divlink:hover {
     }
     50% {
         opacity: 1;
-        background-color: orange;
+        background-color: seagreen;
     }
     100% {
         opacity: 1;
-        background: rgba(255,255,255,0.1);
+        background-color: transparent;
     }
 }
 
@@ -463,19 +464,18 @@ a.divlink:hover {
     padding: 10px;
     overflow:auto;
     height: 25vh;
+    /*box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);*/
 }
 
 .chat-entry-container {
-    margin-top: 10px;
+    margin-top: 5px;
     font-size: 1.5vh;
 }
 
 .chat-entry {
-    background: rgba(255,255,255,0.1);
     padding: 10px;
     color: lightgrey;
-    border-radius: 5px;
-    border-color:lightgrey;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
 .mesAuthor {
