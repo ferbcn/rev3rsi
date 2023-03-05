@@ -17,11 +17,20 @@
 
         {{ username|json_script:"json-username" }}
         <h3>The Arena</h3>
+        <br>
+        <div class="container match-container">
+            <button class="btn btn-outline-warning" id="create-game-submit">Open New Match</button>
+            <br>
+            <h6>Available Matches:</h6>
+            <div id="game-list">
+            </div>
+        </div>
 
         <div class="container">
             <h6>Chat:</h6>
-            <!--<div class="chat-board" id="chat-log" type="text"></div>-->
-            <textarea class="form-control" id="chat-log" rows="10"></textarea><br>
+            <div class="chat-board" id="chat-log" type="text"></div>
+            <br>
+            <!--<textarea class="form-control" id="chat-log" rows="10"></textarea><br>-->
             Message:
             <div class="flex-container">
                 <div class="flex-item-left">
@@ -31,21 +40,6 @@
                 <div class="flex-item-right">
                     <input class="btn btn-outline-success" id="chat-message-submit" type="button" value="Send">
                 </div>
-            </div>
-        </div>
-
-        <div class="container">
-            <button class="btn btn-outline-warning" id="create-game-submit">Create New Match</button>
-            <br>
-            <h6>Available Matches:</h6>
-            <div id="game-list">
-                <i>
-                    <div class="flex-container">
-                        <div class="flex-item-game">Game</div>
-                        <div class="flex-item-user">Host</div>
-                        <div class="flex-item-right"></div>
-                    </div>
-                </i>
             </div>
         </div>
 

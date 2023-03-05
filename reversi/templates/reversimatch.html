@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block heading %}
+
+{% endblock %}
+
+{% block body %}
+
+<!-- container for info messages -->
+<div class="container comm-box">
+    <div class="row">
+        <div class="col-6">
+            <div id='player1_box'>Player 1: {{ player1_name }}</div>
+            <div id='player2_box'>Player 2: {{ player2_name }}</div>
+        </div>
+        <div class="col-6">
+            <div id='score_box'></div>
+        </div>
+    </div>
+</div>
+
+<!-- game board container -->
+<div id="board_parent">
+    <div id="board_child">
+        <!-- container for the game board -->
+        <div class="container" id="board">
+          {% for line in board %}
+            <div class="row" style="height: 12%">
+              {% for cell in line %}
+                <div class="col padding-0">
+                    <a href="#"><span class="dot_empty" id="{{forloop.parentloop.counter0}}{{forloop.counter0}}" onclick="move({{forloop.parentloop.counter0}}, {{forloop.counter0}});return false;"></span></a>
+                </div>
+              {% endfor %}
+            </div>
+          {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div class="container comm-box">
+  <div class="row">
+      <div class="col-9">
+          <div id='message_box'></div>
+      </div>
+      <div class="col-2">
+          <div id='level_box'>Level: {{ game_level }}</div>
+      </div>
+  </div>
+</div>
+
+<div class="container">
+  <div id="gameoverbox"><span id="gameovertext"></span></div>
+</div>
+{{ username|json_script:"json-username" }}
+{{ game_id|json_script:"json-gameId" }}
+<!-- JS: game board update and click capture and redirect to "move" post method -->
+<script src="{% static 'reversimatch.js' %}"></script>
+
+{% endblock %}

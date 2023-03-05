@@ -1,4 +1,5 @@
 const userName = JSON.parse(document.getElementById('json-username').textContent);
+var myInitiated
 
 const chatSocket = new WebSocket(
     'ws://'
@@ -14,7 +15,20 @@ chatSocket.onmessage = function(e) {
 
     if (data.message_type == "chat"){
         const data = JSON.parse(e.data);
-        document.querySelector('#chat-log').value += (data.username + ": " + data.message + '\n');
+        //document.querySelector('#chat-log').value += (data.username + ": " + data.message + '\n');
+        var newMes = document.createElement('div');
+        newMes.classList.add("chat-entry");
+        var text = document.createTextNode(data.username + ": " + data.message);
+        newMes.appendChild(text);
+        var chat = document.querySelector('#chat-log');
+        chat.appendChild(newMes);
+    }
+    else if (data.message_type == "new_game_confirmed"){
+        gameId = data.game_id;
+        host = data.host;
+        if (userName == host){
+            window.location.href = '../loadgame?game_id='+gameId;
+        }
     }
     else if (data.message_type == "add_new_match"){
         var game_id = data.game_id;
@@ -23,6 +37,7 @@ chatSocket.onmessage = function(e) {
 
         var newGame = document.createElement('div');
         newGame.classList.add("flex-container");
+        newGame.classList.add("newmatch-container");
         const gameRowId = game_id;
         newGame.setAttribute("id", gameRowId);
 
@@ -43,14 +58,26 @@ chatSocket.onmessage = function(e) {
         flex_elem_host.setAttribute("id", "hostName");
         flex_elem_host.appendChild(document.createTextNode(host));
 
-        var flex_elem_btn = document.createElement('a');
-        flex_elem_btn.href = "javascript:handleSelectGame('"+gameRowId+"')";
-        flex_elem_btn.classList.add("flex-item-right");
-        var button = document.createElement("button");
-        button.appendChild(document.createTextNode("Go!"));
-        button.classList.add("btn-outline-warning");
-        button.classList.add("btn");
-        flex_elem_btn.appendChild(button);
+        if (host == userName){
+            //add idle animation
+            var flex_elem_btn = document.createElement('div');
+            flex_elem_btn.classList.add("wave-box");
+            for (i=0; i<6; i++){
+                var wave_elem = document.createElement('div');
+                wave_elem.classList.add("wave");
+                flex_elem_btn.appendChild(wave_elem);
+            }
+        }
+        else{
+            var flex_elem_btn = document.createElement('a');
+            flex_elem_btn.href = "javascript:handleSelectGame('"+gameRowId+"')";
+            flex_elem_btn.classList.add("wave-box");
+            for (i=0; i<6; i++){
+                var wave_elem = document.createElement('div');
+                wave_elem.classList.add("wave-good");
+                flex_elem_btn.appendChild(wave_elem);
+            }
+        }
 
         newGame.appendChild(flex_elem_game);
         newGame.appendChild(flex_elem_host);
@@ -94,7 +121,7 @@ function enterRoom(roomName){
 document.querySelector('#create-game-submit').onclick = function(e) {
     console.log("Send create new game event!");
     chatSocket.send(JSON.stringify({
-        'type': "newgame_message",
+        'type': "new_game_create",
         'message': ""
     }));
 };
@@ -108,7 +135,6 @@ function handleSelectGame(id){
     var url = "/newmatch?p1="+host+"&p2="+userName;
 
     // This initiates the game setup
-
 
     fetch(url)
       .then(response => {
@@ -124,15 +150,15 @@ function handleSelectGame(id){
         acceptedGameName = name + userName;
 
         chatSocket.send(JSON.stringify({
-            'type': "newgame_accept",
+            'type': "new_game_accept",
             'game_name': acceptedGameName,
             'game_id': gameId,
             'host': host
         }));
 
         //window.location.href = '../chat/' + gameId;
-        window.location.href = '../reversi';
-
+        window.location.href = '../reversimatch';
+        chatSocket.close();
       })
       .catch(error => console.log(error))
 

@@ -27,7 +27,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         print("Received: ", text_data_json)
         username = self.scope["user"].username
 
-        if text_data_json["type"] == "newgame_message":
+        if text_data_json["type"] == "new_game_create":
             game_uuid = username + "VS"
             #game_uuid = str(datetime.now()).replace("-", "").replace(":", "").replace(" ", "").replace(".", "")
             print(f"New Match creation request, creating match with with id {game_uuid}")
@@ -42,11 +42,23 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 self.room_group_name, {"type": "chat_message", "message_type": "chat", "message": message, "username": username}
             )
 
-        elif text_data_json["type"] == "newgame_accept":
+        elif text_data_json["type"] == "new_game_accept":
             game_id = text_data_json["game_id"]
             game_name = text_data_json["game_name"]
             host = text_data_json["host"]
             print(f'{game_name} with game_id {game_id} (hosted by: {host}), accepted by {username}!')
+            # Send message to room group
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {"type": "chat_message", "message_type": "new_game_confirmed", "game_id": game_id,
+                 'game_name': game_name, "username": username, "host": host}
+            )
+        elif text_data_json["type"] == "new_game_turn":
+            message = text_data_json["message"]
+            # Send message to room group
+            await self.channel_layer.group_send(
+                self.room_group_name, {"type": "chat_message", "message_type": "game_turn", "message": message}
+            )
 
 
     # Receive message from room group
@@ -56,6 +68,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
         game_id = event.get("game_id")
         message = event.get("message")
         username = event.get("username")
+        game_name = event.get("game_name")
+        host = event.get("host")
 
         # Send message to WebSocket
-        await self.send(text_data=json.dumps({"message": message, "message_type": message_type, "username": username, "game_id": game_id}))
+        await self.send(text_data=json.dumps({"message": message, "message_type": message_type, "username": username,
+                                              "game_id": game_id, "game_name": game_name, "host": host}))

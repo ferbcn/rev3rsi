@@ -337,31 +337,137 @@ a.divlink:hover {
 
 .flex-item-game {
   padding: 5px;
-  flex: 40%;
+  flex: 20%;
 }
 
 .flex-item-user {
   padding: 5px;
-  flex: 30%;
+  flex: 20%;
+  text-align: left;
 }
 
 .flex-item-btn {
   padding: 5px;
-  flex: 20%;
+  flex: 40%;
 }
 
 #chat-message-input{
     background-color: transparent;
-    border-color: white;
+    border-color: lightgrey;
     color: white;
 }
 
 #chat-log{
-    background-color: transparent;
+    background: transparent;
+    color: lightgrey;
     width: 100%;
     height: 20vh;
-    color: white;
+    border-style: solid;
+    border-radius: 5px;
+    border-color: lightgrey;
+    border-size: 1px;
+
+}
+
+.chat-entry {
+    margin-left: 10px;
+    font-size: 1vh;
+}
+
+.newmatch-container {
+    background-color: orange;
+    padding: 10px;
+    animation-name: appear;
+    animation-duration: 0.5s;
+    animation-fill-mode: forwards;
+    animation-play-state: play;
+    border-radius: 5px;
+    border-color: orange;
+}
+
+@keyframes appear {
+    0% {
+        opacity: 1;
+        background-color: transparent;
+    }
+    50% {
+        opacity: 1;
+        background-color: orange;
+    }
+    100% {
+        opacity: 1;
+        background-color: transparent;
+    }
+}
+
+.wave-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: transparent;
+}
+.wave {
+  width: 5px;
+  height: 20px;
+  background: linear-gradient(45deg, orange, orange);
+  margin: 5px;
+  animation: wave 1s linear infinite;
+  border-radius: 20px;
+}
+.wave:nth-child(2) {
+  animation-delay: 0.1s;
+}
+.wave:nth-child(3) {
+  animation-delay: 0.2s;
+}
+.wave:nth-child(4) {
+  animation-delay: 0.3s;
+}
+.wave:nth-child(5) {
+  animation-delay: 0.4s;
+}
+.wave:nth-child(6) {
+  animation-delay: 0.5s;
+}
+
+.wave-good {
+  width: 5px;
+  height: 20px;
+  background: linear-gradient(45deg, darkgreen, green);
+  margin: 5px;
+  animation: wave 1s linear infinite;
+  border-radius: 20px;
+}
+.wave-good:nth-child(2) {
+  animation-delay: 0.1s;
+}
+.wave-good:nth-child(3) {
+  animation-delay: 0.2s;
+}
+.wave-good:nth-child(4) {
+  animation-delay: 0.3s;
+}
+.wave-good:nth-child(5) {
+  animation-delay: 0.4s;
+}
+.wave-good:nth-child(6) {
+  animation-delay: 0.5s;
 }
 
 
+@keyframes wave {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(0);
+  }
+}
 
+.match-container{
+    height: 50%;
+    overflow:auto
+}

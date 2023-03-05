@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 # from django.core import serializers
+from django.views.decorators.http import require_http_methods
 
 from reversi.test_games import *
 from reversi.reversi_game import *
@@ -134,18 +135,17 @@ def newmatch(request):
     for line in new_game.board:
         print(line)
 
-    # save game state variables to session variables
-    request.session['board'] = new_game.board
-
     # update scores
     scores = get_scores(new_game.board)
     # and save initial gamestate to DB and session
     game_db_entry = GameDB(user=user, score_p1=scores[0], score_p2=scores[1], player1=player1_name, player2=player2_name, next_player=1, game_over=False)
     game_db_entry.save()
+
+    # save game state variables to session variables
+    request.session['board'] = new_game.board
     request.session["game_id"] = game_db_entry.id
 
     # save game to DB
-    #save_game_db(new_game.game_id, scores[0], scores[1], next_player=1, game_over=False)
     save_gamestate_db(new_game.board, game_db_entry.id)
 
     json_respones = {"game_id": game_db_entry.id}
@@ -163,36 +163,77 @@ def reversi(request):
     # Restore Gamestate from DB
     game_id = request.session['game_id']
     try:
-        board, player1, player2, next_player = load_gamestate_db(game_id, user)
+        board, green_player, blue_player, next_player = load_gamestate_db(game_id, user)
     # Something went wrong retrieving board (db error or cheating)
     except Exception as e:
         print(e)
         return render(request, "index.html", {"user": user})
 
-    if player1 == "human":
-        print("P1 is human.")
-        difficulty = player2
-        player2 = "machine"
-    elif player2 == "human":
+    if green_player == "human":
+        print("Green Player is human.")
+        difficulty = blue_player
+    elif blue_player == "human":
         print("P2 is human.")
-        difficulty = player1
-        player1 = "machine"
+        difficulty = green_player
     else:
         difficulty = "match"
+        print(f"Match: Green is {green_player} and Blue is {blue_player}.")
 
-
-    if user.is_superuser == True:
+    if user.is_superuser:
         levels = admin_game_levels
     else:
         levels = game_levels
 
     return render(request, "reversi.html", {"user": user,
                                             "board": board,
-                                            "player1_name": player1,
-                                            "player2_name": player2,
+                                            "player1_name": green_player,
+                                            "player2_name": blue_player,
                                             "game_level": difficulty,
                                             "game_levels": levels,
                                             })
+
+
+# initial game view
+def reversimatch (request):
+    if request.user.is_authenticated:
+        user = request.user
+    else:
+        return HttpResponseRedirect(reverse("login"))
+
+    # Restore Gamestate from DB
+    game_id = request.session['game_id']
+
+    try:
+        board, green_player, blue_player, next_player = load_gamestate_db(game_id, user)
+    # Something went wrong retrieving board (db error or cheating)
+    except Exception as e:
+        print(e)
+        return render(request, "index.html", {"user": user})
+
+    if green_player == "human":
+        print("Green Player is human.")
+        difficulty = blue_player
+    elif blue_player == "human":
+        print("P2 is human.")
+        difficulty = green_player
+    else:
+        difficulty = "match"
+        print(f"Match: Green is {green_player} and Blue is {blue_player}.")
+
+    if user.is_superuser:
+        levels = admin_game_levels
+    else:
+        levels = game_levels
+
+    return render(request, "reversimatch.html",
+                    {"username": user.username,
+                    "board": board,
+                    "player1_name": green_player,
+                    "player2_name": blue_player,
+                    "game_level": difficulty,
+                    "game_levels": levels,
+                    "game_id": game_id,
+})
 
 
 # Query board status
@@ -206,19 +247,14 @@ def queryboard(request):
     if request.method == "GET":
         # Restore gamestate from DB
         game_id = request.session['game_id']
-        board, player1_name, player2_name, next_player = load_gamestate_db(game_id, user)
-
-        if player1_name == "human":
-            machine_role = 2
-        else:
-            machine_role = 1
+        board, green_player, player2_name, next_player = load_gamestate_db(game_id, user)
 
         possible_moves = get_possible_moves(board, next_player)
         message = f"Player{next_player}'s turn"
         scores = get_scores(board)
 
         data = {"board": board, "message": {"message": message, "color": "white"},
-                "machine_role": machine_role, "next_player": next_player, "game_over": False,
+                "next_player": next_player, "game_over": False,
                 "scores": scores, "possible_moves": possible_moves}
         return JsonResponse(data, safe=False)
 
@@ -312,7 +348,6 @@ def move(request):
                 if len(get_possible_moves(board, next_player)) == 0:
                     game_over = True
 
-
         elif next_player == machine_player.role:
             print("Machine move...")
             # Game Over?
@@ -342,6 +377,83 @@ def move(request):
                 "scores": scores, "possible_moves": get_possible_moves(board, next_player)}
 
         return JsonResponse(data, safe=False)
+
+
+# Main Game Logic is executed in this view every time the current Player makes a move via browser input
+# returns a json data object to browser which updates game board, scores and infos with JS
+@method_decorator(csrf_exempt, name='dispatch')
+@require_http_methods(["POST"])
+def movematch(request):
+    if request.user.is_authenticated:
+        user = request.user
+    else:
+        return HttpResponseRedirect(reverse("login"))
+
+    row = int(request.POST["row"])
+    col = int(request.POST["col"])
+    move = (row, col)
+
+    # Restore gamestate from DB
+    game_id = request.session['game_id']
+    board, player1_name, player2_name, next_player = load_gamestate_db(game_id, user)
+
+    if next_player == 1:
+        next_player_name = player1_name
+    else:
+        next_player_name = player2_name
+
+    game_over = False
+
+    if user.username == next_player_name:
+
+        # Something went wrong retrieving board (db error or cheating)
+        if board is None:
+            return render(request, "index.html", {"user": user, "game_levels": game_levels})
+
+        possible_moves = get_possible_moves(board, next_player)
+        print(possible_moves)
+
+        # Define player1 (player) and player2 (opponent)
+        human_player = Player(role=next_player)
+
+        if is_legal_move(board, next_player, move):
+            next_move, board = human_move(board, human_player, move)
+            r, c = next_move
+            message = f"{next_player} move: row {r + 1}, col {c + 1}"
+            color = 'white'
+            # switch to human player
+            next_player = get_opponent(next_player)
+        else:
+            print("Illegal move!!!")
+            message = f"Illegal move!"
+            color = 'red'
+            # do nothing with board
+
+        # Check for Game Over
+        if len(get_possible_moves(board, next_player)) == 0:
+            next_player = get_opponent(next_player)
+            if len(get_possible_moves(board, next_player)) == 0:
+                game_over = True
+
+        scores = get_scores(board)
+        # save gamestate to DB and session
+        save_game_db(game_id, scores[0], scores[1], next_player, game_over)
+        if not game_over:
+            save_gamestate_db(board, game_id)
+
+    # Not your turn!
+    else:
+        print(f'Not your turn {user.username}')
+        scores = get_scores(board)
+        message = f"Not your turn!"
+        color = 'red'
+
+    data = {"board": board, "message": {"message": message, "color": color},
+            "next_player": next_player, "game_over": game_over,
+            "scores": scores, "possible_moves": get_possible_moves(board, next_player)}
+
+    return JsonResponse(data, safe=False)
+
 
 
 def human_move(board, human_player, move):
@@ -374,7 +486,7 @@ def loadgame(request):
     print("Game ID: ", game_id)
 
     try:
-        board, player1, player2, next_game = load_gamestate_db(game_id, user)
+        board, player1, player2, next_player = load_gamestate_db(game_id, user)
     # Something went wrong retrieving board (db error or cheating)
     except Exception as e:
         print(f"DB Error: {e}")
@@ -387,7 +499,10 @@ def loadgame(request):
     request.session['player1_name'] = player1
     request.session['game_level'] = player2
 
-    return HttpResponseRedirect(reverse("reversi"))
+    if "human" in [player1, player2]:
+        return HttpResponseRedirect(reverse("reversi"))
+    else:
+        return HttpResponseRedirect(reverse("reversimatch"))
 
 
 # return a list o saved games for the current user

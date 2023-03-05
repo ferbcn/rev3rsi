@@ -39,8 +39,12 @@ def remove_game_db(game_id, user):
 
 def load_gamestate_db(game_id, user):
     gameDB_object = GameDB.objects.get(pk=game_id)
-    if not gameDB_object.user == user:
-        return None, None, None
+    # Only allow players or the owner of the game
+    players = [gameDB_object.player1, gameDB_object.player2]
+    if not user.username in players:
+        if not gameDB_object.user == user:
+            return None
+
     print("Game object: ", gameDB_object)
 
     # game_state_objects = GameState.objects.all().filter(game_id=gameDB_object)[::-1]
@@ -48,7 +52,7 @@ def load_gamestate_db(game_id, user):
     game_state = GameState.objects.all().filter(game_id=gameDB_object).last()
     print("Got GameState object from DB:", game_state)
 
-    # deserialize board and save it to session variable
+    # deserialize board
     board_string = game_state.board
     print(board_string)
     game_board = [[0, 0, 0, 0, 0, 0, 0, 0] for x in range(8)]
@@ -57,11 +61,10 @@ def load_gamestate_db(game_id, user):
         for c in range(8):
             game_board[r][c] = int(board_string[cell])
             cell += 1
+
     print("Game Board loaded!")
     player1 = gameDB_object.player1
     player2 = gameDB_object.player2
     next_player = gameDB_object.next_player
-    score_p1 = gameDB_object.score_p1
-    score_p2 = gameDB_object.score_p2
 
     return game_board, player1, player2, next_player
