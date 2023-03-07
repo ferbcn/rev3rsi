@@ -3,6 +3,12 @@ const matchGameId = JSON.parse(document.getElementById('json-gameId').textConten
 
 var chatSocket;
 
+var game_over = false;
+// begin by querying the board status and updating its elements
+startWebsocket();
+//queryBoard();
+
+
 function startWebsocket() {
 
   chatSocket = new WebSocket(
@@ -22,13 +28,51 @@ function startWebsocket() {
         const data = JSON.parse(e.data);
         console.log("Arena message received: ", data);
 
-        if (data.message_type == "game_turn"){
+        if (data.message_type == "chat"){
             const data = JSON.parse(e.data);
-            //window.setTimeout(queryBoard(), 100);
+            //document.querySelector('#chat-log').value += (data.username + ": " + data.message + '\n');
+            var mesTime = document.createElement('div');
+            mesTime.classList.add("mesTime");
+            var timeString = document.createTextNode(new Date().toLocaleTimeString());
+            mesTime.appendChild(timeString);
+
+            var newMesContainer = document.createElement('div')
+            newMesContainer.classList.add("chat-entry-container");
+
+            var newMes = document.createElement('div')
+            newMes.classList.add("chat-entry");
+
+            var mesAuthor = document.createElement('div');
+            mesAuthor.classList.add("mesAuthor");
+            var author = document.createTextNode(data.username+":");
+            mesAuthor.appendChild(author);
+
+            var mesContent = document.createElement('div');
+            mesContent.classList.add("mesContent");
+            var content = document.createTextNode(data.message);
+            mesContent.appendChild(content);
+
+
+            newMes.appendChild(mesTime);
+            newMes.appendChild(mesAuthor);
+            newMes.appendChild(mesContent);
+
+            newMesContainer.appendChild(mesAuthor);
+            newMesContainer.appendChild(newMes);
+
+            var chatLog = document.querySelector('#chat-log');
+            chatLog.appendChild(newMesContainer);
+            // scroll to bottom of div
+            chatLog.scrollTop = chatLog.scrollHeight;
+        }
+        else if (data.message_type == "game_turn"){
+            const data = JSON.parse(e.data);
+            //window.setTimeout(queryBoard(), 3000);
             //window.setTimeout(window.location.reload(true), 1000);
             //chatSocket.close();
             //window.location.reload(true);
-            queryBoard();
+            console.log("Querying board in a moment (race conditions)...");
+            setTimeout(queryBoard, 100);
         }
     };
 
@@ -39,15 +83,29 @@ function startWebsocket() {
     };
 }
 
-startWebsocket();
 
-var game_over = false;
-// begin by querying the board status and updating its elements
-queryBoard();
+//document.querySelector('#chat-message-input').focus();
+document.querySelector('#chat-message-input').onkeyup = function(e) {
+    if (e.keyCode === 13) {  // enter, return
+        sendChatMessage();
+    }
+};
 
+
+function sendChatMessage(){
+    const messageInputDom = document.querySelector('#chat-message-input');
+    const message = messageInputDom.value;
+    if (message.length > 1){
+        chatSocket.send(JSON.stringify({
+            'type': 'chat_message',
+            'message': message
+        }));
+        messageInputDom.value = '';
+    }
+};
 
 function queryBoard(){
-    console.log("Querying board...");
+    console.log("Querying board now!");
     // Open new request to get new posts.
     const request = new XMLHttpRequest();
     request.open('GET', '/queryboard');

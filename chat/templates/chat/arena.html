@@ -11,14 +11,16 @@
 <head>
     <meta charset="utf-8"/>
     <title>Chat Arena</title>
+    <link rel="stylesheet" href="{% static 'arena.css' %}" type="text/css">
 </head>
 <body>
     <div class="container">
 
         {{ username|json_script:"json-username" }}
-        <br>
-        <button class="btn btn-outline-success" id="create-game-submit">Open New Match</button>
-        <div class="container match-list-container" id="match-list-container">
+        <div class="create-game-submit-container">
+            <button class="btn btn-outline-success" id="create-game-submit">Open New Match</button>
+        </div>
+        <div class="match-list-container" id="match-list-container">
             <br>
             <div class="match-list" id="match-list">
                 {% for name, host in open_matches %}
@@ -56,21 +58,13 @@
         </div>
 
         <h6>Live chat:</h6>
-        <div class="container">
-            <div class="chat-board" id="chat-log"></div>
-            <br>
-            <!--<textarea class="form-control" id="chat-log" rows="10"></textarea><br>-->
-            <div class="flex-container chat-message-input-container">
-                <div class="flex-item-left">
-                    <input class="form-control" id="chat-message-input" placeholder="Write a message here..."><br>
-                    <br>
-                </div>
-                <div class="flex-item-right">
-                    <input class="btn btn-outline-success" id="chat-message-submit" type="button" value="Send">
-                </div>
-            </div>
 
+        <div class="arena-chat-log" id="chat-log"></div>
+        <!--<textarea class="form-control" id="chat-log" rows="10"></textarea><br>-->
+        <div class="chat-message-input-container">
+            <input id="chat-message-input" placeholder="Write a message here...">
         </div>
+
 
     </div>
 

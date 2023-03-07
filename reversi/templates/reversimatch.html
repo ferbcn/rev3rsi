@@ -7,6 +7,9 @@
 {% endblock %}
 
 {% block body %}
+<head>
+        <link rel="stylesheet" href="{% static 'arena.css' %}" type="text/css">
+</head>
 
 <!-- container for info messages -->
 <div class="container comm-box">
@@ -53,6 +56,13 @@
 <div class="container">
   <div id="gameoverbox"><span id="gameovertext"></span></div>
 </div>
+
+<div class="match-chat-log" id="chat-log"></div>
+<!--<textarea class="form-control" id="chat-log" rows="10"></textarea><br>-->
+<div class="chat-message-input-container">
+    <input id="chat-message-input" placeholder="Write a message here...">
+</div>
+
 {{ username|json_script:"json-username" }}
 {{ game_id|json_script:"json-gameId" }}
 <!-- JS: game board update and click capture and redirect to "move" post method -->

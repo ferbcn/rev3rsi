@@ -1,5 +1,6 @@
 const userName = JSON.parse(document.getElementById('json-username').textContent);
-var myInitiated
+
+document.querySelector('#chat-message-input').focus();
 
 const chatSocket = new WebSocket(
     'ws://'
@@ -33,6 +34,7 @@ chatSocket.onmessage = function(e) {
         mesAuthor.appendChild(author);
 
         var mesContent = document.createElement('div');
+        mesContent.classList.add("mesContent");
         var content = document.createTextNode(data.message);
         mesContent.appendChild(content);
 
@@ -126,14 +128,14 @@ chatSocket.onclose = function(e) {
 };
 
 
-document.querySelector('#chat-message-input').focus();
 document.querySelector('#chat-message-input').onkeyup = function(e) {
     if (e.keyCode === 13) {  // enter, return
-        document.querySelector('#chat-message-submit').click();
+        sendChatMessage();
     }
 };
 
-document.querySelector('#chat-message-submit').onclick = function(e) {
+
+function sendChatMessage(){
     const messageInputDom = document.querySelector('#chat-message-input');
     const message = messageInputDom.value;
     if (message.length > 1){
@@ -145,11 +147,6 @@ document.querySelector('#chat-message-submit').onclick = function(e) {
     }
 };
 
-
-function enterRoom(roomName){
-    console.log("Entering... " + roomName);
-    window.location.pathname = '/chat/' + roomName + '/';
-};
 
 document.querySelector('#create-game-submit').onclick = function(e) {
     console.log("Send create new game event!");
@@ -203,6 +200,3 @@ function handleSelectGame(id){
 
 };
 
-function saveGameId(id){
-    gameId = id;
-}

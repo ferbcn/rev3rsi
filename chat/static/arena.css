@@ -1,0 +1,225 @@
+.chatarena {
+    margin-top: 5%;
+    width: 95%;
+    max-width: 1000px;
+}
+
+.flex-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.flex-item-left {
+  padding: 5px;
+  flex: 70%;
+}
+
+.flex-item-right {
+  padding: 5px;
+  flex: 10%;
+}
+
+.flex-item-game {
+  padding: 5px;
+  flex: 50%;
+}
+
+.flex-item-user {
+  padding: 5px;
+  flex: 20%;
+  text-align: left;
+}
+
+.flex-item-btn {
+  padding: 5px;
+  flex: 40%;
+}
+
+.wave-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: transparent;
+}
+.wave {
+  width: 5px;
+  height: 20px;
+  background: linear-gradient(45deg, grey, grey);
+  margin: 5px;
+  animation: wave 1s linear infinite;
+  border-radius: 20px;
+}
+.wave:nth-child(2) {
+  animation-delay: 0.1s;
+}
+.wave:nth-child(3) {
+  animation-delay: 0.2s;
+}
+.wave:nth-child(4) {
+  animation-delay: 0.3s;
+}
+.wave:nth-child(5) {
+  animation-delay: 0.4s;
+}
+.wave:nth-child(6) {
+  animation-delay: 0.5s;
+}
+
+.wave-good {
+  width: 5px;
+  height: 20px;
+  background: linear-gradient(45deg, darkgreen, green);
+  margin: 5px;
+  animation: wave 1s linear infinite;
+  border-radius: 20px;
+}
+.wave-good:nth-child(2) {
+  animation-delay: 0.1s;
+}
+.wave-good:nth-child(3) {
+  animation-delay: 0.2s;
+}
+.wave-good:nth-child(4) {
+  animation-delay: 0.3s;
+}
+.wave-good:nth-child(5) {
+  animation-delay: 0.4s;
+}
+.wave-good:nth-child(6) {
+  animation-delay: 0.5s;
+}
+
+
+@keyframes wave {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(0);
+  }
+}
+
+.match-list-container{
+    margin-top: 10px;
+    height: 40%;
+    overflow:auto;
+    font-size: 3vw;
+    width: 100%;
+}
+
+.match-container {
+    margin-top: 5px;
+    padding: 10px;
+    animation-name: appear;
+    animation-duration: 0.5s;
+    animation-fill-mode: forwards;
+    animation-play-state: play;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    color: lightgrey;
+}
+
+@keyframes appear {
+    0% {
+        opacity: 1;
+        background-color: transparent;
+    }
+    50% {
+        opacity: 1;
+        background-color: seagreen;
+    }
+    100% {
+        opacity: 1;
+        background-color: transparent;
+    }
+}
+
+#game-list-container{
+
+}
+
+#chat-log{
+    width: 100%;
+    overflow:auto;
+    /*box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);*/
+}
+
+.chat-entry-container {
+    margin-top: 1vh;
+}
+
+.chat-entry {
+    padding: 10px;
+    color: lightgrey;
+    animation-name: appear;
+    animation-duration: 0.5s;
+    animation-fill-mode: forwards;
+    animation-play-state: play;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.mesAuthor {
+    font-style: italic;
+    color: darkgrey;
+    font-size: 2vw;
+    float: left;
+}
+
+.mesTime {
+    font-style: italic;
+    float: right;
+    color: darkgrey;
+    padding: 5px;
+    font-size: 2vw;
+}
+
+.mesContent {
+    color: lightgrey;
+    font-size: 3vw;
+}
+
+.chat-message-input-container{
+    position:fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: transparent;
+    padding: 10px;
+}
+
+#chat-message-input{
+    background-color: transparent;
+    border-color: lightgrey;
+    border: solid;
+    border-radius: 5px;
+    color: lightgrey;
+    width: 100%;
+    padding: 10px;
+    margin-right: 10px;
+    height: 35px;
+}
+
+.create-game-submit-container{
+    width: 100%;
+    text-align: center;
+}
+
+#create-game-submit{
+    width: 100%;
+    max-width: 500px;
+}
+
+.match-chat-log{
+    margin-top: 1vh;
+    padding: 10px;
+    height: 25vh;
+}
+
+.arena-chat-log{
+    margin-top: 0px;
+    padding: 10px;
+    height: 35vh;
+    padding-bottom: 15%;
+}
