@@ -49,6 +49,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 # Send game request to room group
                 json_resp = {"type": "arena_message", "message_type": "add_new_match", "message": "",
                              "game_uuid": game_uuid, "host": username}
+
                 print("Sending to room group:", json_resp)
                 # Send message to room group
                 await self.channel_layer.group_send(
@@ -111,9 +112,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
                                        "player": username}
             )
 
-    # Receive message from room group
+    # Relay message to room group
     async def arena_message(self, event):
-        print("Group Received: ", event)
         message_type = event["message_type"]
         game_id = event.get("game_id")
         message = event.get("message")

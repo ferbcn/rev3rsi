@@ -2,14 +2,16 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.views.decorators.http import require_http_methods
 
+import redis
 
 game_levels = [('', 'easy'), ('', 'hard'), ('', 'harder'), ('disabled', 'hardest')]
 
-import redis
-conn = redis.Redis('localhost')
 
+@require_http_methods(["GET"])
 def arenaindex(request):
+    conn = redis.Redis('localhost')
     if request.user.is_authenticated:
         username = request.user.username
 
@@ -21,6 +23,7 @@ def arenaindex(request):
             match_host = host.decode("utf-8")
             nice_open_matches.append((match_name, match_host))
         print("Open matches: ", nice_open_matches)
+
         return render(request, "chat/arena.html", {"open_matches": nice_open_matches, "username": username,
                                                    "game_levels": game_levels})
     else:

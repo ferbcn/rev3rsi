@@ -14,6 +14,13 @@ function openChatsocket(){
     );
 }
 
+chatSocket.onclose = function(e) {
+    console.error('Chat socket closed unexpectedly');
+    chatSocket = null;
+    setTimeout(openChatsocket, 100);
+};
+
+
 chatSocket.onmessage = function(e) {
     const data = JSON.parse(e.data);
     console.log("Arena message received: ", data);
@@ -146,11 +153,6 @@ chatSocket.onmessage = function(e) {
             // TODO: fix JS error
         }
     }
-};
-
-chatSocket.onclose = function(e) {
-    console.error('Chat socket closed unexpectedly');
-    openChatsocket();
 };
 
 
