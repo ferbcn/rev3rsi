@@ -1,10 +1,7 @@
 # arena/consumers.py
 import json
 import uuid
-from datetime import datetime
-
 from channels.generic.websocket import AsyncWebsocketConsumer
-
 import redis
 
 conn = redis.Redis('localhost')
