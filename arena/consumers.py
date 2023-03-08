@@ -7,7 +7,7 @@ import redis
 conn = redis.Redis('localhost')
 
 
-class ChatConsumer(AsyncWebsocketConsumer):
+class ArenaConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         print("User: ", self.scope["user"].username, "connected to: ", self.scope["url_route"]["kwargs"])
         self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
