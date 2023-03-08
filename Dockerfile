@@ -22,6 +22,7 @@ RUN pip install -r requirements.txt
 
 COPY mysite mysite
 COPY reversi reversi
+COPY arena arena
 COPY staticfiles staticfiles
 
 CMD ["gunicorn", "--bind", ":80", "--workers", "4", "mysite.wsgi:application"]
