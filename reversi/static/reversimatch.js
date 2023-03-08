@@ -5,104 +5,103 @@ var chatSocket;
 
 var game_over = false;
 // begin by querying the board status and updating its elements
-startWebsocket();
-//queryBoard();
+// queryBoard();
 
-
-function startWebsocket() {
-
-  chatSocket = new WebSocket(
+chatSocket = new WebSocket(
     'ws://'
     + window.location.host
-    + '/ws/chat/'
+    + '/ws/arena/'
     + matchGameId
     + '/'
-    );
+);
 
-  chatSocket.onopen = function(e) {
-        console.log('Chat socket connected!');
-        queryBoard();
-  };
+chatSocket.onopen = function(e) {
+    console.log('Chat socket connected!');
+    console.log("Querying board in a moment (race conditions)...");
+    setTimeout(queryBoard, 1);
+};
 
-    chatSocket.onmessage = function(e) {
+chatSocket.onclose = function(e) {
+    console.error('Chat socket closed unexpectedly', e);
+};
+
+chatSocket.onmessage = function(e) {
+    const data = JSON.parse(e.data);
+    console.log("Arena message received: ", data);
+
+    if (data.message_type == "chat"){
         const data = JSON.parse(e.data);
-        console.log("Arena message received: ", data);
+        //document.querySelector('#chat-log').value += (data.username + ": " + data.message + '\n');
+        var mesTime = document.createElement('div');
+        mesTime.classList.add("mesTime");
+        var timeString = document.createTextNode(new Date().toLocaleTimeString());
+        mesTime.appendChild(timeString);
 
-        if (data.message_type == "chat"){
-            const data = JSON.parse(e.data);
-            //document.querySelector('#chat-log').value += (data.username + ": " + data.message + '\n');
-            var mesTime = document.createElement('div');
-            mesTime.classList.add("mesTime");
-            var timeString = document.createTextNode(new Date().toLocaleTimeString());
-            mesTime.appendChild(timeString);
-
-            var newMesContainer = document.createElement('div')
-            newMesContainer.classList.add("chat-entry-container");
-
-            var newMes = document.createElement('div')
-            newMes.classList.add("chat-entry");
-
-            var mesAuthor = document.createElement('div');
-            mesAuthor.classList.add("mesAuthor");
-            var author = document.createTextNode(data.username+":");
-            mesAuthor.appendChild(author);
-
-            var mesContent = document.createElement('div');
-            mesContent.classList.add("mesContent");
-            var content = document.createTextNode(data.message);
-            mesContent.appendChild(content);
-
-
-            newMes.appendChild(mesTime);
-            newMes.appendChild(mesAuthor);
-            newMes.appendChild(mesContent);
-
-            newMesContainer.appendChild(mesAuthor);
-            newMesContainer.appendChild(newMes);
-
-            var chatLog = document.querySelector('#chat-log');
-            chatLog.appendChild(newMesContainer);
-            // scroll to bottom of div
-            chatLog.scrollTop = chatLog.scrollHeight;
+        var newMesContainer = document.createElement('div')
+        newMesContainer.classList.add("chat-entry-container");
+        if (userName == data.username){
+            newMesContainer.classList.add("chat-entry-container-me");
         }
-        else if (data.message_type == "game_turn"){
-            const data = JSON.parse(e.data);
-            //window.setTimeout(queryBoard(), 3000);
-            //window.setTimeout(window.location.reload(true), 1000);
-            //chatSocket.close();
-            //window.location.reload(true);
-            console.log("Querying board in a moment (race conditions)...");
-            setTimeout(queryBoard, 100);
+        else{
+            newMesContainer.classList.add("chat-entry-container-other");
         }
-    };
 
-    chatSocket.onclose = function(e) {
-        console.error('Chat socket closed unexpectedly', e);
-        chatSocket = null
-        setTimeout(startWebsocket, 1000)
-    };
-}
+        var newMes = document.createElement('div')
+        newMes.classList.add("chat-entry");
+
+        var mesAuthor = document.createElement('div');
+        mesAuthor.classList.add("mesAuthor");
+        var author = document.createTextNode(data.username+":");
+        mesAuthor.appendChild(author);
+
+        var mesContent = document.createElement('div');
+        mesContent.classList.add("mesContent");
+        var content = document.createTextNode(data.message);
+        mesContent.appendChild(content);
+
+
+        newMes.appendChild(mesTime);
+        newMes.appendChild(mesAuthor);
+        newMes.appendChild(mesContent);
+
+        newMesContainer.appendChild(mesAuthor);
+        newMesContainer.appendChild(newMes);
+
+        var chatLog = document.querySelector('#chat-log');
+        chatLog.appendChild(newMesContainer);
+        // scroll to bottom of div
+        chatLog.scrollTop = chatLog.scrollHeight;
+    }
+    else if (data.message_type == "match_turn_cast"){
+        const data = JSON.parse(e.data);
+        player = data.player;
+        //window.setTimeout(queryBoard(), 3000);
+        //window.setTimeout(window.location.reload(true), 1000);
+        //chatSocket.close();
+        //window.location.reload(true);
+        console.log("Querying board in a moment (race conditions)...");
+        if (userName != player){
+            setTimeout(queryBoard, 50);
+        }
+    }
+};
 
 
 //document.querySelector('#chat-message-input').focus();
 document.querySelector('#chat-message-input').onkeyup = function(e) {
     if (e.keyCode === 13) {  // enter, return
-        sendChatMessage();
+        const messageInputDom = document.querySelector('#chat-message-input');
+        const message = messageInputDom.value;
+        if (message.length > 1){
+            chatSocket.send(JSON.stringify({
+                'type': 'chat_text_message',
+                'message': message
+            }));
+            messageInputDom.value = '';
+        }
     }
 };
 
-
-function sendChatMessage(){
-    const messageInputDom = document.querySelector('#chat-message-input');
-    const message = messageInputDom.value;
-    if (message.length > 1){
-        chatSocket.send(JSON.stringify({
-            'type': 'chat_message',
-            'message': message
-        }));
-        messageInputDom.value = '';
-    }
-};
 
 function queryBoard(){
     console.log("Querying board now!");
@@ -112,21 +111,15 @@ function queryBoard(){
     request.onload = () => {
         const data = JSON.parse(request.responseText);
         console.log(data);
-        //game_over = data["game_over"]
         // update everything
         updateAll(data);
     };
-
-    // Send request (only if not game over)
-    if (!game_over){
-        request.send();
-    }
+    request.send();
 };
 
 
 function move(row, col){
-    console.log("Making move...");
-    console.log("Row:", row, "Col:", col);
+    console.log("Making move, Row:", row, "Col:", col);
 
     // Open new request to get new posts.
     const request = new XMLHttpRequest();
@@ -149,14 +142,15 @@ function move(row, col){
 
     // Send request (only if not game over)
     if (!game_over){
+        // make move via post request
         request.send(data);
     }
 
-    // send websocket notification to update gameboard
-    chatSocket.send(JSON.stringify({
-        'type': "new_game_turn",
-        'message': ""
-    }));
+    // send web-socket notification to update gameboard
+        chatSocket.send(JSON.stringify({
+            'type': "match_turn",
+            'message': ""
+        }));
 
 };
 
@@ -175,10 +169,10 @@ function updateAll(data){
     update_board(data["board"], data["possible_moves"]);
 
     // update scores
-    updateScores(data["scores"])
+    updateScores(data["scores"]);
 
     // update message
-    updateMessage(data["message"], data["game_over"])
+    updateMessage(data["message"], data["game_over"]);
 }
 
 
@@ -203,7 +197,8 @@ function updateMessage(message, game_over){
             document.getElementById('gameovertext').innerHTML = "P2 WINS!";
         else
             document.getElementById('gameovertext').innerHTML = "DRAW!";
-        document.getElementById('gameoverbox').classList.add('gameover-box');
+
+        ocument.getElementById('gameoverbox').classList.add('gameover-box');
         game_over = true;
       }
 }

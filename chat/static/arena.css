@@ -1,3 +1,12 @@
+:root {
+  --bg_color: #212529;
+}
+
+html, body {
+    background-color: var(--bg_color);
+    color: lightgrey;
+}
+
 .chatarena {
     margin-top: 5%;
     width: 95%;
@@ -102,7 +111,7 @@
   }
 }
 
-.match-list-container{
+#match-list{
     margin-top: 10px;
     height: 40%;
     overflow:auto;
@@ -136,9 +145,36 @@
     }
 }
 
-#game-list-container{
-
+.match-container-accepted {
+    animation-name: appearHigh;
+    animation-duration: 0.5s;
+    animation-fill-mode: forwards;
+    animation-play-state: play;
 }
+
+@keyframes appearHigh {
+    0% {
+        opacity: 1;
+        background-color: transparent;
+    }
+    25% {
+        opacity: 1;
+        background-color: seagreen;
+    }
+    50% {
+        opacity: 1;
+        background-color: transparent;
+    }
+    75% {
+        opacity: 1;
+        background-color: seagreen;
+    }
+    100% {
+        opacity: 1;
+        background-color: transparent;
+    }
+}
+
 
 #chat-log{
     width: 100%;
@@ -148,6 +184,17 @@
 
 .chat-entry-container {
     margin-top: 1vh;
+}
+
+.chat-entry-container-me{
+    margin-left: 50px;
+    border-radius: 5px;
+    border-radius: 5px;
+}
+.chat-entry-container-other{
+    margin-right: 50px;
+    background-color: #303030;
+    border-radius: 5px;
 }
 
 .chat-entry {
@@ -165,6 +212,7 @@
     color: darkgrey;
     font-size: 2vw;
     float: left;
+    padding-left: 5px;
 }
 
 .mesTime {
@@ -190,7 +238,7 @@
 }
 
 #chat-message-input{
-    background-color: transparent;
+    background-color: var(--bg_color);
     border-color: lightgrey;
     border: solid;
     border-radius: 5px;

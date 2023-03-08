@@ -148,9 +148,9 @@ def newmatch(request):
     # save game to DB
     save_gamestate_db(new_game.board, game_db_entry.id)
 
-    json_respones = {"game_id": game_db_entry.id}
+    json_response = {"game_id": game_db_entry.id}
 
-    return JsonResponse(json_respones, safe=False)
+    return JsonResponse(json_response, safe=False)
 
 
 # initial game view
@@ -210,20 +210,10 @@ def reversimatch (request):
         print(e)
         return render(request, "index.html", {"user": user})
 
-    if green_player == "human":
-        print("Green Player is human.")
-        difficulty = blue_player
-    elif blue_player == "human":
-        print("P2 is human.")
-        difficulty = green_player
-    else:
-        difficulty = "match"
-        print(f"Match: Green is {green_player} and Blue is {blue_player}.")
+    difficulty = "match"
+    print(f"Match: Green is {green_player} and Blue is {blue_player}.")
 
-    if user.is_superuser:
-        levels = admin_game_levels
-    else:
-        levels = game_levels
+    levels = game_levels
 
     return render(request, "reversimatch.html",
                     {"username": user.username,
@@ -254,7 +244,7 @@ def queryboard(request):
         scores = get_scores(board)
 
         data = {"board": board, "message": {"message": message, "color": "white"},
-                "next_player": next_player, "game_over": False,
+                "next_player": next_player,
                 "scores": scores, "possible_moves": possible_moves}
         return JsonResponse(data, safe=False)
 
@@ -262,121 +252,121 @@ def queryboard(request):
 # Main Game Logic is executed in this view every time the current Player makes a move via browser input
 # returns a json data object to browser which updates game board, scores and infos with JS
 @method_decorator(csrf_exempt, name='dispatch')
+@require_http_methods(["POST"])
 def move(request):
     if request.user.is_authenticated:
         user = request.user
     else:
         return HttpResponseRedirect(reverse("login"))
 
-    if request.method == "POST":
-        row = int(request.POST["row"])
-        col = int(request.POST["col"])
-        move = (row, col)
+    row = int(request.POST["row"])
+    col = int(request.POST["col"])
+    current_move = (row, col)
 
-        # Restore gamestate from DB
-        game_id = request.session['game_id']
-        board, player1_name, player2_name, next_player = load_gamestate_db(game_id, user)
+    # Restore gamestate from DB
+    game_id = request.session['game_id']
+    board, player1_name, player2_name, next_player = load_gamestate_db(game_id, user)
 
-        game_over = False
+    game_over = False
 
-        # Something went wrong retrieving board (db error or cheating)
-        if board is None:
-            return render(request, "index.html", {"user": user, "game_levels": game_levels})
+    # Something went wrong retrieving board (db error or cheating)
+    if board is None:
+        return render(request, "index.html", {"user": user, "game_levels": game_levels})
 
-        if player1_name == "human":
-            difficulty = player2_name
-            human_role = 1
-            machine_role = 2
-            human_color = 'green'
-            machine_color = 'blue'
-        elif player2_name == "human":
-            difficulty = player1_name
-            human_role = 2
-            machine_role = 1
-            human_color = 'blue'
-            machine_color = 'green'
+    if player1_name == "human":
+        difficulty = player2_name
+        human_role = 1
+        machine_role = 2
+        human_color = 'green'
+        machine_color = 'blue'
+    elif player2_name == "human":
+        difficulty = player1_name
+        human_role = 2
+        machine_role = 1
+        human_color = 'blue'
+        machine_color = 'green'
+    else:
+        difficulty = 'match'
+        human_role = 0
+        machine_role = 0
+        human_color = 'blue'
+        machine_color = 'green'
+
+    # Define player1 (player) and player2 (opponent)
+    human_player = Player(role=human_role)
+
+    if difficulty == "easy":
+        machine_player = AiRandom(role=machine_role)
+        print("Random Ai initiated")
+    elif difficulty == "hard":
+        machine_player = AiGreedy(role=machine_role)
+        print("Greedy Ai initiated")
+    elif difficulty == "harder":
+        machine_player = AiGreedyPlus(role=machine_role)
+        print("Greedy Plus Ai initiated")
+    else:
+        machine_player = AiGreedy(role=machine_role)
+        print("Defaulting to Greedy Ai")
+
+    message = f""
+    color = 'darkgrey'
+
+    if next_player == human_player.role:
+        print("### Human Player possible moves:")
+    else:
+        print("### Machine Player possible moves:")
+    possible_moves = get_possible_moves(board, next_player)
+    print(possible_moves)
+
+    if next_player == human_player.role:
+        print(f"Human move: {move}")
+        if is_legal_move(board, human_player.role, current_move):
+            next_move, board = human_move(board, human_player, current_move)
+            r, c = next_move
+            message = f"Human move: row {r + 1}, col {c + 1}"
+            color = human_color
+            # switch to human player
+            next_player = machine_player.role
         else:
-            difficulty = 'match'
-            human_role = 0
-            machine_role = 0
-            human_color = 'blue'
-            machine_color = 'green'
-
-        # Define player1 (player) and player2 (opponent)
-        human_player = Player(role=human_role)
-
-        if difficulty == "easy":
-            machine_player = AiRandom(role=machine_role)
-            print("Random Ai initiated")
-        elif difficulty == "hard":
-            machine_player = AiGreedy(role=machine_role)
-            print("Greedy Ai initiated")
-        elif difficulty == "harder":
-            machine_player = AiGreedyPlus(role=machine_role)
-            print("Greedy Plus Ai initiated")
-        else:
-            machine_player = AiGreedy(role=machine_role)
-            print("Defaulting to Greedy Ai")
-
-        message = f""
-        color = 'white'
-
-        if next_player == human_player.role:
-            print("### Human Player possible moves:")
-        else:
-            print("### Machine Player possible moves:")
-        possible_moves = get_possible_moves(board, next_player)
-        print(possible_moves)
-
-        if next_player == human_player.role:
-            print(f"Human move: {move}")
-            if is_legal_move(board, human_player.role, move):
-                next_move, board = human_move(board, human_player, move)
-                r, c = next_move
-                message = f"Human move: row {r + 1}, col {c + 1}"
-                color = human_color
-                # switch to human player
-                next_player = machine_player.role
-            else:
-                print("Illegal move!!!")
-                message = f"Illegal move!"
-                color = 'red'
-                # do nothing with board
-            # Check for Game Over
+            print("Illegal move!!!")
+            message = f"Illegal move!"
+            color = 'red'
+            # do nothing with board
+        # Check for Game Over
+        if len(get_possible_moves(board, next_player)) == 0:
+            next_player = get_opponent(next_player)
             if len(get_possible_moves(board, next_player)) == 0:
-                next_player = get_opponent(next_player)
-                if len(get_possible_moves(board, next_player)) == 0:
-                    game_over = True
+                game_over = True
 
-        elif next_player == machine_player.role:
-            print("Machine move...")
-            # Game Over?
-            if len(get_possible_moves(board, next_player)) > 0:
-                next_move, board = machine_move(board, machine_player)
-                r, c = next_move
-                message = f"Machine move: row {r + 1}, col {c + 1}"
-                color = machine_color
-                if next_move is None:
-                    print("Machine can't move...")
-                    message = f"AI can't move!"
-                # switch to human player
-                next_player = human_player.role
-            # Check for Game Over
-            if len(get_possible_moves(board, next_player)) == 0:
-                if len(get_possible_moves(board, get_opponent(next_player))) == 0:
-                    game_over = True
+    elif next_player == machine_player.role:
+        print("Machine move...")
+        # Game Over?
+        if len(get_possible_moves(board, next_player)) > 0:
+            next_move, board = machine_move(board, machine_player)
+            r, c = next_move
+            message = f"Machine move: row {r + 1}, col {c + 1}"
+            color = machine_color
+            if next_move is None:
+                print("Machine can't move...")
+                message = f"AI can't move!"
+            # switch to human player
+            next_player = human_player.role
+        # Check for Game Over
+        if len(get_possible_moves(board, next_player)) == 0:
+            if len(get_possible_moves(board, get_opponent(next_player))) == 0:
+                game_over = True
 
-        scores = get_scores(board)
-        # save gamestate to DB and session
-        save_game_db(game_id, scores[0], scores[1], next_player, game_over)
-        if not game_over:
-            save_gamestate_db(board, game_id)
+    scores = get_scores(board)
+    # save gamestate to DB and session
+    save_game_db(game_id, scores[0], scores[1], next_player, game_over)
+    if not game_over:
+        save_gamestate_db(board, game_id)
 
-        data = {"board": board, "message": {"message": message, "color": color},
-                "machine_role": machine_player.role, "next_player": next_player, "game_over": game_over,
-                "scores": scores, "possible_moves": get_possible_moves(board, next_player)}
+    data = {"board": board, "message": {"message": message, "color": color},
+            "machine_role": machine_player.role, "next_player": next_player, "game_over": game_over,
+            "scores": scores, "possible_moves": get_possible_moves(board, next_player)}
 
-        return JsonResponse(data, safe=False)
+    return JsonResponse(data, safe=False)
 
 
 # Main Game Logic is executed in this view every time the current Player makes a move via browser input
@@ -391,7 +381,7 @@ def movematch(request):
 
     row = int(request.POST["row"])
     col = int(request.POST["col"])
-    move = (row, col)
+    current_move = (row, col)
 
     # Restore gamestate from DB
     game_id = request.session['game_id']
@@ -410,21 +400,18 @@ def movematch(request):
         if board is None:
             return render(request, "index.html", {"user": user, "game_levels": game_levels})
 
-        possible_moves = get_possible_moves(board, next_player)
-        print(possible_moves)
-
         # Define player1 (player) and player2 (opponent)
         human_player = Player(role=next_player)
 
-        if is_legal_move(board, next_player, move):
-            next_move, board = human_move(board, human_player, move)
+        if is_legal_move(board, next_player, current_move):
+            next_move, board = human_move(board, human_player, current_move)
             r, c = next_move
             message = f"{next_player} move: row {r + 1}, col {c + 1}"
-            color = 'white'
+            color = 'lightgrey'
             # switch to human player
             next_player = get_opponent(next_player)
         else:
-            print("Illegal move!!!")
+            #print("Illegal move!!!")
             message = f"Illegal move!"
             color = 'red'
             # do nothing with board
@@ -443,7 +430,7 @@ def movematch(request):
 
     # Not your turn!
     else:
-        print(f'Not your turn {user.username}')
+        #print(f'Not your turn {user.username}')
         scores = get_scores(board)
         message = f"Not your turn!"
         color = 'red'
@@ -453,7 +440,6 @@ def movematch(request):
             "scores": scores, "possible_moves": get_possible_moves(board, next_player)}
 
     return JsonResponse(data, safe=False)
-
 
 
 def human_move(board, human_player, move):

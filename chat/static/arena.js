@@ -1,14 +1,18 @@
 const userName = JSON.parse(document.getElementById('json-username').textContent);
 
-document.querySelector('#chat-message-input').focus();
+//document.querySelector('#chat-message-input').focus();
+var chatSocket;
+openChatsocket();
 
-const chatSocket = new WebSocket(
-    'ws://'
-    + window.location.host
-    + '/ws/chat/'
-    + 'ARENA'
-    + '/'
-);
+function openChatsocket(){
+    chatSocket = new WebSocket(
+        'ws://'
+        + window.location.host
+        + '/ws/arena/'
+        + 'ARENA'
+        + '/'
+    );
+}
 
 chatSocket.onmessage = function(e) {
     const data = JSON.parse(e.data);
@@ -24,6 +28,12 @@ chatSocket.onmessage = function(e) {
 
         var newMesContainer = document.createElement('div')
         newMesContainer.classList.add("chat-entry-container");
+        if (userName == data.username){
+            newMesContainer.classList.add("chat-entry-container-me");
+        }
+        else{
+            newMesContainer.classList.add("chat-entry-container-other");
+        }
 
         var newMes = document.createElement('div')
         newMes.classList.add("chat-entry");
@@ -51,36 +61,21 @@ chatSocket.onmessage = function(e) {
         // scroll to bottom of div
         chatLog.scrollTop = chatLog.scrollHeight;
     }
-    else if (data.message_type == "new_game_confirmed"){
-        gameId = data.game_id;
-        host = data.host;
-
-        // redirect if we were the host
-        if (userName == host){
-            window.location.href = '../loadgame?game_id='+gameId;
-        }
-        // remove entry from DOM
-        else{
-            var gameList = document.getElementById('match-list');
-            //var entry = document.querySelector('#'+gameId)
-            //gameList.removeChild(entry);
-        }
-    }
     else if (data.message_type == "add_new_match"){
-        var gameId = data.game_id;
-        var host = data.username;
+        var gameUuid = data.game_uuid;
+        var host = data.host;
 
         var gameList = document.getElementById('match-list');
 
         var newGameRow = document.createElement('div');
         newGameRow.classList.add("flex-container");
         newGameRow.classList.add("match-container");
-        newGameRow.setAttribute("id", gameId);
+        newGameRow.setAttribute("id", gameUuid);
 
         var flex_elem_game = document.createElement('div');
         flex_elem_game.classList.add("flex-item-game");
         flex_elem_game.setAttribute("id", "gameName");
-        flex_elem_game.appendChild(document.createTextNode(gameId))
+        flex_elem_game.appendChild(document.createTextNode("New Match requested by"))
 
         var flex_elem_host = document.createElement('div');
         flex_elem_host.classList.add("flex-item-user");
@@ -98,9 +93,9 @@ chatSocket.onmessage = function(e) {
                 flex_elem_btn.appendChild(wave_elem);
             }
         }
-        else{
+        else {
             var flex_elem_btn = document.createElement('a');
-            flex_elem_btn.href = "javascript:handleSelectGame('"+gameId+"')";
+            flex_elem_btn.href = "javascript:handleSelectGame('"+gameUuid+"')";
             flex_elem_btn.classList.add("wave-box");
             for (i=0; i<6; i++){
                 var wave_elem = document.createElement('div');
@@ -115,62 +110,82 @@ chatSocket.onmessage = function(e) {
 
         gameList.appendChild(newGameRow);
 
-        console.log(gameList.scrollHeight);
-        //window.scrollTo(0, document.body.scrollHeight);
+        // console.log(gameList.scrollHeight);
+        // window.scrollTo(0, document.body.scrollHeight);
         // scroll to bottom of div
         document.getElementById('match-list').scrollIntoView(false);
+    }
+    else if (data.message_type == "new_match_confirmed"){
 
+        const gameId = data.game_id;
+        const gameUuid = data.game_uuid;
+        const userPlayer = data.username;
+        host = data.host.trim(" ");
+        deleteMatches = data.delete_matches;
+
+        // redirect to game if we are the host
+        if (userName == host){
+            console.log("My game request (" + gameUuid + ") was accepted!");
+            console.log("Redirecting to ... game_id: " + gameId);
+            window.location.href = '../loadgame?game_id='+gameId;
+        }
+        // remove entry from DOM
+        else if (userName != userPlayer){
+        /*
+            // delete all open requests for matches from host and user
+            console.log("Removing games from DOM...");
+            for (var i=0; i < deleteMatches.length; i++){
+                const gameRow = document.getElementById(deleteMatches[i]);
+                gameRow.parentNode.removeChild(gameRow);
+            }
+            console.log(i + " game(s) removed!");
+            // this seams to lead to a bug in the websocket
+        */
+            // brute force workaround
+            window.location.reload();
+            // TODO: fix JS error
+        }
     }
 };
 
 chatSocket.onclose = function(e) {
     console.error('Chat socket closed unexpectedly');
+    openChatsocket();
 };
 
 
 document.querySelector('#chat-message-input').onkeyup = function(e) {
     if (e.keyCode === 13) {  // enter, return
-        sendChatMessage();
-    }
-};
-
-
-function sendChatMessage(){
-    const messageInputDom = document.querySelector('#chat-message-input');
-    const message = messageInputDom.value;
-    if (message.length > 1){
-        chatSocket.send(JSON.stringify({
-            'type': 'chat_message',
-            'message': message
-        }));
-        messageInputDom.value = '';
+        const messageInputDom = document.querySelector('#chat-message-input');
+        const message = messageInputDom.value;
+        if (message.length > 1){
+            chatSocket.send(JSON.stringify({
+                'type': 'chat_text_message',
+                'message': message
+            }));
+            messageInputDom.value = '';
+        }
     }
 };
 
 
 document.querySelector('#create-game-submit').onclick = function(e) {
-    console.log("Send create new game event!");
+    console.log("Sending create new match event...");
     chatSocket.send(JSON.stringify({
-        'type': "new_game_create",
+        'type': "new_match_create",
         'message': ""
     }));
 };
 
-function handleSelectGame(id){
-    //var gameRow = document.querySelector('#'+id);
-    var gameRow = document.getElementById(id);
-
-    //var name = gameRow.querySelector('#gameName').innerHTML;
-    var name = id;
+function handleSelectGame(uuid){
+    var gameUuid = uuid;
+    var gameRow = document.getElementById(uuid);
     var host = gameRow.querySelector('#hostName').innerHTML;
-    name = name.trim();
     host = host.trim();
     var gameId;
-
     var url = "/newmatch?p1="+host+"&p2="+userName;
 
     // This initiates the game setup
-
     fetch(url)
       .then(response => {
         // indicates whether the response is successful (status code 200-299) or not
@@ -181,22 +196,19 @@ function handleSelectGame(id){
       })
       .then(data => {
         gameId = data["game_id"];
-        console.log("Accepting game " + name + host + " with game_id:  " + gameId +" (host: " + host + ") accepted by " + userName);
-        acceptedGameName = name + userName;
+        console.log("Accepting game " + gameUuid + " with game_id:  " + gameId +" (host: " + host + ") accepted by " + userName);
 
         chatSocket.send(JSON.stringify({
-            'type': "new_game_accept",
-            'game_name': acceptedGameName,
+            'type': "new_match_accept",
+            'game_uuid': gameUuid,
             'game_id': gameId,
             'host': host
         }));
 
-        //window.location.href = '../chat/' + gameId;
-        window.location.href = '../reversimatch';
         //chatSocket.close();
+        window.location.href = '../reversimatch';
       })
       .catch(error => console.log(error))
-
 
 };
 

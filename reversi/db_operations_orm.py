@@ -10,7 +10,7 @@ def save_gamestate_db(board, game_id):
     board_string = ""
     for num in flat_board:
         board_string += str(num)
-    print(board_string)
+    # print(board_string)
     gameDB_object = GameDB.objects.get(pk=game_id)
     game_state_entry = GameState(game_id=gameDB_object, board=board_string)
     game_state_entry.save()
@@ -45,16 +45,15 @@ def load_gamestate_db(game_id, user):
         if not gameDB_object.user == user:
             return None
 
-    print("Game object: ", gameDB_object)
-
+    # print("Game object: ", gameDB_object)
     # game_state_objects = GameState.objects.all().filter(game_id=gameDB_object)[::-1]
     # game_state = game_state_objects[0]
     game_state = GameState.objects.all().filter(game_id=gameDB_object).last()
-    print("Got GameState object from DB:", game_state)
+    # print("Got GameState object from DB:", game_state)
 
     # deserialize board
     board_string = game_state.board
-    print(board_string)
+    # print(board_string)
     game_board = [[0, 0, 0, 0, 0, 0, 0, 0] for x in range(8)]
     cell = 0
     for r in range(8):
@@ -62,7 +61,7 @@ def load_gamestate_db(game_id, user):
             game_board[r][c] = int(board_string[cell])
             cell += 1
 
-    print("Game Board loaded!")
+    print("Game Board loaded!", game_state)
     player1 = gameDB_object.player1
     player2 = gameDB_object.player2
     next_player = gameDB_object.next_player
