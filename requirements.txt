@@ -5,3 +5,4 @@ whitenoise
 channels
 channels_redis
 daphne
+redis
