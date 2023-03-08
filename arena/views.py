@@ -1,4 +1,4 @@
-# chat/views.py
+# arena/views.py
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.urls import reverse
@@ -24,7 +24,7 @@ def arenaindex(request):
             nice_open_matches.append((match_name, match_host))
         print("Open matches: ", nice_open_matches)
 
-        return render(request, "chat/arena.html", {"open_matches": nice_open_matches, "username": username,
+        return render(request, "arena/arena.html", {"open_matches": nice_open_matches, "username": username,
                                                    "game_levels": game_levels})
     else:
         return HttpResponseRedirect(reverse("login"))

@@ -25,7 +25,7 @@ ALLOWED_HOSTS = ['*', 'www.rev3rsi.fun', 'rev3rsi.fun']
 
 INSTALLED_APPS = [
     'daphne',
-    'chat',
+    'arena',
     'reversi.apps.ReversiConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -130,7 +130,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'reversi/static'), os.path.join(BASE_DIR, 'chat/static')]
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'reversi/static'), os.path.join(BASE_DIR, 'arena/static')]
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
