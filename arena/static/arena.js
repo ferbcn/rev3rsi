@@ -25,6 +25,10 @@ chatSocket.onclose = function(e) {
     setTimeout(openChatsocket, 10);
 };
 
+chatSocket.onerror = function(e) {
+    console.error('Websocket Error:', e);
+};
+
 
 chatSocket.onmessage = function(e) {
     const data = JSON.parse(e.data);
