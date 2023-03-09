@@ -9,7 +9,8 @@ var game_over = false;
 
 chatSocket = new WebSocket(
     'wss://'
-    + window.location.host + ":443"
+    + window.location.host
+    + ':443'
     + '/ws/arena/'
     + matchGameId
     + '/'
