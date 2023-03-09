@@ -16,6 +16,7 @@ chatSocket = new WebSocket(
     + '/'
 );
 
+
 chatSocket.onopen = function(e) {
     console.log('Chat socket connected!');
     console.log("Querying board in a moment (race conditions)...");

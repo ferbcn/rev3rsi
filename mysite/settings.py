@@ -29,8 +29,8 @@ ALLOWED_HOSTS = ['*', 'www.rev3rsi.fun', 'rev3rsi.fun']
 # Application definition
 
 INSTALLED_APPS = [
-    'arena',
     'daphne',
+    'arena',
     'reversi',
     'django.contrib.admin',
     'django.contrib.auth',
