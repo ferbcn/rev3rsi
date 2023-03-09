@@ -2,6 +2,7 @@ const userName = JSON.parse(document.getElementById('json-username').textContent
 const matchGameId = JSON.parse(document.getElementById('json-gameId').textContent);
 
 var chatSocket;
+
 var game_over = false;
 // queryBoard();
 
@@ -19,7 +20,7 @@ chatSocket.onopen = function(e) {
     console.log('Chat socket connected!');
     console.log("Querying board...");
     // begin by querying the board status and updating its elements
-    setTimeout(queryBoard, 10);
+    setTimeout(queryBoard, 100);
 };
 
 chatSocket.onclose = function(e) {

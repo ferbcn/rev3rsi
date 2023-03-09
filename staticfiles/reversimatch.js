@@ -2,6 +2,7 @@ const userName = JSON.parse(document.getElementById('json-username').textContent
 const matchGameId = JSON.parse(document.getElementById('json-gameId').textContent);
 
 var chatSocket;
+
 var game_over = false;
 // queryBoard();
 
