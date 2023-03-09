@@ -1,17 +1,20 @@
 # arena/views.py
+import os
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 
 import redis
+REDIS_HOST = os.environ.get("REDIS_HOST")
+conn = redis.Redis(REDIS_HOST)
 
 game_levels = [('', 'easy'), ('', 'hard'), ('', 'harder'), ('disabled', 'hardest')]
 
 
 @require_http_methods(["GET"])
 def arenaindex(request):
-    conn = redis.Redis('localhost')
+
     if request.user.is_authenticated:
         username = request.user.username
 

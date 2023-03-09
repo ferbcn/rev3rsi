@@ -3,8 +3,10 @@ import json
 import uuid
 from channels.generic.websocket import AsyncWebsocketConsumer
 import redis
+import os
 
-conn = redis.Redis('localhost')
+REDIS_HOST = os.environ.get("REDIS_HOST")
+conn = redis.Redis(REDIS_HOST)
 
 
 class ArenaConsumer(AsyncWebsocketConsumer):
