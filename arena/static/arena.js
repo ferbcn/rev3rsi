@@ -4,10 +4,9 @@ const userName = JSON.parse(document.getElementById('json-username').textContent
 var chatSocket;
 openChatsocket();
 
-var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
 function openChatsocket(){
     chatSocket = new WebSocket(
-        ws_scheme
+        'wss'
         +'://'
         + window.location.host
         + ':443'
