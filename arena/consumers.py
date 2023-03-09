@@ -64,7 +64,7 @@ class ArenaConsumer(AsyncWebsocketConsumer):
             # Send message to room group
             await self.channel_layer.group_send(
                 self.room_group_name,
-                {"type": "arena_message", "message_type": "arena", "message": message, "username": username}
+                {"type": "arena_message", "message_type": "chat", "message": message, "username": username}
             )
 
         elif message_super_type == "new_match_accept":

@@ -21,15 +21,16 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
+
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*', 'www.rev3rsi.fun', 'rev3rsi.fun']
 
 # Application definition
 
 INSTALLED_APPS = [
-    'daphne',
+    #'daphne',
     'arena',
     'reversi',
     'django.contrib.admin',
@@ -83,7 +84,6 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 DB_PASSWORD = os.environ.get('DB_PASSWORD')
 DB_URL = os.environ.get('DB_URL')
 DB_USER = os.environ.get('DB_USER')
-
 
 # Heroku PostgreSQL Database
 DATABASES = {

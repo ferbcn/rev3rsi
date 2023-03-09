@@ -7,7 +7,7 @@ var game_over = false;
 // begin by querying the board status and updating its elements
 // queryBoard();
 
-const wsUrl = "ws://" + window.location.host + "/ws/arena/ARENA/";
+const wsUrl = "wss://" + window.location.host + "/ws/arena/ARENA/";
 
 var chatSocket = new WebSocket(wsUrl);
 // const wsUrl = "wss://rev3rsi.fun/ws/arena/ARENA/";
