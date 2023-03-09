@@ -2,9 +2,9 @@ const userName = JSON.parse(document.getElementById('json-username').textContent
 
 //document.querySelector('#chat-message-input').focus();
 var chatSocket;
-openChatsocket();
-
 const wsUrl = "wss://rev3rsi.fun:443/ws/arena/ARENA/";
+
+openChatsocket();
 
 function openChatsocket(){
     chatSocket = new WebSocket(wsUrl);
