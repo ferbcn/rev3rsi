@@ -3,13 +3,10 @@ const userName = JSON.parse(document.getElementById('json-username').textContent
 //document.querySelector('#chat-message-input').focus();
 var chatSocket;
 // const wsUrl = "wss://rev3rsi.fun/ws/arena/ARENA/";
-const wsUrl = "wss://" + window.location.host + ":443" + "/ws/arena/ARENA/";
 
 openChatsocket();
 
 function openChatsocket(){
-    chatSocket = new WebSocket(wsUrl);
-    /*
     chatSocket = new WebSocket(
         'ws://'
         + window.location.host
@@ -17,13 +14,13 @@ function openChatsocket(){
         + 'ARENA'
         + '/'
     );
-    */
+
 }
 
 chatSocket.onclose = function(e) {
     console.error('Chat socket closed unexpectedly');
     chatSocket = null;
-    setTimeout(openChatsocket, 100);
+    setTimeout(openChatsocket, 10);
 };
 
 

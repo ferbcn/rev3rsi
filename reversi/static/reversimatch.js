@@ -4,7 +4,6 @@ const matchGameId = JSON.parse(document.getElementById('json-gameId').textConten
 var chatSocket;
 
 var game_over = false;
-// begin by querying the board status and updating its elements
 // queryBoard();
 
 chatSocket = new WebSocket(
@@ -17,7 +16,8 @@ chatSocket = new WebSocket(
 
 chatSocket.onopen = function(e) {
     console.log('Chat socket connected!');
-    console.log("Querying board in a moment (race conditions)...");
+    console.log("Querying board...");
+    // begin by querying the board status and updating its elements
     setTimeout(queryBoard, 1);
 };
 
@@ -128,7 +128,6 @@ function move(row, col){
         //const data = request.responseText;
         const data = JSON.parse(request.responseText);
         console.log(data);
-        game_over = data["game_over"]
 
         // update everything
         updateAll(data);
