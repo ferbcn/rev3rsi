@@ -8,13 +8,17 @@ var game_over = false;
 
 var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
 
-chatSocket = new WebSocket(
-    ws_scheme + '://'
-    + window.location.host
-    + '/ws/arena/'
-    + matchGameId
-    + '/'
-);
+openChatsocket();
+
+function openChatsocket(){
+    chatSocket = new WebSocket(
+        ws_scheme + '://'
+        + window.location.host
+        + '/ws/arena/'
+        + matchGameId
+        + '/'
+    );
+}
 
 chatSocket.onopen = function(e) {
     console.log('Chat socket connected!');
@@ -25,6 +29,8 @@ chatSocket.onopen = function(e) {
 
 chatSocket.onclose = function(e) {
     console.error('Chat socket closed unexpectedly', e);
+    chatSocket = null;
+    setTimeout(openChatsocket, 10);
 };
 
 chatSocket.onmessage = function(e) {

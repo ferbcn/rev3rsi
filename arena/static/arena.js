@@ -1,8 +1,6 @@
 const userName = JSON.parse(document.getElementById('json-username').textContent);
-
 //document.querySelector('#chat-message-input').focus();
 var chatSocket;
-// const wsUrl = "wss://rev3rsi.fun/ws/arena/ARENA/";
 
 var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
 
@@ -16,9 +14,34 @@ function openChatsocket(){
         + 'ARENA'
         + '/'
     );
-
 }
 
+chatSocket.onopen = function(e) {
+    console.log("Websocket Arena connected!");
+
+    // Listen for button inputs
+    document.querySelector('#create-game-submit').onclick = function(e) {
+        console.log("Sending create new match event...");
+        chatSocket.send(JSON.stringify({
+            'type': "new_match_create",
+            'message': ""
+        }));
+    };
+
+    document.querySelector('#chat-message-input').onkeyup = function(e) {
+        if (e.keyCode === 13) {  // enter, return
+            const messageInputDom = document.querySelector('#chat-message-input');
+            const message = messageInputDom.value;
+            if (message.length > 1){
+                chatSocket.send(JSON.stringify({
+                    'type': 'chat_text_message',
+                    'message': message
+                }));
+                messageInputDom.value = '';
+            }
+        }
+    };
+};
 chatSocket.onclose = function(e) {
     console.error('Chat socket closed unexpectedly', e);
     chatSocket = null;
@@ -165,28 +188,7 @@ chatSocket.onmessage = function(e) {
 };
 
 
-document.querySelector('#chat-message-input').onkeyup = function(e) {
-    if (e.keyCode === 13) {  // enter, return
-        const messageInputDom = document.querySelector('#chat-message-input');
-        const message = messageInputDom.value;
-        if (message.length > 1){
-            chatSocket.send(JSON.stringify({
-                'type': 'chat_text_message',
-                'message': message
-            }));
-            messageInputDom.value = '';
-        }
-    }
-};
 
-
-document.querySelector('#create-game-submit').onclick = function(e) {
-    console.log("Sending create new match event...");
-    chatSocket.send(JSON.stringify({
-        'type': "new_match_create",
-        'message': ""
-    }));
-};
 
 function handleSelectGame(uuid){
     var gameUuid = uuid;
