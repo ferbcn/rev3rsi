@@ -4,11 +4,13 @@ const userName = JSON.parse(document.getElementById('json-username').textContent
 var chatSocket;
 // const wsUrl = "wss://rev3rsi.fun/ws/arena/ARENA/";
 
+var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
+
 openChatsocket();
 
 function openChatsocket(){
     chatSocket = new WebSocket(
-        'ws://'
+        ws_scheme + '://'
         + window.location.host
         + '/ws/arena/'
         + 'ARENA'
