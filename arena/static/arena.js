@@ -6,7 +6,7 @@ openChatsocket();
 
 function openChatsocket(){
     chatSocket = new WebSocket(
-        'ws://'
+        'wss://'
         + window.location.host
         + '/ws/arena/'
         + 'ARENA'
