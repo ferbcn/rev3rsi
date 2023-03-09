@@ -8,7 +8,7 @@ var game_over = false;
 // queryBoard();
 
 chatSocket = new WebSocket(
-    'ws://'
+    'wss://'
     + window.location.host
     + '/ws/arena/'
     + matchGameId
