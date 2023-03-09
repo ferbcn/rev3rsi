@@ -4,7 +4,7 @@ const userName = JSON.parse(document.getElementById('json-username').textContent
 var chatSocket;
 openChatsocket();
 
-wsUrl = "wss://rev3rsi.fun:443/ws/arena/ARENA/";
+const wsUrl = "wss://rev3rsi.fun:443/ws/arena/ARENA/";
 
 function openChatsocket(){
     chatSocket = new WebSocket(wsUrl);
