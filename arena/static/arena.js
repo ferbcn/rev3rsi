@@ -3,7 +3,7 @@ const userName = JSON.parse(document.getElementById('json-username').textContent
 //document.querySelector('#chat-message-input').focus();
 var chatSocket;
 // const wsUrl = "wss://rev3rsi.fun/ws/arena/ARENA/";
-const wsUrl = "wss://" + window.location.host + "/ws/arena/ARENA/";
+const wsUrl = "wss://" + window.location.host + ":443" + "/ws/arena/ARENA/";
 
 openChatsocket();
 
