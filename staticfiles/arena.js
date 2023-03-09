@@ -20,7 +20,7 @@ function openChatsocket(){
 }
 
 chatSocket.onclose = function(e) {
-    console.error('Chat socket closed unexpectedly');
+    console.error('Chat socket closed unexpectedly', e);
     chatSocket = null;
     setTimeout(openChatsocket, 10);
 };
