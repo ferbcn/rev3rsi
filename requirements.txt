@@ -5,4 +5,4 @@ whitenoise
 channels
 uvicorn[standard]
 redis[hiredis]
-channels_redis
+channels-redis
