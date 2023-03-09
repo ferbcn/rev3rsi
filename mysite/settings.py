@@ -145,6 +145,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 ASGI_APPLICATION = "mysite.asgi.application"
 
 REDIS_HOST = os.environ.get('REDIS_HOST')
+
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",

@@ -20,6 +20,7 @@ if __name__ == "__main__":
             host='0.0.0.0',
             port=8000,
             reload=True,
+            lifespan="off",
             # ssl_keyfile='cert/key.pem',
             # ssl_certfile='cert/cert.pem',
         )
