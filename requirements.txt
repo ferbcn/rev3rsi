@@ -4,4 +4,4 @@ psycopg2-binary
 whitenoise
 channels
 uvicorn[standard]
-redis
+redis[hiredis]

@@ -5,9 +5,10 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 
+
 import redis
 REDIS_HOST = os.environ.get("REDIS_HOST")
-conn = redis.Redis(REDIS_HOST)
+conn = redis.Redis(host=REDIS_HOST)
 
 game_levels = [('', 'easy'), ('', 'hard'), ('', 'harder'), ('disabled', 'hardest')]
 

@@ -78,6 +78,7 @@ class ArenaConsumer(AsyncWebsocketConsumer):
             # remove open matches from Redis DB
             new_open_matches = {}
             delete_matches = []
+
             for match, games_host in open_matches.items():
                 match_deco = match.decode("utf-8")
                 host_deco = games_host.decode("utf-8")
