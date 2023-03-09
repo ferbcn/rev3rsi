@@ -3,5 +3,5 @@ gunicorn
 psycopg2-binary
 whitenoise
 channels
-uvicorn
+uvicorn[standard]
 redis
