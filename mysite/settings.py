@@ -156,12 +156,12 @@ CHANNEL_LAYERS = {
     },
 }
 
+
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
         'LOCATION': 'redis://' + REDIS_HOST + ':6379',
         'OPTIONS': {
-            'db': '10',
             'parser_class': 'redis.connection.PythonParser',
             'pool_class': 'redis.BlockingConnectionPool',
         }
