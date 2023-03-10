@@ -2,8 +2,7 @@
 import json
 import uuid
 from channels.generic.websocket import AsyncWebsocketConsumer
-import redis
-import os
+
 
 from django.core.cache import cache
 
