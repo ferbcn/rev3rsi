@@ -146,6 +146,7 @@ ASGI_APPLICATION = "mysite.asgi.application"
 
 REDIS_HOST = os.environ.get('REDIS_HOST')
 
+
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
@@ -153,4 +154,16 @@ CHANNEL_LAYERS = {
             "hosts": [(REDIS_HOST, 6379)],
         },
     },
+}
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': 'redis://127.0.0.1:6379',
+        'OPTIONS': {
+            'db': '10',
+            'parser_class': 'redis.connection.PythonParser',
+            'pool_class': 'redis.BlockingConnectionPool',
+        }
+    }
 }

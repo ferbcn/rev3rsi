@@ -76,6 +76,7 @@ chatSocket.onmessage = function(e) {
         chatLog.appendChild(newMesContainer);
         // scroll to bottom of div
         chatLog.scrollTop = chatLog.scrollHeight;
+
     }
     else if (data.message_type == "add_new_match"){
         var gameUuid = data.game_uuid;
@@ -126,9 +127,9 @@ chatSocket.onmessage = function(e) {
 
         gameList.appendChild(newGameRow);
 
+        // TODO: scroll to bottom of div
         // console.log(gameList.scrollHeight);
         // window.scrollTo(0, document.body.scrollHeight);
-        // scroll to bottom of div
         document.getElementById('match-list').scrollIntoView(false);
     }
     else if (data.message_type == "new_match_confirmed"){
@@ -139,15 +140,15 @@ chatSocket.onmessage = function(e) {
         host = data.host.trim(" ");
         deleteMatches = data.delete_matches;
 
-        // redirect to game if we are the host
-        if (userName == host){
+        // load game set-up
+        if (userName == host || userName == userPlayer){
             console.log("My game request (" + gameUuid + ") was accepted!");
             console.log("Redirecting to ... game_id: " + gameId);
             window.location.href = '../loadgame?game_id='+gameId;
         }
         // remove entry from DOM
-        else if (userName != userPlayer){
-        /*
+        else {
+
             // delete all open requests for matches from host and user
             console.log("Removing games from DOM...");
             for (var i=0; i < deleteMatches.length; i++){
@@ -155,11 +156,8 @@ chatSocket.onmessage = function(e) {
                 gameRow.parentNode.removeChild(gameRow);
             }
             console.log(i + " game(s) removed!");
-            // this seams to lead to a bug in the websocket
-        */
             // brute force workaround
-            window.location.reload();
-            // TODO: fix JS error
+            // window.location.reload();
         }
     }
 };
@@ -217,7 +215,7 @@ function handleSelectGame(uuid){
         }));
 
         //chatSocket.close();
-        window.location.href = '../reversimatch';
+        //window.location.href = '../reversimatch';
       })
       .catch(error => console.log(error))
 

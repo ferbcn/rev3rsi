@@ -6,3 +6,4 @@ channels
 uvicorn[standard]
 redis[hiredis]
 channels-redis
+pymemcache
