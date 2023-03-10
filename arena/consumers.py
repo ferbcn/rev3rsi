@@ -2,11 +2,6 @@
 import json
 import uuid
 from channels.generic.websocket import AsyncWebsocketConsumer
-import redis
-import os
-
-REDIS_HOST = os.environ.get("REDIS_HOST")
-conn = redis.Redis(REDIS_HOST)
 
 
 class ArenaConsumer(AsyncWebsocketConsumer):
@@ -32,12 +27,7 @@ class ArenaConsumer(AsyncWebsocketConsumer):
         message_super_type = text_data_json["type"]
 
         if message_super_type == "new_match_create":
-            # game_uuid = str(datetime.now()).replace("-", "").replace(":", "").replace(" ", "").replace(".", "")
-            # check for existing matches ba user
-            #open_matches = conn.hgetall("openMatches")
-            # check if user has an open match request
-            #hosts = [name.decode("utf-8") for name in list(open_matches.values())]
-            hosts= []
+            hosts = []
             if username in hosts:
                 print("User already has an open match request!")
             else:
@@ -53,11 +43,6 @@ class ArenaConsumer(AsyncWebsocketConsumer):
                 # Send message to room group
                 await self.channel_layer.group_send(
                     self.room_group_name, json_resp)
-
-                #open_matches.update({game_uuid: username})
-                #conn.hmset("openMatches", open_matches)
-                #print("Match added to OpenMatches, OpenMatches:", open_matches)
-
 
         elif message_super_type == "chat_text_message":
             message = text_data_json["message"]
@@ -78,17 +63,7 @@ class ArenaConsumer(AsyncWebsocketConsumer):
             # remove open matches from Redis DB
             new_open_matches = {}
             delete_matches = []
-            """
-            for match, games_host in open_matches.items():
-                match_deco = match.decode("utf-8")
-                host_deco = games_host.decode("utf-8")
-                if username == host_deco or match_deco == game_uuid:
-                    print(f"Game {match_deco} removed from DB!")
-                    delete_matches.append(match_deco)
-                else:
-                    new_open_matches.update({match_deco: host_deco})
-            print("OpenMatches Updated in DB: ", new_open_matches)
-            """
+
             json_resp = {"type": "arena_message", "message_type": "new_match_confirmed",
                          "game_id": game_id, 'game_uuid': game_uuid, "username": username, "host": host,
                          "delete_matches": delete_matches,
@@ -98,12 +73,6 @@ class ArenaConsumer(AsyncWebsocketConsumer):
             await self.channel_layer.group_send(
                 self.room_group_name, json_resp)
 
-            """
-            # Redis DB: flush and save open matches
-            conn.flushdb()
-            if len(new_open_matches) > 0:
-                conn.hmset("openMatches", new_open_matches)
-            """
 
         elif message_super_type == "match_turn":
             print("NEW TURN event received!")

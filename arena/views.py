@@ -20,7 +20,6 @@ def arenaindex(request):
         username = request.user.username
 
         # Read open matches from Redis DB
-        #open_matches = conn.hgetall("openMatches")
         nice_open_matches = []
         """
         for match, host in open_matches.items():
