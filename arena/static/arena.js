@@ -6,8 +6,6 @@ var chatSocket;
 
 var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
 
-openChatsocket();
-
 function openChatsocket(){
     chatSocket = new WebSocket(
         ws_scheme + '://'
@@ -19,6 +17,10 @@ function openChatsocket(){
 
 }
 
+chatSocket.onopen = function(e) {
+    console.log('Chat socket connected!');
+};
+
 chatSocket.onclose = function(e) {
     console.error('Chat socket closed unexpectedly', e);
     chatSocket = null;
@@ -29,6 +31,7 @@ chatSocket.onerror = function(e) {
     console.error('Websocket Error:', e);
 };
 
+openChatsocket();
 
 chatSocket.onmessage = function(e) {
     const data = JSON.parse(e.data);
