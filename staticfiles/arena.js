@@ -16,11 +16,11 @@ function openChatsocket(){
     );
 
 }
-
+/*
 chatSocket.onopen = function(e) {
     console.log('Chat socket connected!');
 };
-
+*/
 chatSocket.onclose = function(e) {
     console.error('Chat socket closed unexpectedly', e);
     chatSocket = null;
