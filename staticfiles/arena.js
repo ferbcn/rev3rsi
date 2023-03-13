@@ -16,11 +16,13 @@ function openChatsocket(){
     );
 
 }
-/*
+
+openChatsocket();
+
 chatSocket.onopen = function(e) {
     console.log('Chat socket connected!');
 };
-*/
+
 chatSocket.onclose = function(e) {
     console.error('Chat socket closed unexpectedly', e);
     chatSocket = null;
@@ -30,8 +32,6 @@ chatSocket.onclose = function(e) {
 chatSocket.onerror = function(e) {
     console.error('Websocket Error:', e);
 };
-
-openChatsocket();
 
 chatSocket.onmessage = function(e) {
     const data = JSON.parse(e.data);
