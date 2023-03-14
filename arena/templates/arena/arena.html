@@ -24,7 +24,11 @@
 
         <div class="match-list" id="match-list">
             {% for name, host in open_matches %}
-            <div class="flex-container match-container" id="{{ name }}">
+            {% if username == host %}
+                <div class="flex-container match-container match-container-me" id="{{ name }}">
+            {% else %}
+                <div class="flex-container match-container match-container-others" id="{{ name }}">
+            {% endif %}
                 <div class="flex-item-game" id="gameName">
                     New Match requested by
                 </div>
@@ -32,25 +36,25 @@
                     {{ host }}
                 </div>
                 {% if username == host %}
-                <div class="wave-box">
-                    <div class="wave"></div>
-                    <div class="wave"></div>
-                    <div class="wave"></div>
-                    <div class="wave"></div>
-                    <div class="wave"></div>
-                    <div class="wave"></div>
-                </div>
+                    <div class="wave-box">
+                        <div class="wave"></div>
+                        <div class="wave"></div>
+                        <div class="wave"></div>
+                        <div class="wave"></div>
+                        <div class="wave"></div>
+                        <div class="wave"></div>
+                    </div>
                 {% else %}
-                <a href="javascript:handleSelectGame('{{ name }}')">
-                <div class="wave-box">
-                    <div class="wave-good"></div>
-                    <div class="wave-good"></div>
-                    <div class="wave-good"></div>
-                    <div class="wave-good"></div>
-                    <div class="wave-good"></div>
-                    <div class="wave-good"></div>
-                </div>
-                </a>
+                    <a href="javascript:handleSelectGame('{{ name }}')">
+                    <div class="wave-box">
+                        <div class="wave-good"></div>
+                        <div class="wave-good"></div>
+                        <div class="wave-good"></div>
+                        <div class="wave-good"></div>
+                        <div class="wave-good"></div>
+                        <div class="wave-good"></div>
+                    </div>
+                    </a>
                 {% endif %}
             </div>
         {% endfor %}

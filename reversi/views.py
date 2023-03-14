@@ -214,6 +214,7 @@ def reversimatch (request):
     print(f"Match: Green is {green_player} and Blue is {blue_player}.")
 
     levels = game_levels
+    user_color = "green" if user.username == green_player else "blue"
 
     return render(request, "reversimatch.html",
                     {"username": user.username,
@@ -223,6 +224,7 @@ def reversimatch (request):
                     "game_level": difficulty,
                     "game_levels": levels,
                     "game_id": game_id,
+                    "user_color": user_color
 })
 
 
@@ -241,11 +243,14 @@ def queryboard(request):
 
         possible_moves = get_possible_moves(board, next_player)
         message = f"Player{next_player}'s turn"
+
+        print("Next player:", next_player)
+        board_color = 'green' if next_player == 1 else 'blue'
         scores = get_scores(board)
 
-        data = {"board": board, "message": {"message": message, "color": "white"},
+        data = {"board": board, "message": {"message": message, "color": board_color},
                 "next_player": next_player,
-                "scores": scores, "possible_moves": possible_moves}
+                "scores": scores, "possible_moves": possible_moves, "board_color": board_color}
         return JsonResponse(data, safe=False)
 
 
@@ -422,6 +427,8 @@ def movematch(request):
             if len(get_possible_moves(board, next_player)) == 0:
                 game_over = True
 
+
+
         scores = get_scores(board)
         # save gamestate to DB and session
         save_game_db(game_id, scores[0], scores[1], next_player, game_over)
@@ -435,9 +442,11 @@ def movematch(request):
         message = f"Not your turn!"
         color = 'red'
 
+    board_color = 'green' if next_player == 1 else 'blue'
+
     data = {"board": board, "message": {"message": message, "color": color},
             "next_player": next_player, "game_over": game_over,
-            "scores": scores, "possible_moves": get_possible_moves(board, next_player)}
+            "scores": scores, "possible_moves": get_possible_moves(board, next_player), "board_color": board_color}
 
     return JsonResponse(data, safe=False)
 

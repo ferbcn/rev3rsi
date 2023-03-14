@@ -28,6 +28,7 @@ chatSocket.onclose = function(e) {
 };
 
 chatSocket.onmessage = function(e) {
+
     const data = JSON.parse(e.data);
     console.log("Arena message received: ", data);
 
@@ -77,13 +78,9 @@ chatSocket.onmessage = function(e) {
     else if (data.message_type == "match_turn_cast"){
         const data = JSON.parse(e.data);
         player = data.player;
-        //window.setTimeout(queryBoard(), 3000);
-        //window.setTimeout(window.location.reload(true), 1000);
-        //chatSocket.close();
-        //window.location.reload(true);
         console.log("Querying board in a moment (race conditions)...");
         if (userName != player){
-            setTimeout(queryBoard, 50);
+            setTimeout(queryBoard, 100);
         }
     }
 };
@@ -167,7 +164,8 @@ function check_for_and_make_auto_machine_move(data){
 
 function updateAll(data){
     // update board
-    update_board(data["board"], data["possible_moves"]);
+    console.log("Color: " + data.board_color);
+    update_board(data["board"], data["possible_moves"], data.board_color);
 
     // update scores
     updateScores(data["scores"]);
@@ -180,7 +178,7 @@ function updateAll(data){
 function updateScores(scores){
     score_p1 = scores[0];
     score_p2 = scores[1];
-    scores = "Scores: " + score_p1 + " / " + score_p2;
+    scores = "Score: " + score_p1 + " / " + score_p2;
     document.getElementById('score_box').innerHTML = scores;
 }
 
@@ -192,12 +190,18 @@ function updateMessage(message, game_over){
     document.getElementById('message_box').style = "color: " + color;
 
     if (game_over){
-        if (score_p1 > score_p2)
+        if (score_p1 > score_p2){
             document.getElementById('gameovertext').innerHTML = "P1 WINS!";
-        else if (score_p1 < score_p2)
+            board_elem.classList.add("board_glow_green");
+        }
+        else if (score_p1 < score_p2){
             document.getElementById('gameovertext').innerHTML = "P2 WINS!";
-        else
+            board_elem.classList.add("board_glow_blue");
+        }
+        else{
             document.getElementById('gameovertext').innerHTML = "DRAW!";
+            board_elem.classList.add("board_glow_green_blue_cycle");
+        }
 
         ocument.getElementById('gameoverbox').classList.add('gameover-box');
         game_over = true;
@@ -205,7 +209,19 @@ function updateMessage(message, game_over){
 }
 
 
-function update_board(board, possible_moves){
+function update_board(board, possible_moves, board_color){
+
+    // Set board color
+    var board_elem = document.getElementById('board')
+    if (board_color == 'green'){
+        board_elem.classList.add("board_glow_green");
+        board_elem.classList.remove("board_glow_blue");
+    }
+    else if (board_color == 'blue'){
+        board_elem.classList.add("board_glow_blue");
+        board_elem.classList.remove("board_glow_green");
+    }
+
     for (var r=0; r<8; r++){
       for (var c=0; c<8; c++){
           var id = r.toString() + c.toString();

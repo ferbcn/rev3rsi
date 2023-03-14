@@ -53,7 +53,34 @@ a:hover {
    height: 70vw;
    max-height: 70vh;
    max-width: 70vh;
-   box-shadow: 8px 8px 8px 8px rgba(0, 0, 0, 0.2), 8px 8px 8px 8px rgba(0, 0, 0, 0.19);
+   /*box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);*/
+}
+
+.board_glow_green{
+    box-shadow: 0 4px 8px 0 rgba(0, 225, 0, 0.2), 0 6px 20px 0 rgba(0, 225, 0, 0.19);
+}
+
+.board_glow_blue{
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 255, 0.2), 0 6px 20px 0 rgba(0, 0, 255, 0.19);
+}
+
+.board_glow_green_blue_cycle{
+    box-shadow: 0 4px 8px 0 rgba(0, 225, 0, 0.2), 0 6px 20px 0 rgba(0, 225, 0, 0.19);
+    animation: 3s infinite color-fader;
+    animation-fill-mode: forwards;
+    animation-play-state: play;
+}
+
+@keyframes color-fader {
+    0% {
+        box-shadow: 0 4px 8px 0 rgba(0, 225, 0, 0.2), 0 6px 20px 0 rgba(0, 225, 0, 0.19);
+    }
+    50% {
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 255, 0.2), 0 6px 20px 0 rgba(0, 0, 255, 0.19);
+    }
+    100% {
+        box-shadow: 0 4px 8px 0 rgba(0, 225, 0, 0.2), 0 6px 20px 0 rgba(0, 225, 0, 0.19);
+    }
 }
 
 #player_box {
@@ -308,4 +335,14 @@ a.divlink:hover {
   50% {
     opacity: 0.5;
   }
+}
+
+#player_self_box{
+}
+
+.player_self_box_container{
+    width: 5vw;
+    height: 5vw;
+    align-items: center;
+    padding: 5px;
 }
