@@ -20,7 +20,29 @@ function openChatsocket(){
 }
 
 chatSocket.onopen = function(e) {
-    console.error('Chat socket connected!');
+    console.log('Chat socket connected!');
+
+    document.querySelector('#chat-message-input').onkeyup = function(e) {
+    if (e.keyCode === 13) {  // enter, return
+        const messageInputDom = document.querySelector('#chat-message-input');
+        const message = messageInputDom.value;
+        if (message.length > 1){
+            chatSocket.send(JSON.stringify({
+                'type': 'chat_text_message',
+                'message': message
+            }));
+            messageInputDom.value = '';
+        }
+    }
+    };
+
+    document.querySelector('#create-game-submit').onclick = function(e) {
+        console.log("Sending create new match event...");
+        chatSocket.send(JSON.stringify({
+            'type': "new_match_create",
+            'message': ""
+        }));
+    };
 };
 
 chatSocket.onclose = function(e) {
@@ -113,6 +135,8 @@ chatSocket.onmessage = function(e) {
                 wave_elem.classList.add("wave");
                 flex_elem_btn.appendChild(wave_elem);
             }
+            // give its own class for shadow selection
+            newGameRow.classList.add("match-container-me");
         }
         else {
             var flex_elem_btn = document.createElement('a');
@@ -123,6 +147,8 @@ chatSocket.onmessage = function(e) {
                 wave_elem.classList.add("wave-good");
                 flex_elem_btn.appendChild(wave_elem);
             }
+            // give its own class for shadow selection
+            newGameRow.classList.add("match-container-others");
         }
 
         newGameRow.appendChild(flex_elem_game);
@@ -166,29 +192,6 @@ chatSocket.onmessage = function(e) {
     }
 };
 
-
-document.querySelector('#chat-message-input').onkeyup = function(e) {
-    if (e.keyCode === 13) {  // enter, return
-        const messageInputDom = document.querySelector('#chat-message-input');
-        const message = messageInputDom.value;
-        if (message.length > 1){
-            chatSocket.send(JSON.stringify({
-                'type': 'chat_text_message',
-                'message': message
-            }));
-            messageInputDom.value = '';
-        }
-    }
-};
-
-
-document.querySelector('#create-game-submit').onclick = function(e) {
-    console.log("Sending create new match event...");
-    chatSocket.send(JSON.stringify({
-        'type': "new_match_create",
-        'message': ""
-    }));
-};
 
 function handleSelectGame(uuid){
     var gameUuid = uuid;

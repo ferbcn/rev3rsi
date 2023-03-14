@@ -126,8 +126,15 @@ html, body {
     animation-duration: 0.5s;
     animation-fill-mode: forwards;
     animation-play-state: play;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     color: lightgrey;
+}
+
+.match-container-me{
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.match-container-others{
+    box-shadow: 0 4px 8px 0 rgba(0, 225, 0, 0.2), 0 6px 20px 0 rgba(0, 225, 0, 0.19);
 }
 
 @keyframes appear {
@@ -183,18 +190,15 @@ html, body {
 }
 
 .chat-entry-container {
+    border-radius: 5px;
     margin-top: 1vh;
 }
 
 .chat-entry-container-me{
-    margin-left: 50px;
-    border-radius: 5px;
-    border-radius: 5px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 .chat-entry-container-other{
-    margin-right: 50px;
-    background-color: #303030;
-    border-radius: 5px;
+    box-shadow: 0 4px 8px 0 rgba(0, 225, 0, 0.2), 0 6px 20px 0 rgba(0, 225, 0, 0.19);
 }
 
 .chat-entry {
@@ -204,7 +208,7 @@ html, body {
     animation-duration: 0.5s;
     animation-fill-mode: forwards;
     animation-play-state: play;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+
 }
 
 .mesAuthor {
