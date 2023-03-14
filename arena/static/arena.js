@@ -19,10 +19,14 @@ function openChatsocket(){
 
 }
 
+chatSocket.onopen = function(e) {
+    console.error('Chat socket connected!');
+};
+
 chatSocket.onclose = function(e) {
     console.error('Chat socket closed unexpectedly', e);
     chatSocket = null;
-    setTimeout(openChatsocket, 10);
+    setTimeout(openChatsocket, 100);
 };
 
 chatSocket.onerror = function(e) {
