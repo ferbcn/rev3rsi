@@ -12,7 +12,7 @@ from django.views.decorators.http import require_http_methods
 
 from reversi.test_games import *
 from reversi.reversi_game import *
-from reversi.db_operations_orm import *
+from reversi.data_layer import *
 
 # Game difficulties and which are available
 # Hardest Level is disabled by default

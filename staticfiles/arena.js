@@ -23,17 +23,17 @@ chatSocket.onopen = function(e) {
     console.log('Chat socket connected!');
 
     document.querySelector('#chat-message-input').onkeyup = function(e) {
-    if (e.keyCode === 13) {  // enter, return
-        const messageInputDom = document.querySelector('#chat-message-input');
-        const message = messageInputDom.value;
-        if (message.length > 1){
-            chatSocket.send(JSON.stringify({
-                'type': 'chat_text_message',
-                'message': message
-            }));
-            messageInputDom.value = '';
+        if (e.keyCode === 13) {  // enter, return
+            const messageInputDom = document.querySelector('#chat-message-input');
+            const message = messageInputDom.value;
+            if (message.length > 1){
+                chatSocket.send(JSON.stringify({
+                    'type': 'chat_text_message',
+                    'message': message
+                }));
+                messageInputDom.value = '';
+            }
         }
-    }
     };
 
     document.querySelector('#create-game-submit').onclick = function(e) {
@@ -158,9 +158,8 @@ chatSocket.onmessage = function(e) {
         gameList.appendChild(newGameRow);
 
         // TODO: scroll to bottom of div
-        // console.log(gameList.scrollHeight);
-        // window.scrollTo(0, document.body.scrollHeight);
-        document.getElementById('match-list').scrollIntoView(false);
+        var matchList = document.getElementById('match-list').scrollIntoView(true);
+        matchList.scrollTop = matchList.scrollHeight;
     }
     else if (data.message_type == "new_match_confirmed"){
 

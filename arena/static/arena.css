@@ -128,6 +128,7 @@ html, body {
     overflow: auto;
     font-size: 3vw;
     width: 100%;
+    margin-bottom: 10px;
 }
 
 .match-container {
@@ -225,7 +226,6 @@ html, body {
     animation-duration: 0.5s;
     animation-fill-mode: forwards;
     animation-play-state: play;
-
 }
 
 .mesAuthor {
