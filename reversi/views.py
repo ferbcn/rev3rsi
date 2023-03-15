@@ -36,7 +36,7 @@ def index(request):
     return render(request, "index.html", {"user": user, "game_levels": levels})
 
 
-# game board initialization
+# game board initialization (player vs machine)
 def newgame(request):
     if request.user.is_authenticated:
         user = request.user
@@ -102,7 +102,7 @@ def newgame(request):
     return HttpResponseRedirect(reverse("reversi"))
 
 
-# game board initialization for match (play vs player)
+# game board initialization for match (player vs player)
 def newmatch(request):
 
     if request.user.is_authenticated:
@@ -138,7 +138,8 @@ def newmatch(request):
     # update scores
     scores = get_scores(new_game.board)
     # and save initial gamestate to DB and session
-    game_db_entry = GameDB(user=user, score_p1=scores[0], score_p2=scores[1], player1=player1_name, player2=player2_name, next_player=1, game_over=False)
+    game_db_entry = GameDB(user=user, score_p1=scores[0], score_p2=scores[1], player1=player1_name, player2=player2_name,
+                           next_player=1, game_over=False)
     game_db_entry.save()
 
     # save game state variables to session variables
@@ -225,7 +226,7 @@ def reversimatch (request):
                     "game_levels": levels,
                     "game_id": game_id,
                     "user_color": user_color
-})
+                    })
 
 
 # Query board status
@@ -411,7 +412,7 @@ def movematch(request):
         if is_legal_move(board, next_player, current_move):
             next_move, board = human_move(board, human_player, current_move)
             r, c = next_move
-            message = f"{next_player} move: row {r + 1}, col {c + 1}"
+            message = f"Player{next_player} move: row {r + 1}, col {c + 1}"
             color = 'lightgrey'
             # switch to human player
             next_player = get_opponent(next_player)
@@ -426,8 +427,6 @@ def movematch(request):
             next_player = get_opponent(next_player)
             if len(get_possible_moves(board, next_player)) == 0:
                 game_over = True
-
-
 
         scores = get_scores(board)
         # save gamestate to DB and session

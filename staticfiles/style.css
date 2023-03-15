@@ -120,7 +120,36 @@ a:hover {
 #savedgames {
   margin-top: 1%;
   color: white;
+  overflow: scroll;
+  height: 85vh;
 }
+
+.savegamerow {
+  color: white;
+  background: rgba(255,255,255,0.1);
+  height: 50px;
+  text-align: center;
+  padding-top: 12px;
+}
+
+.savegamerow:hover {
+  color: green;
+  text-align: center;
+  padding-top: 12px;
+  box-shadow: 0px 0px 8px 8px rgba(0, 225, 0, 0.2)
+}
+
+.savegameheader{
+  height: 50px;
+  padding-top: 12px;
+  background-color: lightgrey;
+  color: black;
+  font-weight: bold;
+  text-align: center;
+  font-size: min(4vw, 18px);
+  margin-bottom: 10px;
+}
+
 
 #login_parent{
    display: flex;
@@ -225,31 +254,6 @@ a:hover {
 
 #gameovertext{
   opacity: 1;
-}
-
-.savegamerow {
-  color: white;
-  background: rgba(255,255,255,0.2);
-  height: 50px;
-  text-align: center;
-  padding-top: 12px;
-}
-
-.savegamerow:hover {
-  color: green;
-  background: rgba(255,255,255,0.8);
-  text-align: center;
-  padding-top: 12px;
-}
-
-.savegameheader{
-  height: 50px;
-  padding-top: 12px;
-  background-color: lightgrey;
-  color: black;
-  font-weight: bold;
-  text-align: center;
-  font-size: min(4vw, 18px);
 }
 
 a.divlink {
