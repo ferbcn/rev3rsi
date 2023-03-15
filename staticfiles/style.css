@@ -337,12 +337,10 @@ a.divlink:hover {
   }
 }
 
-#player_self_box{
-}
 
 .player_self_box_container{
-    width: 5vw;
-    height: 5vw;
+    width: 6vw;
+    height: 6vw;
     align-items: center;
     padding: 5px;
 }

@@ -111,10 +111,21 @@ html, body {
   }
 }
 
+
+.create-game-submit-container{
+    width: 100%;
+    text-align: center;
+}
+
+#create-game-submit{
+    width: 100%;
+    max-width: 500px;
+}
+
 #match-list{
     margin-top: 10px;
-    height: 40%;
-    overflow:auto;
+    height: 40vh;
+    overflow: auto;
     font-size: 3vw;
     width: 100%;
 }
@@ -182,6 +193,12 @@ html, body {
     }
 }
 
+.arena-chat-log{
+    margin-top: 0px;
+    padding: 10px;
+    height: 40vh;
+    padding-bottom: 10%;
+}
 
 #chat-log{
     width: 100%;
@@ -253,25 +270,8 @@ html, body {
     height: 35px;
 }
 
-.create-game-submit-container{
-    width: 100%;
-    text-align: center;
-}
-
-#create-game-submit{
-    width: 100%;
-    max-width: 500px;
-}
-
 .match-chat-log{
     margin-top: 1vh;
     padding: 10px;
     height: 25vh;
-}
-
-.arena-chat-log{
-    margin-top: 0px;
-    padding: 10px;
-    height: 35vh;
-    padding-bottom: 15%;
 }
