@@ -30,11 +30,10 @@ function move(row, col){
     console.log("Making move...");
     console.log("Row:", row, "Col:", col);
 
-    // Open new request to get new posts.
+    // Open new request
     const request = new XMLHttpRequest();
     request.open('POST', '/move');
     request.onload = () => {
-        //const data = request.responseText;
         const data = JSON.parse(request.responseText);
         console.log(data);
         game_over = data["game_over"]
@@ -42,6 +41,7 @@ function move(row, col){
         // update everything
         updateAll(data);
 
+        // make a machine move
         check_for_and_make_auto_machine_move(data)
     };
 
@@ -103,6 +103,9 @@ function updateMessage(message, game_over){
             document.getElementById('gameovertext').innerHTML = "DRAW!";
         document.getElementById('gameoverbox').classList.add('gameover-box');
         game_over = true;
+
+        document.getElementById("board").classList.add("board_glow_green_blue_cycle");
+
       }
 }
 

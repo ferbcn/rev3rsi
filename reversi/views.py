@@ -290,12 +290,6 @@ def move(request):
         machine_role = 1
         human_color = 'blue'
         machine_color = 'green'
-    else:
-        difficulty = 'match'
-        human_role = 0
-        machine_role = 0
-        human_color = 'blue'
-        machine_color = 'green'
 
     # Define player1 (player) and player2 (opponent)
     human_player = Player(role=human_role)

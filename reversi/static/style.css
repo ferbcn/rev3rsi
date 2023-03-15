@@ -53,7 +53,6 @@ a:hover {
    height: 70vw;
    max-height: 70vh;
    max-width: 70vh;
-   /*box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);*/
 }
 
 .board_glow_green{
@@ -220,6 +219,11 @@ a:hover {
   background-color: green;
   border-radius: 50%;
   display: inline-block;
+
+  animation-name: flash_appear;
+  animation-duration: 1s;
+  animation-fill-mode: forwards;
+  animation-play-state: play;
 }
 
 .dot_p2 {
@@ -228,7 +232,25 @@ a:hover {
   background-color: blue;
   border-radius: 50%;
   display: inline-block;
+
+  animation-name: flash_appear;
+  animation-duration: 1s;
+  animation-fill-mode: forwards;
+  animation-play-state: play;
 }
+
+@keyframes flash_appear {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
 
 .fadeIn {
   animation-name: fadeIn;
@@ -353,4 +375,6 @@ a.divlink:hover {
     height: 6vw;
     align-items: center;
     padding: 5px;
+    max-width: 70px;
+    max-height: 70px;
 }
