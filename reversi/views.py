@@ -60,7 +60,7 @@ def newgame(request):
         human_role = 2
 
     # Launch a test game
-    if user.is_superuser == True:
+    if user.is_superuser:
         if difficulty == "P1-Draw":
             new_game = TestGameP1LastMoveToDraw(player1_name, player2_name, difficulty)
         elif difficulty == "P1-Win":
@@ -83,8 +83,6 @@ def newgame(request):
         print(line)
 
     # save game state variables to session variables
-    request.session['board'] = new_game.board
-    request.session['human_player'] = human_role
     request.session['game_level'] = new_game.difficulty
 
     # save game to DB
@@ -143,7 +141,6 @@ def newmatch(request):
     game_db_entry.save()
 
     # save game state variables to session variables
-    request.session['board'] = new_game.board
     request.session["game_id"] = game_db_entry.id
 
     # save game to DB
@@ -202,6 +199,7 @@ def reversimatch (request):
         return HttpResponseRedirect(reverse("login"))
 
     # Restore Gamestate from DB
+    # Read GameId from session variable
     game_id = request.session['game_id']
 
     try:
@@ -489,7 +487,7 @@ def loadgame(request):
     for line in board: print(line)
 
     # save game state variables to session variables
-    request.session['board'] = board
+    #request.session['board'] = board
     request.session['player1_name'] = player1
     request.session['game_level'] = player2
 
