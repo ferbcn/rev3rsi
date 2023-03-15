@@ -45,11 +45,8 @@ def load_gamestate_db(game_id, user):
         if not gameDB_object.user == user:
             return None
 
-    # print("Game object: ", gameDB_object)
-    # game_state_objects = GameState.objects.all().filter(game_id=gameDB_object)[::-1]
-    # game_state = game_state_objects[0]
+    # Get Game DB object
     game_state = GameState.objects.all().filter(game_id=gameDB_object).last()
-    # print("Got GameState object from DB:", game_state)
 
     # deserialize board
     board_string = game_state.board
@@ -67,3 +64,6 @@ def load_gamestate_db(game_id, user):
     next_player = gameDB_object.next_player
 
     return game_board, player1, player2, next_player
+
+def get_saved_games_for_user(user):
+    return reversed(GameDB.objects.all().filter(user=user).order_by("id"))

@@ -11,10 +11,23 @@
 <!-- container for info messages -->
 <div class="container comm-box">
     <div class="row">
-        <div class="col-6">
-            <div id='player1_box'>Player 1: {{ player1_name }}</div>
-            <div id='player2_box'>Player 2:  {{ player2_name }}</div>
+        <div class="col-3">
+            <div id='player1_box'>P1: {{ player1_name }}</div>
+            <div id='player2_box'>P2: {{ player2_name }}</div>
+        </div><div class="col-1">
+            You:
         </div>
+
+        <div class="col-1">
+            <div class="player_self_box_container">
+                {% if user_color == "green" %}
+                <div class="dot_p1"></div>
+                {% else %}
+                <div class="dot_p2"></div>
+                {% endif %}
+            </div>
+        </div>
+
         <div class="col-6">
             <div id='score_box'></div>
         </div>
@@ -25,7 +38,11 @@
 <div id="board_parent">
     <div id="board_child">
         <!-- container for the game board -->
-        <div class="container" id="board">
+        {% if user_color == "green" %}
+            <div class="container board_glow_green" id="board">
+        {% else %}
+            <div class="container board_glow_blue" id="board">
+        {% endif %}
           {% for line in board %}
             <div class="row" style="height: 12%">
               {% for cell in line %}

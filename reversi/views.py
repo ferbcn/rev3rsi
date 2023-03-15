@@ -82,20 +82,18 @@ def newgame(request):
     for line in new_game.board:
         print(line)
 
-    # save game state variables to session variables
-    request.session['game_level'] = new_game.difficulty
+    scores = get_scores(new_game.board)
 
     # save game to DB
-    scores = get_scores(new_game.board)
-    # save gamestate to DB and session
-
     game_db_entry = GameDB(user=user, score_p1=scores[0], score_p2=scores[1], player1=player1_name, player2=player2_name, next_player=1, game_over=False)
     game_db_entry.save()
+
+    # Save Session variable
     request.session["game_id"] = game_db_entry.id
 
-    # save game to DB
-    #save_game_db(new_game.game_id, scores[0], scores[1], next_player=1, game_over=False)
+    # save gamestate to DB and session
     save_gamestate_db(new_game.board, game_db_entry.id)
+
 
     return HttpResponseRedirect(reverse("reversi"))
 
@@ -170,9 +168,11 @@ def reversi(request):
     if green_player == "human":
         print("Green Player is human.")
         difficulty = blue_player
+        player_color = 'green'
     elif blue_player == "human":
         print("P2 is human.")
         difficulty = green_player
+        player_color = 'blue'
     else:
         difficulty = "match"
         print(f"Match: Green is {green_player} and Blue is {blue_player}.")
@@ -188,6 +188,7 @@ def reversi(request):
                                             "player2_name": blue_player,
                                             "game_level": difficulty,
                                             "game_levels": levels,
+                                            "user_color": player_color,
                                             })
 
 
@@ -486,11 +487,6 @@ def loadgame(request):
 
     for line in board: print(line)
 
-    # save game state variables to session variables
-    #request.session['board'] = board
-    request.session['player1_name'] = player1
-    request.session['game_level'] = player2
-
     if "human" in [player1, player2]:
         return HttpResponseRedirect(reverse("reversi"))
     else:
@@ -504,7 +500,7 @@ def savedgames(request):
     else:
         return HttpResponseRedirect(reverse("login"))
 
-    saved_games = reversed(GameDB.objects.all().filter(user=user)[:100])
+    saved_games = get_saved_games_for_user(user)
 
     if user.is_superuser:
         levels = admin_game_levels

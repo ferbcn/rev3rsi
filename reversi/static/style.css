@@ -36,7 +36,7 @@ a:hover {
 
 #board_parent{
    display: flex;
-   margin-top: 0px;
+   margin-top: 10px;
    align-items: center;
    justify-content: center;
    position: relative;
@@ -57,11 +57,11 @@ a:hover {
 }
 
 .board_glow_green{
-    box-shadow: 0 4px 8px 0 rgba(0, 225, 0, 0.2), 0 6px 20px 0 rgba(0, 225, 0, 0.19);
+    box-shadow: 0 0 8px 8px rgba(0, 225, 0, 0.2), 0 6px 20px 8px rgba(0, 225, 0, 0.19);
 }
 
 .board_glow_blue{
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 255, 0.2), 0 6px 20px 0 rgba(0, 0, 255, 0.19);
+    box-shadow: 0 0 8px 8px rgba(10, 10, 255, 0.2), 0 6px 20px 8px rgba(10, 10, 255, 0.19);
 }
 
 .board_glow_green_blue_cycle{
@@ -130,6 +130,12 @@ a:hover {
   height: 50px;
   text-align: center;
   padding-top: 12px;
+}
+
+.gameid_label {
+    padding: 5px;
+    margin-right: 5px;
+    color: lighgrey;
 }
 
 .savegamerow:hover {
