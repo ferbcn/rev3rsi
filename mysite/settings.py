@@ -4,6 +4,7 @@ PRODUCTION SETTINGS !!!
 
 Environmental Variables that are needed to run:
 SECRET KEY
+DB_NAME
 DB_USER
 DB_PASSWORD
 DB_URL
