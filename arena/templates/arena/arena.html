@@ -25,7 +25,7 @@
 
             <div class="flex-container-left">
                 <div class="user-list" id="user-list">
-                    Online Players
+                    <div class="section-title">Online Players</div>
                     {% for user in online_users %}
                         <div class="online-user" id="{{ user }}"><span class="oi oi-people oi-people-green"></span>{{ user }}</div>
                     {% endfor %}
@@ -35,7 +35,7 @@
             <div class="flex-container-right">
 
             <div class="match-list" id="match-list">
-                Match requests
+                <div class="section-title">Match requests</div>
                 {% for name, host in open_matches %}
                     {% if username == host %}
                         <div class="flex-container match-container match-container-me" id="{{ name }}">

@@ -44,6 +44,12 @@ a:hover {
    height: auto;
 }
 
+@media screen and (min-width: 800px) {
+  #board_parent {
+     height: 700px;
+  }
+}
+
 #board_child{
    position: relative;
 }
@@ -51,9 +57,16 @@ a:hover {
 #board{
    width: 70vw;
    height: 70vw;
-   max-height: 70vh;
-   max-width: 70vh;
 }
+
+@media screen and (min-width: 800px) {
+  #board{
+     width: 700px;
+     height: 700px;
+  }
+}
+
+
 
 .board_glow_green{
     box-shadow: 0 0 8px 8px rgba(0, 225, 0, 0.2), 0 6px 20px 8px rgba(0, 225, 0, 0.19);

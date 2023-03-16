@@ -86,7 +86,7 @@ html, body {
 .wave-good {
   width: 5px;
   height: 20px;
-  background: linear-gradient(45deg, darkgreen, green);
+  background: linear-gradient(45deg, seagreen, seagreen);
   margin: 5px;
   animation: wave 1s linear infinite;
   border-radius: 20px;
@@ -140,6 +140,12 @@ html, body {
     font-size: 3vw;
 }
 
+@media screen and (min-width: 800px) {
+  .user-list {
+     font-size: 24px;
+  }
+}
+
 .online-user{
     padding: 5px;
     margin-top: 5px;
@@ -172,8 +178,13 @@ html, body {
     animation-duration: 0.5s;
     animation-fill-mode: forwards;
     animation-play-state: play;
-    color: lightgrey;
     border-radius: 5px;
+}
+
+@media screen and (min-width: 800px) {
+  .match-container {
+     font-size: 24px;
+  }
 }
 
 .match-container-me{
@@ -182,6 +193,7 @@ html, body {
 
 .match-container-others{
     box-shadow: 0 4px 8px 0 rgba(0, 225, 0, 0.2), 0 6px 20px 0 rgba(0, 225, 0, 0.19);
+    color: seagreen;
 }
 
 @keyframes appear {
@@ -264,13 +276,26 @@ html, body {
     animation-duration: 0.5s;
     animation-fill-mode: forwards;
     animation-play-state: play;
+    font-size: 2vw;
+}
+
+@media screen and (min-width: 800px) {
+  .chat-entry {
+     font-size: 18px;
+  }
 }
 
 .mesAuthor {
     font-style: italic;
-    font-size: 2vw;
     float: left;
     padding-left: 5px;
+    font-size: 2vw;
+}
+
+@media screen and (min-width: 800px) {
+  .mesAuthor {
+     font-size: 16px;
+  }
 }
 
 .mesTime {
@@ -278,11 +303,16 @@ html, body {
     float: right;
     color: darkgrey;
     padding: 5px;
-    font-size: 2vw;
+}
+
+@media screen and (min-width: 800px) {
+  .mesTime {
+     font-size: 14px;
+  }
 }
 
 .mesContent {
-    font-size: 3vw;
+
 }
 
 .chat-message-input-container{
@@ -311,6 +341,12 @@ html, body {
     font-size: 3vw;
 }
 
+@media screen and (min-width: 800px) {
+  .section-title {
+     font-size: 24px;
+  }
+}
+
 .match-chat-log{
     margin-top: 1vh;
     padding: 10px;
@@ -324,6 +360,7 @@ html, body {
   color: seagreen;
 }
 
+/* icons */
 .oi-chat{
     margin-right: 10px;
 }

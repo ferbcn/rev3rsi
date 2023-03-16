@@ -31,6 +31,7 @@ chatSocket.onmessage = function(e) {
 
     const data = JSON.parse(e.data);
     console.log("Arena message received: ", data);
+    const mesUserName = data.username;
 
     if (data.message_type == "chat"){
         const data = JSON.parse(e.data);
@@ -42,7 +43,7 @@ chatSocket.onmessage = function(e) {
 
         var newMesContainer = document.createElement('div')
         newMesContainer.classList.add("chat-entry-container");
-        if (userName == data.username){
+        if (userName == mesUserName){
             newMesContainer.classList.add("chat-entry-container-me");
         }
         else{
@@ -54,7 +55,18 @@ chatSocket.onmessage = function(e) {
 
         var mesAuthor = document.createElement('div');
         mesAuthor.classList.add("mesAuthor");
-        var author = document.createTextNode(data.username+":");
+        var mesAuthorIcon = document.createElement('div');
+        mesAuthorIcon.classList.add("oi");
+        mesAuthorIcon.classList.add("oi-chat");
+        if (userName != mesUserName){
+            mesAuthorIcon.classList.add("oi-chat-green");
+            var author = document.createTextNode(mesUserName+":");
+        }
+        else {
+            var author = document.createTextNode("you:");
+        }
+
+        mesAuthor.appendChild(mesAuthorIcon);
         mesAuthor.appendChild(author);
 
         var mesContent = document.createElement('div');
@@ -74,6 +86,7 @@ chatSocket.onmessage = function(e) {
         chatLog.appendChild(newMesContainer);
         // scroll to bottom of div
         chatLog.scrollTop = chatLog.scrollHeight;
+
     }
     else if (data.message_type == "match_turn_cast"){
         const data = JSON.parse(e.data);
