@@ -18,7 +18,7 @@ class ArenaConsumer(AsyncWebsocketConsumer):
 
         # Add users to onlineUsers only when connect to ARENA group
         if self.room_name == "ARENA":
-            online_users = cache.get("onlineUsers")
+            online_users = [cache.get("onlineUsers") if cache.get("onlineUsers") is not None else []]
             if not user in online_users:
                 online_users.append(user)
             cache.set("onlineUsers", online_users)
