@@ -182,20 +182,17 @@ chatSocket.onmessage = function(e) {
         else {
 
             // delete all open requests for matches from host and user
-            console.log("Removing games from DOM...");
-            for (var i=0; i < deleteMatches.length; i++){
-                const gameRow = document.getElementById(deleteMatches[i]);
-                gameRow.parentNode.removeChild(gameRow);
-            }
-            console.log(i + " game(s) removed!");
+            removeOpenMatchesDom(deleteMatches);
             // brute force workaround
             // window.location.reload();
         }
     }
     else if (data.message_type == "user_online_status_message"){
-        // add user
         user = data.username;
         userConnected = data.user_connected;
+        deleteMatches = data.delete_matches;
+
+        // add user
         var userList = document.getElementById("user-list");
         if (userConnected && document.getElementById(user) == null){
             var newUser = document.createElement("div");
@@ -212,14 +209,18 @@ chatSocket.onmessage = function(e) {
             newUser.appendChild(newUserText);
             userList.appendChild(newUser);
             }
-        // remove user
+        // remove user and user's games
         }
         if (!userConnected){
+            // remove games
+            if (deleteMatches.length > 0){
+                removeOpenMatchesDom(deleteMatches);
+            }
+            // remove user from user list
             var userItem = document.getElementById(user);
             userList.removeChild(userItem);
             console.log("User item removed!")
             // remove open match requests if any
-
         }
 
 };
@@ -260,3 +261,11 @@ function handleSelectGame(uuid){
 
 };
 
+function removeOpenMatchesDom(deleteMatches){
+    console.log("Removing games from DOM...");
+    for (var i=0; i < deleteMatches.length; i++){
+        const gameRow = document.getElementById(deleteMatches[i]);
+        gameRow.parentNode.removeChild(gameRow);
+    }
+    console.log(i + " game(s) removed!")
+;}

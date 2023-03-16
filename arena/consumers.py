@@ -40,8 +40,21 @@ class ArenaConsumer(AsyncWebsocketConsumer):
             cache.set("onlineUsers", online_users)
             print(f"Online users: {online_users}")
 
+            # remove open matches from Cache
+            open_matches = cache.get("openMatches")
+            new_open_matches = []
+            delete_matches = []
+            for match, games_host in open_matches:
+                if user == games_host:
+                    print(f"Game {match} removed from DB!")
+                    delete_matches.append(match)
+                else:
+                    new_open_matches.append((match, games_host))
+            cache.set("openMatches", new_open_matches)
+            print("OpenMatches Updated in DB: ", new_open_matches)
+            print("Delete matches: ", delete_matches)
             json_mes = {"type": "user_online_message", "message_type": "user_online_status_message", "username": user,
-                        "user_connected": False}
+                        "user_connected": False, "delete_matches": delete_matches}
             await self.channel_layer.group_send(self.room_group_name, json_mes)
 
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
@@ -162,8 +175,10 @@ class ArenaConsumer(AsyncWebsocketConsumer):
         message_type = event["message_type"]
         user_connected = event.get("user_connected")
         username = event.get("username")
+        delete_matches = event.get("delete_matches")
 
-        json_resp = {"message_type": message_type, "username": username, "user_connected": user_connected}
+        json_resp = {"message_type": message_type,
+                     "username": username, "user_connected": user_connected, "delete_matches": delete_matches}
         print("Group BROADCAST message: ", json_resp)
 
         # Send message to WebSocket
