@@ -18,6 +18,15 @@ html, body {
   flex-wrap: wrap;
 }
 
+.flex-container-right {
+  padding: 5px;
+  flex: 60%;
+}
+.flex-container-left {
+  padding: 5px;
+  flex: 20%;
+}
+
 .flex-item-left {
   padding: 5px;
   flex: 70%;
@@ -30,7 +39,7 @@ html, body {
 
 .flex-item-game {
   padding: 5px;
-  flex: 50%;
+  flex: 10%;
 }
 
 .flex-item-user {
@@ -41,7 +50,7 @@ html, body {
 
 .flex-item-btn {
   padding: 5px;
-  flex: 40%;
+  flex: 60%;
 }
 
 .wave-box {
@@ -122,14 +131,35 @@ html, body {
     max-width: 500px;
 }
 
+
+.user-list {
+    margin-top: 20px;
+    padding: 5px;
+    height: 40vh;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    font-size: 3vw;
+}
+
+.online-user{
+    padding: 5px;
+    margin-top: 5px;
+    color: seagreen;
+}
+
+.oi-people-green{
+    color: seagreen;
+    margin-right: 10px;
+}
+
 #match-list{
-    margin-top: 10px;
+    margin-top: 20px;
     height: 40vh;
     overflow: auto;
     font-size: 3vw;
     width: 100%;
     margin-bottom: 10px;
     padding: 5px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
 .match-container {

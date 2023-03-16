@@ -21,42 +21,60 @@
             <button class="btn btn-outline-success" id="create-game-submit">Request New Match</button>
         </div>
 
-        <div class="match-list" id="match-list">
-            {% for name, host in open_matches %}
-            {% if username == host %}
-                <div class="flex-container match-container match-container-me" id="{{ name }}">
-            {% else %}
-                <div class="flex-container match-container match-container-others" id="{{ name }}">
-            {% endif %}
-                <div class="flex-item-game" id="gameName">
-                    New Match requested by
+        <div class="flex-container">
+
+            <div class="flex-container-left">
+                <div class="user-list" id="user-list">
+                    Online Players
+                    {% for user in online_users %}
+                        <div class="online-user" id="{{ user }}"><span class="oi oi-people oi-people-green"></span>{{ user }}</div>
+                    {% endfor %}
                 </div>
-                <div class="flex-item-user" id="hostName">
-                    {{ host }}
-                </div>
-                {% if username == host %}
-                    <div class="wave-box">
-                        <div class="wave"></div>
-                        <div class="wave"></div>
-                        <div class="wave"></div>
-                        <div class="wave"></div>
-                        <div class="wave"></div>
-                        <div class="wave"></div>
-                    </div>
-                {% else %}
-                    <a href="javascript:handleSelectGame('{{ name }}')">
-                    <div class="wave-box">
-                        <div class="wave-good"></div>
-                        <div class="wave-good"></div>
-                        <div class="wave-good"></div>
-                        <div class="wave-good"></div>
-                        <div class="wave-good"></div>
-                        <div class="wave-good"></div>
-                    </div>
-                    </a>
-                {% endif %}
             </div>
-        {% endfor %}
+
+            <div class="flex-container-right">
+
+            <div class="match-list" id="match-list">
+                Match requests
+                {% for name, host in open_matches %}
+                    {% if username == host %}
+                        <div class="flex-container match-container match-container-me" id="{{ name }}">
+                    {% else %}
+                        <div class="flex-container match-container match-container-others" id="{{ name }}">
+                    {% endif %}
+                    <div class="flex-item-game">
+                         <i class="oi oi-people"></i>
+                    </div>
+                    <div class="flex-item-user" id="hostName">
+                        {{ host }}
+                    </div>
+                    {% if username == host %}
+                        <div class="wave-box">
+                            <div class="wave"></div>
+                            <div class="wave"></div>
+                            <div class="wave"></div>
+                            <div class="wave"></div>
+                            <div class="wave"></div>
+                            <div class="wave"></div>
+                        </div>
+                    {% else %}
+                        <a href="javascript:handleSelectGame('{{ name }}')">
+                        <div class="wave-box">
+                            <div class="wave-good"></div>
+                            <div class="wave-good"></div>
+                            <div class="wave-good"></div>
+                            <div class="wave-good"></div>
+                            <div class="wave-good"></div>
+                            <div class="wave-good"></div>
+                        </div>
+                        </a>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+
+            </div>
+
         </div>
 
         <div class="arena-chat-log" id="chat-log"></div>

@@ -152,6 +152,51 @@ class AiGreedyPlus(AiGreedy):
         return move
 
 
+class AiMiniMax(AiGreedy):
+    def __init__(self, is_human=False, role=None):
+        self.is_human = is_human
+        self.role = role
+
+    def next_move(self, board, possible_moves):
+        return self.minimax_move(board, possible_moves)
+
+    # Implementation of the Minimax algorithm
+    def minimax_move(self, board, possible_moves):
+        parent_node = Node(None, None, board, get_scores(board))
+
+        for move in possible_moves:
+            # we get all possible outcomes for all possible moves
+            new_board = self.make_move(copy.deepcopy(board), self.role, move)
+            score_p1, score_p2 = self.get_scores(new_board)
+            if self.role == 1:
+                score = score_p1 - score_p2
+            else:
+                score = score_p2 - score_p1
+            child_node = Node(parent_node, move, board, score)
+            print(child_node)
+            # opponent makes all possible moves
+            self.minimax(new_board, self.get_opponent(self.role), child_node)
+    def minimax(self, board, player, parent_node):
+        possible_moves = get_possible_moves(board, player)
+        for move in possible_moves:
+            new_board = self.make_move(copy.deepcopy(board), self.role, move)
+            score_p1, score_p2 = self.get_scores(new_board)
+            if self.role == 1:
+                score = score_p1 - score_p2
+            else:
+                score = score_p2 - score_p1
+            child_node = Node(parent_node, move, board, score)
+            print(child_node)
+            self.minimax(new_board, self.get_opponent(player), child_node)
+class Node:
+    def __init__(self, parent_node, move, board, score):
+        self.parent_node = parent_node
+        self.move = move
+        self.board = board
+        self.score = score
+    def __repr__(self):
+        return f"{self.move} with score {self.score}"
+
 class Game:
     def __init__(self, player1, player2, difficulty, board=None):
         if board is None:

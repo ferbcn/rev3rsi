@@ -16,8 +16,8 @@ from reversi.data_layer import *
 
 # Game difficulties and which are available
 # Hardest Level is disabled by default
-game_levels = [('', 'easy'), ('', 'hard'), ('', 'harder'), ('disabled', 'hardest')]
-admin_game_levels = [('', 'easy'), ('', 'hard'), ('', 'harder'), ('disabled', 'hardest'),
+game_levels = [('', 'easy'), ('', 'hard'), ('', 'harder'), ('', 'hardest')]
+admin_game_levels = [('', 'easy'), ('', 'hard'), ('', 'harder'), ('', 'hardest'),
                       ('', 'P1-Draw'), ('', 'P1-Win'), ('', 'P1-Lose'), ('', 'P2-Win'), ('', 'P2-Lose')]
 
 
@@ -303,6 +303,9 @@ def move(request):
     elif difficulty == "harder":
         machine_player = AiGreedyPlus(role=machine_role)
         print("Greedy Plus Ai initiated")
+    elif difficulty == "hardest":
+        machine_player = AiMiniMax(role=machine_role)
+        print("Greedy Minimax Ai initiated")
     else:
         machine_player = AiGreedy(role=machine_role)
         print("Defaulting to Greedy Ai")

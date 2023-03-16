@@ -117,8 +117,10 @@ chatSocket.onmessage = function(e) {
 
         var flex_elem_game = document.createElement('div');
         flex_elem_game.classList.add("flex-item-game");
-        flex_elem_game.setAttribute("id", "gameName");
-        flex_elem_game.appendChild(document.createTextNode("New Match requested by"))
+        flex_elem_game.classList.add("oi");
+        flex_elem_game.classList.add("oi-people");
+        // flex_elem_game.setAttribute("id", "gameName");
+        // flex_elem_game.appendChild(document.createTextNode("New Match requested by"))
 
         var flex_elem_host = document.createElement('div');
         flex_elem_host.classList.add("flex-item-user");
@@ -190,6 +192,36 @@ chatSocket.onmessage = function(e) {
             // window.location.reload();
         }
     }
+    else if (data.message_type == "user_online_status_message"){
+        // add user
+        user = data.username;
+        userConnected = data.user_connected;
+        var userList = document.getElementById("user-list");
+        if (userConnected && document.getElementById(user) == null){
+            var newUser = document.createElement("div");
+            newUser.setAttribute("id", user);
+            newUser.classList.add("online-user");
+
+            var newUserIcon = document.createElement("span");
+            newUserIcon.classList.add("oi");
+            newUserIcon.classList.add("oi-people");
+            newUserIcon.classList.add("oi-people-green");
+            var newUserText = document.createTextNode(user);
+
+            newUser.appendChild(newUserIcon);
+            newUser.appendChild(newUserText);
+            userList.appendChild(newUser);
+            }
+        // remove user
+        }
+        if (!userConnected){
+            var userItem = document.getElementById(user);
+            userList.removeChild(userItem);
+            console.log("User item removed!")
+            // remove open match requests if any
+
+        }
+
 };
 
 

@@ -7,17 +7,43 @@ from django.core.cache import cache
 
 class ArenaConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        print("User: ", self.scope["user"].username, "connected to: ", self.scope["url_route"]["kwargs"])
+        user = self.scope["user"].username
         self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
+        print("User: ", user, "connected to: ", self.room_name)
         self.room_group_name = "arena_%s" % self.room_name
 
         # Join room group
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
         await self.accept()
 
+        # Add users to onlineUsers only when connect to ARENA group
+        if self.room_name == "ARENA":
+            online_users = cache.get("onlineUsers")
+            if not user in online_users:
+                online_users.append(user)
+            cache.set("onlineUsers", online_users)
+            print(f"Online users: {online_users}")
+
+            json_mes = {"type": "user_online_message", "message_type": "user_online_status_message", "username": user, "user_connected": True}
+            await self.channel_layer.group_send(self.room_group_name, json_mes)
+
     async def disconnect(self, close_code):
         # Leave room group
-        print("User: ", self.scope["user"].username, "disconnected from: ", self.scope["url_route"]["kwargs"])
+        user = self.scope["user"].username
+        room_name = self.scope["url_route"]["kwargs"]
+        print("User: ", user, "disconnected from: ", room_name)
+
+        if self.room_name == "ARENA":
+            online_users = cache.get("onlineUsers")
+            if user in online_users:
+                del online_users[online_users.index(user)]
+            cache.set("onlineUsers", online_users)
+            print(f"Online users: {online_users}")
+
+            json_mes = {"type": "user_online_message", "message_type": "user_online_status_message", "username": user,
+                        "user_connected": False}
+            await self.channel_layer.group_send(self.room_group_name, json_mes)
+
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
 
     # Receive message from WebSocket
@@ -125,6 +151,19 @@ class ArenaConsumer(AsyncWebsocketConsumer):
         json_resp = {"message_type": message_type, "message": message, "username": username,
                      "game_id": game_id, "game_uuid": game_uuid, "host": host, "player": player,
                      "delete_matches": delete_matches}
+        print("Group BROADCAST message: ", json_resp)
+
+        # Send message to WebSocket
+        await self.send(text_data=json.dumps(json_resp))
+
+
+    # Relay message to room group
+    async def user_online_message(self, event):
+        message_type = event["message_type"]
+        user_connected = event.get("user_connected")
+        username = event.get("username")
+
+        json_resp = {"message_type": message_type, "username": username, "user_connected": user_connected}
         print("Group BROADCAST message: ", json_resp)
 
         # Send message to WebSocket

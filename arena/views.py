@@ -15,9 +15,10 @@ def arenaindex(request):
 
         # Read open matches from Redis DB
         open_matches = cache.get("openMatches")
+        online_users = cache.get("onlineUsers")
         #print(open_matches)
 
-        return render(request, "arena/arena.html", {"open_matches": open_matches, "username": username,
-                                                    "game_levels": game_levels})
+        return render(request, "arena/arena.html", {"username": username, "game_levels": game_levels,
+                                                    "open_matches": open_matches, "online_users": online_users})
     else:
         return HttpResponseRedirect(reverse("login"))
