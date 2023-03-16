@@ -308,3 +308,7 @@ html, body {
     padding: 10px;
     height: 25vh;
 }
+
+.section-title{
+    font-size: 3vw;
+}
