@@ -14,7 +14,7 @@ def arenaindex(request):
         username = request.user.username
 
         # Read open matches from Redis DB
-        open_matches = cache.get("onlineUsers") if cache.get("openMatches") is not None else []
+        open_matches = cache.get("openMatches") if cache.get("openMatches") is not None else []
         online_users = cache.get("onlineUsers") if cache.get("onlineUsers") is not None else []
         #print(open_matches)
 
