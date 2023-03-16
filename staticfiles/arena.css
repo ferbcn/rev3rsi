@@ -268,7 +268,6 @@ html, body {
 
 .mesAuthor {
     font-style: italic;
-    color: darkgrey;
     font-size: 2vw;
     float: left;
     padding-left: 5px;
@@ -323,4 +322,12 @@ html, body {
 .btn.btn-outline-success:focus {
   background-color: transparent;
   color: seagreen;
+}
+
+.oi-chat{
+    margin-right: 10px;
+}
+
+.oi-chat-green{
+    color: seagreen;
 }

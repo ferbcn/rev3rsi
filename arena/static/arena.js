@@ -56,6 +56,7 @@ chatSocket.onerror = function(e) {
 chatSocket.onmessage = function(e) {
     const data = JSON.parse(e.data);
     console.log("Arena message received: ", data);
+    const mesUserName = data.username;
 
     if (data.message_type == "chat"){
         const data = JSON.parse(e.data);
@@ -67,7 +68,7 @@ chatSocket.onmessage = function(e) {
 
         var newMesContainer = document.createElement('div')
         newMesContainer.classList.add("chat-entry-container");
-        if (userName == data.username){
+        if (userName == mesUserName){
             newMesContainer.classList.add("chat-entry-container-me");
         }
         else{
@@ -81,11 +82,15 @@ chatSocket.onmessage = function(e) {
         mesAuthor.classList.add("mesAuthor");
         var mesAuthorIcon = document.createElement('div');
         mesAuthorIcon.classList.add("oi");
-        mesAuthorIcon.classList.add("oi-people");
-        if (userName != data.username){
-            mesAuthorIcon.classList.add("oi-people-green");
+        mesAuthorIcon.classList.add("oi-chat");
+        if (userName != mesUserName){
+            mesAuthorIcon.classList.add("oi-chat-green");
+            var author = document.createTextNode(mesUserName+":");
         }
-        var author = document.createTextNode(data.username+":");
+        else {
+            var author = document.createTextNode("you:");
+        }
+
         mesAuthor.appendChild(mesAuthorIcon);
         mesAuthor.appendChild(author);
 
