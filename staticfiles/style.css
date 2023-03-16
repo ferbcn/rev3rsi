@@ -9,7 +9,7 @@ html, body {
 }
 
 a {
-  color: red;
+  color: green;
 }
 
 h6 {
@@ -17,7 +17,7 @@ h6 {
 }
 
 a:hover {
-  color: green;
+  color: white;
 }
 
 .nav-item {
