@@ -14,8 +14,8 @@ def arenaindex(request):
         username = request.user.username
 
         # Read open matches from Redis DB
-        open_matches = cache.get("openMatches")
-        online_users = cache.get("onlineUsers")
+        open_matches = cache.get("onlineUsers") if cache.get("openMatches") is not None else []
+        online_users = cache.get("onlineUsers") if cache.get("onlineUsers") is not None else []
         #print(open_matches)
 
         return render(request, "arena/arena.html", {"username": username, "game_levels": game_levels,

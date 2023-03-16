@@ -34,7 +34,7 @@ class ArenaConsumer(AsyncWebsocketConsumer):
         print("User: ", user, "disconnected from: ", room_name)
 
         if self.room_name == "ARENA":
-            online_users = cache.get("onlineUsers")
+            online_users = cache.get("onlineUsers") if cache.get("onlineUsers") is not None else []
             if user in online_users:
                 del online_users[online_users.index(user)]
             cache.set("onlineUsers", online_users)

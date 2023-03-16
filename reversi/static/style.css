@@ -13,7 +13,7 @@ a {
 }
 
 h6 {
-    margin-top:3vh;
+    margin-top:1vh;
 }
 
 a:hover {
@@ -113,7 +113,7 @@ a:hover {
 }
 
 .comm-box {
-  margin-top: 5%;
+  margin-top: 20px;
   font-size: calc(6px + 1.5vw);
   width: 70vw;
   padding: 5px;
