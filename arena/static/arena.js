@@ -1,8 +1,6 @@
 const userName = JSON.parse(document.getElementById('json-username').textContent);
 
-//document.querySelector('#chat-message-input').focus();
 var chatSocket;
-// const wsUrl = "wss://rev3rsi.fun/ws/arena/ARENA/";
 
 var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
 
@@ -16,8 +14,7 @@ function openChatsocket(){
         + 'ARENA'
         + '/'
     );
-
-}
+};
 
 chatSocket.onopen = function(e) {
     console.log('Chat socket connected!');
@@ -82,7 +79,14 @@ chatSocket.onmessage = function(e) {
 
         var mesAuthor = document.createElement('div');
         mesAuthor.classList.add("mesAuthor");
+        var mesAuthorIcon = document.createElement('div');
+        mesAuthorIcon.classList.add("oi");
+        mesAuthorIcon.classList.add("oi-people");
+        if (userName != data.username){
+            mesAuthorIcon.classList.add("oi-people-green");
+        }
         var author = document.createTextNode(data.username+":");
+        mesAuthor.appendChild(mesAuthorIcon);
         mesAuthor.appendChild(author);
 
         var mesContent = document.createElement('div');

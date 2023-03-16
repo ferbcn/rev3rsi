@@ -146,9 +146,12 @@ html, body {
     color: seagreen;
 }
 
+.oi-people{
+    margin-right: 10px;
+}
+
 .oi-people-green{
     color: seagreen;
-    margin-right: 10px;
 }
 
 #match-list{
@@ -235,7 +238,7 @@ html, body {
     padding: 10px;
     height: 40vh;
     padding-top: 5%;
-    padding-bottom: 10%;
+    padding-bottom: 25%;
     overflow:auto;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
@@ -243,18 +246,20 @@ html, body {
 .chat-entry-container {
     border-radius: 5px;
     margin-top: 1vh;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
 .chat-entry-container-me{
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    color: darkgrey;
+    /*box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);*/
 }
 .chat-entry-container-other{
-    box-shadow: 0 4px 8px 0 rgba(0, 225, 0, 0.2), 0 6px 20px 0 rgba(0, 225, 0, 0.19);
+    color: seagreen;
+    /*box-shadow: 0 4px 8px 0 rgba(0, 225, 0, 0.2), 0 6px 20px 0 rgba(0, 225, 0, 0.19);*/
 }
 
 .chat-entry {
-    padding: 5px;
-    color: lightgrey;
+    padding: 10px;
     animation-name: appear;
     animation-duration: 0.5s;
     animation-fill-mode: forwards;
@@ -278,7 +283,6 @@ html, body {
 }
 
 .mesContent {
-    color: lightgrey;
     font-size: 3vw;
 }
 
@@ -297,10 +301,15 @@ html, body {
     border: solid;
     border-radius: 5px;
     color: lightgrey;
-    width: 100%;
+    width: 94%;
+    margin-left: 3%;
+    margin-right: 3%;
     padding: 10px;
-    margin-right: 10px;
     height: 35px;
+}
+
+.section-title{
+    font-size: 3vw;
 }
 
 .match-chat-log{
@@ -309,6 +318,9 @@ html, body {
     height: 25vh;
 }
 
-.section-title{
-    font-size: 3vw;
+/* avoid that hoover effects gets sticky on mobile*/
+.btn.btn-outline-success:active,
+.btn.btn-outline-success:focus {
+  background-color: transparent;
+  color: seagreen;
 }
