@@ -241,7 +241,6 @@ class Game:
         self.difficulty = difficulty
 
 
-
 def get_opponent(player):
     if player == 1:
         return 2
