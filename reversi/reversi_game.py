@@ -162,32 +162,60 @@ class AiMiniMax(AiGreedy):
 
     # Implementation of the Minimax algorithm
     def minimax_move(self, board, possible_moves):
-        parent_node = Node(None, None, board, get_scores(board))
+        depth = 4
+        print(f"Minimax move with depth {depth}...")
+        possible_moves = get_possible_moves(board, self.role)
+        player = self.role
+        minimax_moves = []
+        for move in possible_moves:
+            new_board = self.make_move(copy.deepcopy(board), player, move)
+            score = self.minimax(new_board, self.role, depth, True)
+            minimax_moves.append((move, score))
+        print(minimax_moves)
+        minimax_moves = sorted(minimax_moves, key=lambda x: x[1], reverse=True)
 
-        for move in possible_moves:
-            # we get all possible outcomes for all possible moves
-            new_board = self.make_move(copy.deepcopy(board), self.role, move)
-            score_p1, score_p2 = self.get_scores(new_board)
-            if self.role == 1:
-                score = score_p1 - score_p2
-            else:
-                score = score_p2 - score_p1
-            child_node = Node(parent_node, move, board, score)
-            print(child_node)
-            # opponent makes all possible moves
-            self.minimax(new_board, self.get_opponent(self.role), child_node)
-    def minimax(self, board, player, parent_node):
+        return_move = minimax_moves[0][0]
+        print(f"Returning move: {return_move}")
+        return return_move
+
+    def minimax(self, board, player, depth, maximizingPlayer):
+        # print(f"Current depth: {depth}")
+        if depth == 0 or self.game_over_position(board, player):
+            return self.get_abs_score(board, player)
+
         possible_moves = get_possible_moves(board, player)
-        for move in possible_moves:
-            new_board = self.make_move(copy.deepcopy(board), self.role, move)
-            score_p1, score_p2 = self.get_scores(new_board)
-            if self.role == 1:
-                score = score_p1 - score_p2
-            else:
-                score = score_p2 - score_p1
-            child_node = Node(parent_node, move, board, score)
-            print(child_node)
-            self.minimax(new_board, self.get_opponent(player), child_node)
+        if maximizingPlayer:
+            max_eval = -64
+            for move in possible_moves:
+                new_board = self.make_move(copy.deepcopy(board), player, move)
+                eval = self.minimax(new_board, player, depth-1, False)
+                max_eval = max(max_eval, eval)
+            return max_eval
+        else:
+            min_eval = +64
+            for move in possible_moves:
+                new_board = self.make_move(copy.deepcopy(board), self.get_opponent(player), move)
+                eval = self.minimax(new_board, self.get_opponent(player), depth-1, False)
+                min_eval = min(min_eval, eval)
+            return min_eval
+
+    def get_abs_score(self, board, player):
+        score_p1, score_p2 = self.get_scores(board)
+        if player == 1:
+            score = score_p1 - score_p2
+        else:
+            score = score_p2 - score_p1
+        return score
+
+    def game_over_position(self, board, player):
+        possible_moves = get_possible_moves(board, player)
+        if len(possible_moves) == 0:
+            next_possible_moves = get_possible_moves(board, self.get_opponent(player))
+            if len(next_possible_moves) == 0:
+                print("Game Over Position found!")
+                return True
+        return False
+
 class Node:
     def __init__(self, parent_node, move, board, score):
         self.parent_node = parent_node
