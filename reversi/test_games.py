@@ -43,3 +43,21 @@ class TestGameP1MoveP2LastMoveToWin(TestGame):
         self.board = [[2, 2, 0, 0, 0, 1, 1, 1] for x in range(8)]
         self.board[0][4] = 2
         self.board[7][2] = 1
+
+
+class TestGameJumpCheck(TestGame):
+    def __init__(self, player1, player2, difficulty):
+        super().__init__(player1, player2, difficulty)
+        self.board = [[1, 1, 1, 1, 1, 1, 1, 1] for x in range(8)]
+        self.board[0][0] = 0
+        self.board[0][2] = 2
+        self.board[0][3] = 0
+        self.board[0][5] = 2
+        self.board[0][6] = 0
+        self.board[0][7] = 0
+        self.board[7][0] = 0
+        self.board[7][2] = 2
+        self.board[7][3] = 0
+        self.board[7][5] = 2
+        self.board[7][6] = 0
+        self.board[7][7] = 1

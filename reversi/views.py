@@ -16,9 +16,9 @@ from reversi.data_layer import *
 
 # Game difficulties and which are available
 # Hardest Level is disabled by default
-game_levels = [('', 'easy'), ('', 'hard'), ('', 'harder'), ('', 'hardest')]
+game_levels = [('', 'easy'), ('', 'hard'), ('', 'harder'), ('hidden', 'hardest')]
 admin_game_levels = [('', 'easy'), ('', 'hard'), ('', 'harder'), ('', 'hardest'),
-                      ('', 'P1-Draw'), ('', 'P1-Win'), ('', 'P1-Lose'), ('', 'P2-Win'), ('', 'P2-Lose')]
+                      ('', 'P1-Draw'), ('', 'P1-Win'), ('', 'P1-Lose'), ('', 'P2-Win'), ('', 'P2-Lose'), ('', 'JumpCheck')]
 
 
 # default view which renders an animation
@@ -71,6 +71,8 @@ def newgame(request):
             new_game = TestGameP1MoveP2LastMoveToWin(player1_name, player2_name, difficulty)
         elif difficulty == "P2-Lose":
             new_game = TestGameP1MoveP2LastMoveToLose(player1_name, player2_name, difficulty)
+        elif difficulty == "JumpCheck":
+            new_game = TestGameJumpCheck(player1_name, player2_name, difficulty)
         else:
             new_game = Game(player1_name, player2_name, difficulty, board=None)
     else:
@@ -307,8 +309,10 @@ def move(request):
         machine_player = AiMiniMax(role=machine_role)
         print("Greedy Minimax Ai initiated")
     else:
-        machine_player = AiGreedy(role=machine_role)
-        print("Defaulting to Greedy Ai")
+        machine_player = AiMiniMax(role=machine_role)
+        print("Greedy Minimax Ai initiated")
+        #machine_player = AiGreedy(role=machine_role)
+        #print("Defaulting to Greedy Ai")
 
     message = f""
     color = 'darkgrey'

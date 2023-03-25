@@ -44,12 +44,13 @@ class ArenaConsumer(AsyncWebsocketConsumer):
             open_matches = cache.get("openMatches")
             new_open_matches = []
             delete_matches = []
-            for match, games_host in open_matches:
-                if user == games_host:
-                    print(f"Game {match} removed from DB!")
-                    delete_matches.append(match)
-                else:
-                    new_open_matches.append((match, games_host))
+            if open_matches:
+                for match, games_host in open_matches:
+                    if user == games_host:
+                        print(f"Game {match} removed from DB!")
+                        delete_matches.append(match)
+                    else:
+                        new_open_matches.append((match, games_host))
             cache.set("openMatches", new_open_matches)
             print("OpenMatches Updated in DB: ", new_open_matches)
             print("Delete matches: ", delete_matches)
