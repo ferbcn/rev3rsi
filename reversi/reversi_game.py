@@ -191,16 +191,16 @@ class AiMiniMax(AiGreedyPlus):
 
         possible_moves = get_possible_moves(board, player)
         if maximizingPlayer:
-            max_eval = -64
+            max_eval = -65
             for move in possible_moves:
                 new_board = self.make_move(copy.deepcopy(board), player, move)
                 eval = self.minimax(new_board, self.get_opponent(player), depth-1, False)
                 max_eval = max(max_eval, eval)
             return max_eval
         else:
-            min_eval = 64
+            min_eval = 65
             for move in possible_moves:
-                new_board = self.make_move(copy.deepcopy(board), self.get_opponent(player), move)
+                new_board = self.make_move(copy.deepcopy(board), player, move)
                 eval = self.minimax(new_board, self.get_opponent(player), depth-1, True)
                 min_eval = min(min_eval, eval)
             return min_eval
