@@ -160,20 +160,20 @@ class AiMiniMax(AiGreedyPlus):
 
     def next_move(self, board, possible_moves):
         scores = self.get_scores(board)
-        if scores[0] + scores[1] < 40:
+        if scores[0] + scores[1] < 33:
             return self.greedy_plus_move(board, possible_moves)
         return self.minimax_move(board, possible_moves)
 
     # Implementation of the Minimax algorithm
     def minimax_move(self, board, possible_moves):
-        depth = 4
+        depth = 6
         print(f"Minimax move with depth {depth}...")
         possible_moves = get_possible_moves(board, self.role)
         player = self.role
         minimax_moves = []
         for move in possible_moves:
             new_board = self.make_move(copy.deepcopy(board), player, move)
-            score = self.minimax(new_board, self.role, depth, True)
+            score = self.minimax(new_board, self.role, depth, -65, 65, True)
             minimax_moves.append((move, score))
         minimax_moves = sorted(minimax_moves, key=lambda x: x[1], reverse=True)
         print(minimax_moves)
@@ -182,11 +182,11 @@ class AiMiniMax(AiGreedyPlus):
         print(f"Returning move: {return_move}")
         return return_move
 
-    def minimax(self, board, player, depth, maximizingPlayer):
+    def minimax(self, board, player, depth, alpha, beta, maximizingPlayer):
         # print(f"Current depth: {depth}")
         if depth == 0 or self.game_over_position(board, player):
             abs_score = self.get_abs_score(board, self.role)
-            print("Returning board with ABS score:", abs_score, "at depth:", 4-depth)
+            #print("Returning board with ABS score:", abs_score, "at depth:", 4-depth)
             return abs_score
 
         possible_moves = get_possible_moves(board, player)
@@ -194,15 +194,21 @@ class AiMiniMax(AiGreedyPlus):
             max_eval = -65
             for move in possible_moves:
                 new_board = self.make_move(copy.deepcopy(board), player, move)
-                eval = self.minimax(new_board, self.get_opponent(player), depth-1, False)
+                eval = self.minimax(new_board, self.get_opponent(player), depth-1, alpha, beta, False)
                 max_eval = max(max_eval, eval)
+                alpha = max(alpha, max_eval)
+                if beta <= alpha:
+                    break
             return max_eval
         else:
             min_eval = 65
             for move in possible_moves:
                 new_board = self.make_move(copy.deepcopy(board), player, move)
-                eval = self.minimax(new_board, self.get_opponent(player), depth-1, True)
+                eval = self.minimax(new_board, self.get_opponent(player), depth-1, alpha, beta, True)
                 min_eval = min(min_eval, eval)
+                beta = min(beta, min_eval)
+                if beta <= alpha:
+                    break
             return min_eval
 
     def get_abs_score(self, board, player):
@@ -215,8 +221,12 @@ class AiMiniMax(AiGreedyPlus):
         if len(possible_moves) == 0:
             next_possible_moves = get_possible_moves(board, self.get_opponent(player))
             if len(next_possible_moves) == 0:
+                """
                 print("Game Over Position found!")
                 for line in board: print(line)
+                scores = self.get_scores(board)
+                print(f"Score: {scores[0]}/{scores[1]}")
+                """
                 return True
         return False
 
