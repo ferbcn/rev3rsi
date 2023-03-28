@@ -391,3 +391,15 @@ a.divlink:hover {
     max-width: 70px;
     max-height: 70px;
 }
+
+.spin-container {
+    z-index: -10;
+    margin-bottom: 50%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.spinner-border {
+    width: 4rem;
+    height: 4rem;
+}

@@ -30,6 +30,11 @@ function move(row, col){
     console.log("Making move...");
     console.log("Row:", row, "Col:", col);
 
+    // set spinner to visible until we get next machine move
+    var element = document.getElementById("spinner");
+    element.style.top = "500px";
+    element.style.visibility = 'visible';
+
     // Open new request
     const request = new XMLHttpRequest();
     request.open('POST', '/move');
@@ -40,6 +45,9 @@ function move(row, col){
 
         // update everything
         updateAll(data);
+
+        // hide spinner
+        element.style.visibility = 'hidden';
 
         // make a machine move
         check_for_and_make_auto_machine_move(data)
