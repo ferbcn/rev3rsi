@@ -1,6 +1,10 @@
 var game_over = false;
 // begin by querying the board status and updating its elements
-queryBoard();
+
+
+document.addEventListener("DOMContentLoaded", function(){
+    queryBoard();
+});
 
 
 function queryBoard(){
@@ -27,49 +31,51 @@ function queryBoard(){
 
 
 function move(row, col){
-    console.log("Making move...");
-    console.log("Row:", row, "Col:", col);
-
-    // set spinner to visible until we get next machine move
-    var element = document.getElementById("spinner");
-    element.style.top = "500px";
-    element.style.visibility = 'visible';
-
-    // Open new request
-    const request = new XMLHttpRequest();
-    request.open('POST', '/move');
-    request.onload = () => {
-        const data = JSON.parse(request.responseText);
-        console.log(data);
-        game_over = data["game_over"]
-
-        // update everything
-        updateAll(data);
-
-        // hide spinner
-        element.style.visibility = 'hidden';
-
-        // make a machine move
-        check_for_and_make_auto_machine_move(data)
-    };
-
-    // Add row/col to request data.
-    const data = new FormData();
-    data.append('row', row);
-    data.append('col', col);
-
-    // Send request (only if not game over)
     if (!game_over){
-        request.send(data);
-    }
+        console.log("Making move...");
+        console.log("Row:", row, "Col:", col);
 
-    // window.location.reload(true);
+        // set spinner to visible until we get next machine move
+        var element = document.getElementById("spinner");
+        element.style.top = "500px";
+        element.style.visibility = 'visible';
+
+        // Open new request
+        const request = new XMLHttpRequest();
+        request.open('POST', '/move');
+        request.onload = () => {
+            const data = JSON.parse(request.responseText);
+            console.log(data);
+            game_over = data["game_over"]
+
+            // update everything
+            updateAll(data);
+
+            // hide spinner
+            element.style.visibility = 'hidden';
+
+            // make a machine move
+            check_for_and_make_auto_machine_move(data)
+        };
+
+        // Add row/col to request data.
+        const data = new FormData();
+        data.append('row', row);
+        data.append('col', col);
+
+        // Send request (only if not game over)
+        if (!game_over){
+            request.send(data);
+        }
+
+        // window.location.reload(true);
+    }
 };
 
 
 function check_for_and_make_auto_machine_move(data){
     if (data["machine_role"] == data["next_player"]){
-        // dummy move make --> machine move (includes delay for better visualization)
+        // dummy move --> machine move (includes delay for better visualization)
         setTimeout(function() {
             move(-1, -1);}, 1);
     }
@@ -113,8 +119,14 @@ function updateMessage(message, game_over){
         game_over = true;
 
         document.getElementById("board").classList.add("board_glow_green_blue_cycle");
+        var element = document.getElementById("spinner");
+        element.style.visibility = 'hidden';
 
-      }
+        addEventListener("mousedown", (event) => {});
+            onmousedown = (event) => {
+                document.getElementById('gameoverbox').classList.remove('gameover-box');
+            };
+        }
 }
 
 

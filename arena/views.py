@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 from django.core.cache import cache
 
-game_levels = [('', 'easy'), ('', 'hard'), ('', 'harder'), ('disabled', 'hardest')]
+game_levels = [('', 'easy'), ('', 'hard'), ('', 'harder'), ('', 'hardest')]
 
 
 @require_http_methods(["GET"])

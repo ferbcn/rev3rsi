@@ -11,39 +11,37 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_http_methods
 
 from reversi.test_games import *
-from reversi.reversi_game import *
+from reversi.game_logic import *
 from reversi.data_layer import *
 
 # Game difficulties and which are available
-# Hardest Level is disabled by default
-game_levels = [('', 'easy'), ('', 'hard'), ('', 'harder'), ('', 'extreme')]
-admin_game_levels = [('', 'easy'), ('', 'hard'), ('', 'harder'), ('', 'extreme'),
-                      ('', 'P1-Draw'), ('', 'P1-Win'), ('', 'P1-Lose'), ('', 'P2-Win'), ('', 'P2-Lose'), ('', 'JumpCheck')]
-
+from .game_levels import Levels
 
 # default view which renders an animation
 def index(request):
+    lev = Levels()
     if request.user.is_authenticated:
         user = request.user
         if user.is_superuser:
-            levels = admin_game_levels
+            levels = lev.get_admin_levels()
         else:
-            levels = game_levels
+            levels = lev.get_levels()
     else:
         user = False
-        levels = game_levels
+        levels = lev.get_levels()
 
     return render(request, "index.html", {"user": user, "game_levels": levels})
 
 
 # game board initialization (player vs machine)
 def newgame(request):
+    levels = Levels()
     if request.user.is_authenticated:
         user = request.user
     else:
         level = request.GET["difficulty"]
         return render(request, "users/login.html", {"message": "Please login first to start a new game!", "user": False,
-                                                    "game_levels": game_levels, "level": level})
+                                                    "game_levels": levels.get_levels(), "level": level})
 
     # Game level is passed as url parameter http://localhost/newgame?difficulty=...
     difficulty = request.GET["difficulty"]
@@ -53,11 +51,11 @@ def newgame(request):
     if human_is_player1 == 1:
         player1_name = "human"
         player2_name = difficulty
-        human_role = 1
+        request.session["machine_role"] = 2
     else:
         player1_name = difficulty
         player2_name = "human"
-        human_role = 2
+        request.session["machine_role"] = 1
 
     # Launch a test game
     if user.is_superuser:
@@ -102,13 +100,13 @@ def newgame(request):
 
 # game board initialization for match (player vs player)
 def newmatch(request):
-
     if request.user.is_authenticated:
         user = request.user
     else:
         level = request.GET["difficulty"]
+        levels = Levels()
         return render(request, "users/login.html", {"message": "Please login first to start a new game!", "user": False,
-                                                        "game_levels": game_levels, "level": level})
+                                                        "game_levels": levels.get_levels(), "level": level})
 
     p1_name = request.GET["p1"]
     p2_name = request.GET["p2"]
@@ -160,6 +158,7 @@ def reversi(request):
 
     # Restore Gamestate from DB
     game_id = request.session['game_id']
+
     try:
         board, green_player, blue_player, next_player = load_gamestate_db(game_id, user)
     # Something went wrong retrieving board (db error or cheating)
@@ -172,17 +171,18 @@ def reversi(request):
         difficulty = blue_player
         player_color = 'green'
     elif blue_player == "human":
-        print("P2 is human.")
+        print("Blue Player is human.")
         difficulty = green_player
         player_color = 'blue'
     else:
         difficulty = "match"
         print(f"Match: Green is {green_player} and Blue is {blue_player}.")
 
+    lev = Levels()
     if user.is_superuser:
-        levels = admin_game_levels
+        levels = lev.get_admin_levels()
     else:
-        levels = game_levels
+        levels = lev.get_levels()
 
     return render(request, "reversi.html", {"user": user,
                                             "board": board,
@@ -215,7 +215,8 @@ def reversimatch (request):
     difficulty = "match"
     print(f"Match: Green is {green_player} and Blue is {blue_player}.")
 
-    levels = game_levels
+    levels = Levels()
+    game_levels = levels.get_levels()
     user_color = "green" if user.username == green_player else "blue"
 
     return render(request, "reversimatch.html",
@@ -224,7 +225,7 @@ def reversimatch (request):
                     "player1_name": green_player,
                     "player2_name": blue_player,
                     "game_level": difficulty,
-                    "game_levels": levels,
+                    "game_levels": game_levels,
                     "game_id": game_id,
                     "user_color": user_color
                     })
@@ -241,7 +242,14 @@ def queryboard(request):
     if request.method == "GET":
         # Restore gamestate from DB
         game_id = request.session['game_id']
-        board, green_player, player2_name, next_player = load_gamestate_db(game_id, user)
+        board, player1_name, player2_name, next_player = load_gamestate_db(game_id, user)
+
+        if player1_name == "human":
+            machine_role = 2
+        elif player2_name == "human":
+            machine_role = 1
+        else:
+            machine_role = 0
 
         possible_moves = get_possible_moves(board, next_player)
         message = f"Player{next_player}'s turn"
@@ -251,7 +259,7 @@ def queryboard(request):
         scores = get_scores(board)
 
         data = {"board": board, "message": {"message": message, "color": board_color},
-                "next_player": next_player,
+                "next_player": next_player, "machine_role": machine_role,
                 "scores": scores, "possible_moves": possible_moves, "board_color": board_color}
         return JsonResponse(data, safe=False)
 
@@ -277,8 +285,9 @@ def move(request):
     game_over = False
 
     # Something went wrong retrieving board (db error or cheating)
+    levels = Levels()
     if board is None:
-        return render(request, "index.html", {"user": user, "game_levels": game_levels})
+        return render(request, "index.html", {"user": user, "game_levels": levels.get_levels()})
 
     if player1_name == "human":
         difficulty = player2_name
@@ -299,13 +308,13 @@ def move(request):
     if difficulty == "easy":
         machine_player = AiRandom(role=machine_role)
         print("Random Ai initiated")
-    elif difficulty == "hard":
+    elif difficulty == "medium":
         machine_player = AiGreedy(role=machine_role)
         print("Greedy Ai initiated")
-    elif difficulty == "harder":
+    elif difficulty == "hard":
         machine_player = AiGreedyPlus(role=machine_role)
         print("Greedy Plus Ai initiated")
-    elif difficulty == "extreme":
+    elif difficulty == "harder":
         machine_player = AiMiniMax(role=machine_role)
         print("Greedy Minimax Ai initiated")
     else:
@@ -401,10 +410,10 @@ def movematch(request):
     game_over = False
 
     if user.username == next_player_name:
-
+        levels = Levels()
         # Something went wrong retrieving board (db error or cheating)
         if board is None:
-            return render(request, "index.html", {"user": user, "game_levels": game_levels})
+            return render(request, "index.html", {"user": user, "game_levels": levels.get_levels()})
 
         # Define player1 (player) and player2 (opponent)
         human_player = Player(role=next_player)
@@ -484,7 +493,8 @@ def loadgame(request):
     # Something went wrong retrieving board (db error or cheating)
     except Exception as e:
         print(f"DB Error: {e}")
-        return render(request, "index.html", {"user": user, "game_levels": game_levels})
+        levels = Levels()
+        return render(request, "index.html", {"user": user, "game_levels": levels.get_levels()})
 
     for line in board: print(line)
 
@@ -503,10 +513,11 @@ def savedgames(request):
 
     saved_games = get_saved_games_for_user(user)
 
+    levels = Levels()
     if user.is_superuser:
-        levels = admin_game_levels
+        levels = levels.get_admin_levels()
     else:
-        levels = game_levels
+        levels = levels.get_levels()
 
     return render(request, "savedgames.html",
                   {"user": user, "game_levels": levels, "saved_games": saved_games})
@@ -530,9 +541,10 @@ def deletegame(request):
 
 def login_view(request):
     if request.method == "GET":
+        levels = Levels()
         return render(request, "users/login.html",
                       {"message": "Please enter your username and password.", "user": False,
-                       "game_levels": game_levels})
+                       "game_levels": levels.get_levels()})
 
     username = request.POST["username"]
     password = request.POST["password"]
@@ -549,8 +561,9 @@ def login_view(request):
             return HttpResponseRedirect(redirect)
         return HttpResponseRedirect(reverse("index"))
     else:
+        levels = Levels()
         return render(request, "users/login.html",
-                      {"message": "Invalid credentials.", "user": False, "game_levels": game_levels})
+                      {"message": "Invalid credentials.", "user": False, "game_levels": levels.get_levels()})
 
 
 def logout_view(request):
@@ -559,13 +572,14 @@ def logout_view(request):
 
 
 def register(request):
+    levels = Levels()
     if request.user.is_authenticated:
         return HttpResponseRedirect(reverse("index"))
 
     if request.method == "GET":
         return render(request, "users/register.html",
                       {"message": "Please choose a username and password.", "user": False,
-                       "game_levels": game_levels})
+                       "game_levels": levels.get_levels()})
 
     if request.method == "POST":
         username = request.POST["username"]
