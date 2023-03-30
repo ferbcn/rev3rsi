@@ -127,7 +127,7 @@ chatSocket.onmessage = function(e) {
         var flex_elem_game = document.createElement('div');
         flex_elem_game.classList.add("flex-item-game");
         flex_elem_game.classList.add("oi");
-        flex_elem_game.classList.add("oi-people");
+        flex_elem_game.classList.add("oi-puzzle-piece");
         // flex_elem_game.setAttribute("id", "gameName");
         // flex_elem_game.appendChild(document.createTextNode("New Match requested by"))
 

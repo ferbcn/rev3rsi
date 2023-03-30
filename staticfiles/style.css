@@ -444,22 +444,20 @@ a.divlink:hover {
 
 #button-back{
   margin: 5px;
-  background-color: lightgrey; /* Green */
   border: none;
   color: white;
   padding: 5px 5px;
   text-align: center;
-  font-size: 16px;
+  font-size: 24px;
 }
 
 #button-fwd{
   margin: 5px;
-  background-color: lightgrey; /* Green */
   border: none;
   color: white;
   padding: 5px 5px;
   text-align: center;
-  font-size: 16px;
+  font-size: 24px;
 }
 
 .game-nav-box{
