@@ -94,42 +94,6 @@ function updateAll(data){
 }
 
 
-function updateScores(scores){
-    score_p1 = scores[0];
-    score_p2 = scores[1];
-    scores = "Scores: " + score_p1 + " / " + score_p2;
-    document.getElementById('score_box').innerHTML = scores;
-}
-
-
-function updateMessage(message, game_over){
-    // write message to comm field
-    document.getElementById('message_box').innerHTML = message["message"];
-    var color = message["color"];
-    document.getElementById('message_box').style = "color: " + color;
-
-    if (game_over){
-        if (score_p1 > score_p2)
-            document.getElementById('gameovertext').innerHTML = "P1 WINS!";
-        else if (score_p1 < score_p2)
-            document.getElementById('gameovertext').innerHTML = "P2 WINS!";
-        else
-            document.getElementById('gameovertext').innerHTML = "DRAW!";
-        document.getElementById('gameoverbox').classList.add('gameover-box');
-        game_over = true;
-
-        document.getElementById("board").classList.add("board_glow_green_blue_cycle");
-        var element = document.getElementById("spinner");
-        element.style.visibility = 'hidden';
-
-        addEventListener("mousedown", (event) => {});
-            onmousedown = (event) => {
-                document.getElementById('gameoverbox').classList.remove('gameover-box');
-            };
-        }
-}
-
-
 function update_board(board, possible_moves){
     for (var r=0; r<8; r++){
       for (var c=0; c<8; c++){
@@ -158,4 +122,47 @@ function update_board(board, possible_moves){
           }
       }
     }
+}
+
+
+function updateScores(scores){
+    score_p1 = scores[0];
+    score_p2 = scores[1];
+    scores = "Scores: " + score_p1 + " / " + score_p2;
+    document.getElementById('score_box').innerHTML = scores;
+}
+
+
+function updateMessage(message, game_over){
+    // write message to comm field
+    document.getElementById('message_box').innerHTML = message["message"];
+    var color = message["color"];
+    document.getElementById('message_box').style = "color: " + color;
+
+    if (game_over){
+        if (score_p1 > score_p2){
+            document.getElementById('gameovertext').innerHTML = "P1 WINS!";
+            document.getElementById("board").classList.add("board_glow_green_cycle");
+        }
+        else if (score_p1 < score_p2){
+            document.getElementById('gameovertext').innerHTML = "P2 WINS!";
+            document.getElementById("board").classList.add("board_glow_blue_cycle");
+        }
+        else{
+            document.getElementById('gameovertext').innerHTML = "DRAW!";
+            document.getElementById("board").classList.add("board_glow_green_blue_cycle");
+        }
+
+        document.getElementById('gameoverbox').classList.add('gameover-box');
+        game_over = true;
+
+        // document.getElementById("board").classList.add("board_glow_green_blue_cycle");
+        var element = document.getElementById("spinner");
+        element.style.visibility = 'hidden';
+
+        addEventListener("mousedown", (event) => {});
+            onmousedown = (event) => {
+                document.getElementById('gameoverbox').classList.remove('gameover-box');
+            };
+        }
 }

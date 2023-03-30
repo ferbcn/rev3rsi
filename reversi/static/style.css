@@ -76,11 +76,49 @@ a:hover {
     box-shadow: 0 0 8px 8px rgba(10, 10, 255, 0.2), 0 6px 20px 8px rgba(10, 10, 255, 0.19);
 }
 
+.board_glow_green_cycle{
+    box-shadow: 0 4px 8px 0 rgba(0, 225, 0, 0.2), 0 6px 20px 0 rgba(0, 225, 0, 0.19);
+    animation: 2s infinite color-fader-green;
+    animation-fill-mode: forwards;
+    animation-play-state: play;
+}
+
+.board_glow_blue_cycle{
+    box-shadow: 0 4px 8px 0 rgba(0, 225, 0, 0.2), 0 6px 20px 0 rgba(0, 225, 0, 0.19);
+    animation: 2s infinite color-fader-blue;
+    animation-fill-mode: forwards;
+    animation-play-state: play;
+}
+
 .board_glow_green_blue_cycle{
     box-shadow: 0 4px 8px 0 rgba(0, 225, 0, 0.2), 0 6px 20px 0 rgba(0, 225, 0, 0.19);
     animation: 3s infinite color-fader;
     animation-fill-mode: forwards;
     animation-play-state: play;
+}
+
+@keyframes color-fader-green {
+    0% {
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 225, 0, 0.19);
+    }
+    50% {
+        box-shadow: 0 4px 8px 0 rgba(0, 255, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 255, 0.19);
+    }
+    100% {
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 225, 0, 0.19);
+    }
+}
+
+@keyframes color-fader-blue {
+    0% {
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 225, 0, 0.19);
+    }
+    50% {
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 255, 0.2), 0 6px 20px 0 rgba(0, 0, 255, 0.19);
+    }
+    100% {
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 225, 0, 0.19);
+    }
 }
 
 @keyframes color-fader {
@@ -401,4 +439,33 @@ a.divlink:hover {
 .spinner-border {
     width: 4rem;
     height: 4rem;
+}
+
+
+#button-back{
+  margin: 5px;
+  border: none;
+  color: white;
+  padding: 5px 5px;
+  text-align: center;
+  font-size: 24px;
+}
+
+#button-fwd{
+  margin: 5px;
+  border: none;
+  color: white;
+  padding: 5px 5px;
+  text-align: center;
+  font-size: 24px;
+}
+
+.game-nav-box{
+   display: flex;
+   margin-top: 10px;
+   align-items: center;
+   justify-content: center;
+   position: relative;
+   width: 100%;
+   height: auto;
 }
