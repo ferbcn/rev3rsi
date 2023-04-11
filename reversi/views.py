@@ -90,9 +90,11 @@ def newgame(request):
 
     # Save Session variable
     request.session["game_id"] = game_db_entry.id
+    prev_state_id = 0
+    request.session['prev_state_id'] = prev_state_id
 
     # save gamestate to DB and session
-    save_gamestate_db(new_game.board, game_db_entry.id)
+    save_gamestate_db(new_game.board, game_db_entry.id, prev_state_id)
 
 
     return HttpResponseRedirect(reverse("reversi"))
@@ -142,7 +144,7 @@ def newmatch(request):
     request.session["game_id"] = game_db_entry.id
 
     # save game to DB
-    save_gamestate_db(new_game.board, game_db_entry.id)
+    save_gamestate_db(new_game.board, game_db_entry.id, None)
 
     json_response = {"game_id": game_db_entry.id}
 
@@ -160,7 +162,7 @@ def reversi(request):
     game_id = request.session['game_id']
 
     try:
-        board, green_player, blue_player, next_player = load_gamestate_db(game_id, user)
+        board, green_player, blue_player, next_player, state_id = load_gamestate_db(game_id, user)
     # Something went wrong retrieving board (db error or cheating)
     except Exception as e:
         print(e)
@@ -206,7 +208,7 @@ def reversimatch (request):
     game_id = request.session['game_id']
 
     try:
-        board, green_player, blue_player, next_player = load_gamestate_db(game_id, user)
+        board, green_player, blue_player, next_player, state_id = load_gamestate_db(game_id, user)
     # Something went wrong retrieving board (db error or cheating)
     except Exception as e:
         print(e)
@@ -242,7 +244,7 @@ def queryboard(request):
     if request.method == "GET":
         # Restore gamestate from DB
         game_id = request.session['game_id']
-        board, player1_name, player2_name, next_player = load_gamestate_db(game_id, user)
+        board, player1_name, player2_name, next_player, state_id = load_gamestate_db(game_id, user)
 
         if player1_name == "human":
             machine_role = 2
@@ -280,7 +282,7 @@ def move(request):
 
     # Restore gamestate from DB
     game_id = request.session['game_id']
-    board, player1_name, player2_name, next_player = load_gamestate_db(game_id, user)
+    board, player1_name, player2_name, next_player, state_id = load_gamestate_db(game_id, user)
 
     game_over = False
 
@@ -374,8 +376,11 @@ def move(request):
     scores = get_scores(board)
     # save gamestate to DB and session
     save_game_db(game_id, scores[0], scores[1], next_player, game_over)
+
     if not game_over:
-        save_gamestate_db(board, game_id)
+        save_gamestate_db(board, game_id, state_id)
+
+    request.session['prev_state_id'] = state_id
 
     data = {"board": board, "message": {"message": message, "color": color},
             "machine_role": machine_player.role, "next_player": next_player, "game_over": game_over,
@@ -400,7 +405,8 @@ def movematch(request):
 
     # Restore gamestate from DB
     game_id = request.session['game_id']
-    board, player1_name, player2_name, next_player = load_gamestate_db(game_id, user)
+
+    board, player1_name, player2_name, next_player, state_id = load_gamestate_db(game_id, user)
 
     if next_player == 1:
         next_player_name = player1_name
@@ -441,7 +447,7 @@ def movematch(request):
         # save gamestate to DB and session
         save_game_db(game_id, scores[0], scores[1], next_player, game_over)
         if not game_over:
-            save_gamestate_db(board, game_id)
+            save_gamestate_db(board, game_id, None)
 
     # Not your turn!
     else:
@@ -489,7 +495,7 @@ def loadgame(request):
     print("Game ID: ", game_id)
 
     try:
-        board, player1, player2, next_player = load_gamestate_db(game_id, user)
+        board, player1, player2, next_player, state_id = load_gamestate_db(game_id, user)
     # Something went wrong retrieving board (db error or cheating)
     except Exception as e:
         print(f"DB Error: {e}")
@@ -503,6 +509,29 @@ def loadgame(request):
     else:
         return HttpResponseRedirect(reverse("reversimatch"))
 
+def load_prev_gamestate(request):
+    if request.user.is_authenticated:
+        user = request.user
+    else:
+        return HttpResponseRedirect(reverse("login"))
+
+    game_id = request.session['game_id']
+    print("Game ID: ", game_id)
+
+    try:
+        board, player1, player2, next_player, state_id = load_gamestate_db(game_id, user, prev=1)
+    # Something went wrong retrieving board (db error or cheating)
+    except Exception as e:
+        print(f"DB Error: {e}")
+        levels = Levels()
+        return render(request, "index.html", {"user": user, "game_levels": levels.get_levels()})
+
+    for line in board: print(line)
+
+    if "human" in [player1, player2]:
+        return HttpResponseRedirect(reverse("reversi"))
+    else:
+        return HttpResponseRedirect(reverse("reversimatch"))
 
 # return a list o saved games for the current user
 def savedgames(request):

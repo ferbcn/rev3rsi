@@ -19,4 +19,5 @@ urlpatterns = [
     path("newmatch", views.newmatch, name="newmatch"),
     path("reversimatch", views.reversimatch, name="reversimatch"),
     path("movematch", views.movematch, name="movematch"),
+    path("load_prev_gamestate", views.load_prev_gamestate, name="load_prev_gamestate"),
 ]
