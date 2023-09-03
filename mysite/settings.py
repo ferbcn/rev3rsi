@@ -86,6 +86,7 @@ DB_PASSWORD = os.environ.get('DB_PASSWORD')
 DB_URL = os.environ.get('DB_URL')
 DB_USER = os.environ.get('DB_USER')
 DB_NAME = os.environ.get('DB_NAME')
+DB_PORT = os.environ.get('DB_PORT')
 
 # Heroku PostgreSQL Database
 DATABASES = {
@@ -95,7 +96,7 @@ DATABASES = {
         'USER': DB_USER,
         'PASSWORD': DB_PASSWORD,
         'HOST': DB_URL,
-        'PORT': '5432',
+        'PORT': DB_PORT,
         }
 }
 
