@@ -24,9 +24,9 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['*', 'www.rev3rsi.fun', 'rev3rsi.fun']
+ALLOWED_HOSTS = ['www.rev3rsi.fun', 'rev3rsi.fun']
 
 # Application definition
 
