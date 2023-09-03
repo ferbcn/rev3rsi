@@ -166,7 +166,7 @@ CACHES = {
         'LOCATION': 'redis://' + REDIS_HOST + ':6379',
         'OPTIONS': {
             'db': '10',
-            'parser_class': 'redis.connection.PythonParser',
+            #'parser_class': 'redis.connection.PythonParser',
             'pool_class': 'redis.BlockingConnectionPool',
         }
     }
