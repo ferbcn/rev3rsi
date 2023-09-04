@@ -18,7 +18,7 @@ from reversi.data_layer import *
 from .game_levels import Levels
 
 # default view which renders an animation
-def index(request):
+async def index(request):
     lev = Levels()
     if request.user.is_authenticated:
         user = request.user
