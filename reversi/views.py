@@ -378,7 +378,7 @@ def move(request):
     save_game_db(game_id, scores[0], scores[1], next_player, game_over)
 
     if not game_over:
-        save_gamestate_db(board, game_id, state_id)
+        save_gamestate_db(board, game_id) #, state_id)
 
     request.session['prev_state_id'] = state_id
 
