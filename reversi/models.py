@@ -15,5 +15,5 @@ class GameDB(models.Model):
 class GameState(models.Model):
     game_id = models.ForeignKey(GameDB, on_delete=models.CASCADE, related_name="game")
     #prev_state = models.ForeignKey("self", null=True, on_delete=models.CASCADE, related_name="prev_state")
-    prev_state = models.IntegerField(default=0, null=True)
+    #prev_state = models.IntegerField(default=0, null=True)
     board = models.CharField(max_length=64)

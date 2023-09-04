@@ -5,14 +5,14 @@
 from .models import GameDB, GameState
 
 
-def save_gamestate_db(board, game_id, prev_state_id):
+def save_gamestate_db(board, game_id): #, prev_state_id):
     flat_board = [item for row in board for item in row]
     board_string = ""
     for num in flat_board:
         board_string += str(num)
     # print(board_string)
     gameDB_object = GameDB.objects.get(pk=game_id)
-    game_state_entry = GameState(game_id=gameDB_object, board=board_string, prev_state=prev_state_id)
+    game_state_entry = GameState(game_id=gameDB_object, board=board_string) #, prev_state=prev_state_id)
     game_state_entry.save()
 
 
