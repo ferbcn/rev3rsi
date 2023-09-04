@@ -23,12 +23,12 @@ async def index(request):
     if request.user.is_authenticated:
         user = request.user
         if user.is_superuser:
-            levels = lev.get_admin_levels()
+            levels = await lev.get_admin_levels()
         else:
-            levels = lev.get_levels()
+            levels = await lev.get_levels()
     else:
         user = False
-        levels = lev.get_levels()
+        levels = await lev.get_levels()
 
     return render(request, "index.html", {"user": user, "game_levels": levels})
 
