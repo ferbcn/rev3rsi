@@ -144,7 +144,7 @@ def newmatch(request):
     request.session["game_id"] = game_db_entry.id
 
     # save game to DB
-    save_gamestate_db(new_game.board, game_db_entry.id, None)
+    save_gamestate_db(new_game.board, game_db_entry.id) #, None)
 
     json_response = {"game_id": game_db_entry.id}
 
