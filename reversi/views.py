@@ -17,18 +17,25 @@ from reversi.data_layer import *
 # Game difficulties and which are available
 from .game_levels import Levels
 
+from asgiref.sync import sync_to_async
+
 # default view which renders an animation
+
 async def index(request):
+    return await sync_index(request)
+
+@sync_to_async
+def sync_index(request):
     lev = Levels()
     if request.user.is_authenticated:
         user = request.user
         if user.is_superuser:
-            levels = await lev.get_admin_levels()
+            levels = lev.get_admin_levels()
         else:
-            levels = await lev.get_levels()
+            levels = lev.get_levels()
     else:
         user = False
-        levels = await lev.get_levels()
+        levels = lev.get_levels()
 
     return render(request, "index.html", {"user": user, "game_levels": levels})
 
