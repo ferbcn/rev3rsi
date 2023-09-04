@@ -5,7 +5,7 @@
 from .models import GameDB, GameState
 
 
-def save_gamestate_db(board, game_id): #, prev_state_id):
+def save_gamestate_db(board, game_id, prev_state_id):
     flat_board = [item for row in board for item in row]
     board_string = ""
     for num in flat_board:
