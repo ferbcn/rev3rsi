@@ -1,7 +1,10 @@
-document.body.style.backgroundColor = "black";
 var game_over = false;
 // begin by querying the board status and updating its elements
-queryBoard();
+
+
+document.addEventListener("DOMContentLoaded", function(){
+    queryBoard();
+});
 
 
 function queryBoard(){
@@ -28,41 +31,51 @@ function queryBoard(){
 
 
 function move(row, col){
-    console.log("Making move...");
-    console.log("Row:", row, "Col:", col);
-
-    // Open new request to get new posts.
-    const request = new XMLHttpRequest();
-    request.open('POST', '/move');
-    request.onload = () => {
-        //const data = request.responseText;
-        const data = JSON.parse(request.responseText);
-        console.log(data);
-        game_over = data["game_over"]
-
-        // update everything
-        updateAll(data);
-
-        check_for_and_make_auto_machine_move(data)
-    };
-
-    // Add row/col to request data.
-    const data = new FormData();
-    data.append('row', row);
-    data.append('col', col);
-
-    // Send request (only if not game over)
     if (!game_over){
-        request.send(data);
-    }
+        console.log("Making move...");
+        console.log("Row:", row, "Col:", col);
 
-    // window.location.reload(true);
+        // set spinner to visible until we get next machine move
+        var element = document.getElementById("spinner");
+        element.style.top = "500px";
+        element.style.visibility = 'visible';
+
+        // Open new request
+        const request = new XMLHttpRequest();
+        request.open('POST', '/move');
+        request.onload = () => {
+            const data = JSON.parse(request.responseText);
+            console.log(data);
+            game_over = data["game_over"]
+
+            // update everything
+            updateAll(data);
+
+            // hide spinner
+            element.style.visibility = 'hidden';
+
+            // make a machine move
+            check_for_and_make_auto_machine_move(data)
+        };
+
+        // Add row/col to request data.
+        const data = new FormData();
+        data.append('row', row);
+        data.append('col', col);
+
+        // Send request (only if not game over)
+        if (!game_over){
+            request.send(data);
+        }
+
+        // window.location.reload(true);
+    }
 };
 
 
 function check_for_and_make_auto_machine_move(data){
     if (data["machine_role"] == data["next_player"]){
-        // dummy move make --> machine move (includes delay for better visualization)
+        // dummy move --> machine move (includes delay for better visualization)
         setTimeout(function() {
             move(-1, -1);}, 1);
     }
@@ -78,33 +91,6 @@ function updateAll(data){
 
     // update message
     updateMessage(data["message"], data["game_over"])
-}
-
-
-function updateScores(scores){
-    score_p1 = scores[0];
-    score_p2 = scores[1];
-    scores = "Scores: " + score_p1 + " / " + score_p2;
-    document.getElementById('score_box').innerHTML = scores;
-}
-
-
-function updateMessage(message, game_over){
-    // write message to comm field
-    document.getElementById('message_box').innerHTML = message["message"];
-    var color = message["color"];
-    document.getElementById('message_box').style = "color: " + color;
-
-    if (game_over){
-        if (score_p1 > score_p2)
-            document.getElementById('gameovertext').innerHTML = "P1 WINS!";
-        else if (score_p1 < score_p2)
-            document.getElementById('gameovertext').innerHTML = "P2 WINS!";
-        else
-            document.getElementById('gameovertext').innerHTML = "DRAW!";
-        document.getElementById('gameoverbox').classList.add('gameover-box');
-        game_over = true;
-      }
 }
 
 
@@ -136,4 +122,47 @@ function update_board(board, possible_moves){
           }
       }
     }
+}
+
+
+function updateScores(scores){
+    score_p1 = scores[0];
+    score_p2 = scores[1];
+    scores = "Scores: " + score_p1 + " / " + score_p2;
+    document.getElementById('score_box').innerHTML = scores;
+}
+
+
+function updateMessage(message, game_over){
+    // write message to comm field
+    document.getElementById('message_box').innerHTML = message["message"];
+    var color = message["color"];
+    document.getElementById('message_box').style = "color: " + color;
+
+    if (game_over){
+        if (score_p1 > score_p2){
+            document.getElementById('gameovertext').innerHTML = "P1 WINS!";
+            document.getElementById("board").classList.add("board_glow_green_cycle");
+        }
+        else if (score_p1 < score_p2){
+            document.getElementById('gameovertext').innerHTML = "P2 WINS!";
+            document.getElementById("board").classList.add("board_glow_blue_cycle");
+        }
+        else{
+            document.getElementById('gameovertext').innerHTML = "DRAW!";
+            document.getElementById("board").classList.add("board_glow_green_blue_cycle");
+        }
+
+        document.getElementById('gameoverbox').classList.add('gameover-box');
+        game_over = true;
+
+        // document.getElementById("board").classList.add("board_glow_green_blue_cycle");
+        var element = document.getElementById("spinner");
+        element.style.visibility = 'hidden';
+
+        addEventListener("mousedown", (event) => {});
+            onmousedown = (event) => {
+                document.getElementById('gameoverbox').classList.remove('gameover-box');
+            };
+        }
 }

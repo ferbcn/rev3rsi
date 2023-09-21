@@ -1,0 +1,370 @@
+:root {
+  --bg_color: #212529;
+}
+
+html, body {
+    background-color: var(--bg_color);
+    color: lightgrey;
+}
+
+.chatarena {
+    margin-top: 5%;
+    width: 95%;
+    max-width: 1000px;
+}
+
+.flex-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.flex-container-right {
+  padding: 5px;
+  flex: 60%;
+}
+.flex-container-left {
+  padding: 5px;
+  flex: 20%;
+}
+
+.flex-item-left {
+  padding: 5px;
+  flex: 70%;
+}
+
+.flex-item-right {
+  padding: 5px;
+  flex: 10%;
+}
+
+.flex-item-game {
+  padding: 5px;
+  flex: 10%;
+}
+
+.flex-item-user {
+  padding: 5px;
+  flex: 20%;
+  text-align: left;
+}
+
+.flex-item-btn {
+  padding: 5px;
+  flex: 60%;
+}
+
+.wave-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: transparent;
+}
+.wave {
+  width: 5px;
+  height: 20px;
+  background: linear-gradient(45deg, grey, grey);
+  margin: 5px;
+  animation: wave 1s linear infinite;
+  border-radius: 20px;
+}
+.wave:nth-child(2) {
+  animation-delay: 0.1s;
+}
+.wave:nth-child(3) {
+  animation-delay: 0.2s;
+}
+.wave:nth-child(4) {
+  animation-delay: 0.3s;
+}
+.wave:nth-child(5) {
+  animation-delay: 0.4s;
+}
+.wave:nth-child(6) {
+  animation-delay: 0.5s;
+}
+
+.wave-good {
+  width: 5px;
+  height: 20px;
+  background: linear-gradient(45deg, seagreen, seagreen);
+  margin: 5px;
+  animation: wave 1s linear infinite;
+  border-radius: 20px;
+}
+.wave-good:nth-child(2) {
+  animation-delay: 0.1s;
+}
+.wave-good:nth-child(3) {
+  animation-delay: 0.2s;
+}
+.wave-good:nth-child(4) {
+  animation-delay: 0.3s;
+}
+.wave-good:nth-child(5) {
+  animation-delay: 0.4s;
+}
+.wave-good:nth-child(6) {
+  animation-delay: 0.5s;
+}
+
+
+@keyframes wave {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(0);
+  }
+}
+
+
+.create-game-submit-container{
+    width: 100%;
+    text-align: center;
+}
+
+#create-game-submit{
+    width: 100%;
+    max-width: 500px;
+}
+
+
+.user-list {
+    margin-top: 20px;
+    padding: 5px;
+    height: 40vh;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    font-size: 3vw;
+}
+
+@media screen and (min-width: 800px) {
+  .user-list {
+     font-size: 24px;
+  }
+}
+
+.online-user{
+    padding: 5px;
+    margin-top: 5px;
+    color: seagreen;
+}
+
+.oi-people{
+    margin-right: 10px;
+}
+
+.oi-people-green{
+    color: seagreen;
+}
+
+#match-list{
+    margin-top: 20px;
+    height: 40vh;
+    overflow: auto;
+    font-size: 3vw;
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 5px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.match-container {
+    margin-top: 5px;
+    padding: 10px;
+    animation-name: appear;
+    animation-duration: 0.5s;
+    animation-fill-mode: forwards;
+    animation-play-state: play;
+    border-radius: 5px;
+}
+
+@media screen and (min-width: 800px) {
+  .match-container {
+     font-size: 24px;
+  }
+}
+
+.match-container-me{
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.match-container-others{
+    box-shadow: 0 4px 8px 0 rgba(0, 225, 0, 0.2), 0 6px 20px 0 rgba(0, 225, 0, 0.19);
+    color: seagreen;
+}
+
+@keyframes appear {
+    0% {
+        opacity: 1;
+        background-color: transparent;
+    }
+    50% {
+        opacity: 1;
+        background-color: seagreen;
+    }
+    100% {
+        opacity: 1;
+        background-color: transparent;
+    }
+}
+
+.match-container-accepted {
+    animation-name: appearHigh;
+    animation-duration: 0.5s;
+    animation-fill-mode: forwards;
+    animation-play-state: play;
+}
+
+@keyframes appearHigh {
+    0% {
+        opacity: 1;
+        background-color: transparent;
+    }
+    25% {
+        opacity: 1;
+        background-color: seagreen;
+    }
+    50% {
+        opacity: 1;
+        background-color: transparent;
+    }
+    75% {
+        opacity: 1;
+        background-color: seagreen;
+    }
+    100% {
+        opacity: 1;
+        background-color: transparent;
+    }
+}
+
+.arena-chat-log{
+
+}
+
+#chat-log{
+    margin: 5px;
+    padding: 10px;
+    height: 40vh;
+    padding-top: 5%;
+    padding-bottom: 25%;
+    overflow:auto;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.chat-entry-container {
+    border-radius: 5px;
+    margin-top: 1vh;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.chat-entry-container-me{
+    color: darkgrey;
+    /*box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);*/
+}
+.chat-entry-container-other{
+    color: seagreen;
+    /*box-shadow: 0 4px 8px 0 rgba(0, 225, 0, 0.2), 0 6px 20px 0 rgba(0, 225, 0, 0.19);*/
+}
+
+.chat-entry {
+    padding: 10px;
+    animation-name: appear;
+    animation-duration: 0.5s;
+    animation-fill-mode: forwards;
+    animation-play-state: play;
+    font-size: 2vw;
+}
+
+@media screen and (min-width: 800px) {
+  .chat-entry {
+     font-size: 18px;
+  }
+}
+
+.mesAuthor {
+    font-style: italic;
+    float: left;
+    padding-left: 5px;
+    font-size: 2vw;
+}
+
+@media screen and (min-width: 800px) {
+  .mesAuthor {
+     font-size: 16px;
+  }
+}
+
+.mesTime {
+    font-style: italic;
+    float: right;
+    color: darkgrey;
+    padding: 5px;
+}
+
+@media screen and (min-width: 800px) {
+  .mesTime {
+     font-size: 14px;
+  }
+}
+
+.mesContent {
+
+}
+
+.chat-message-input-container{
+    position:fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: transparent;
+    padding: 10px;
+}
+
+#chat-message-input{
+    background-color: var(--bg_color);
+    border-color: lightgrey;
+    border: solid;
+    border-radius: 5px;
+    color: lightgrey;
+    width: 94%;
+    margin-left: 3%;
+    margin-right: 3%;
+    padding: 10px;
+    height: 35px;
+}
+
+.section-title{
+    font-size: 3vw;
+}
+
+@media screen and (min-width: 800px) {
+  .section-title {
+     font-size: 24px;
+  }
+}
+
+.match-chat-log{
+    margin-top: 1vh;
+    padding: 10px;
+    height: 25vh;
+}
+
+/* avoid that hoover effects gets sticky on mobile*/
+.btn.btn-outline-success:active,
+.btn.btn-outline-success:focus {
+  background-color: transparent;
+  color: seagreen;
+}
+
+/* icons */
+.oi-chat{
+    margin-right: 10px;
+}
+
+.oi-chat-green{
+    color: seagreen;
+}

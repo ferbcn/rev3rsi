@@ -7,6 +7,9 @@
 {% endblock %}
 
 {% block body %}
+<head>
+        <link rel="stylesheet" href="{% static 'arena.css' %}" type="text/css">
+</head>
 
 <!-- container for info messages -->
 <div class="container comm-box">
@@ -38,11 +41,7 @@
 <div id="board_parent">
     <div id="board_child">
         <!-- container for the game board -->
-        {% if user_color == "green" %}
-            <div class="container board_glow_green" id="board">
-        {% else %}
-            <div class="container board_glow_blue" id="board">
-        {% endif %}
+        <div class="container" id="board">
           {% for line in board %}
             <div class="row" style="height: 12%">
               {% for cell in line %}
@@ -67,22 +66,19 @@
   </div>
 </div>
 
-<div class="container game-nav-box">
-    <a href="{% url 'load_prev_gamestate'%}"><div class="oi oi-action oi-action-undo" id="button-back"></div></a>
-    <div class="oi oi-action oi-action-redo" id="button-fwd"></div>
-</div>
-
 <div class="container">
   <div id="gameoverbox"><span id="gameovertext"></span></div>
 </div>
 
-<div class="spin-container" id="spinner">
-    <div class="spinner-border text-light" role="status">
-        <span class="visually-hidden">Loading...</span>
-    </div>
+<div class="match-chat-log" id="chat-log"></div>
+<!--<textarea class="form-control" id="arena-log" rows="10"></textarea><br>-->
+<div class="chat-message-input-container">
+    <input id="chat-message-input" placeholder="Write a message here...">
 </div>
 
+{{ username|json_script:"json-username" }}
+{{ game_id|json_script:"json-gameId" }}
 <!-- JS: game board update and click capture and redirect to "move" post method -->
-<script src="{% static 'reversi.js' %}"></script>
+<script src="{% static 'reversimatch.js' %}"></script>
 
 {% endblock %}

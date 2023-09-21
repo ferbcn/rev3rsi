@@ -2,6 +2,8 @@ from django.urls import path
 
 from . import views
 
+from django.urls import include, path
+
 urlpatterns = [
     path("", views.index, name="index"),
     path("login", views.login_view, name="login"),
@@ -14,4 +16,8 @@ urlpatterns = [
     path("savedgames", views.savedgames, name="savedgames"),
     path("loadgame", views.loadgame, name="loadgame"),
     path("deletegame", views.deletegame, name="deletegame"),
+    path("newmatch", views.newmatch, name="newmatch"),
+    path("reversimatch", views.reversimatch, name="reversimatch"),
+    path("movematch", views.movematch, name="movematch"),
+    path("load_prev_gamestate", views.load_prev_gamestate, name="load_prev_gamestate"),
 ]
