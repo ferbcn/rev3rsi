@@ -34,4 +34,4 @@ Players can select different machine players (difficulty) and therefore play aga
 - deploy inside a docker container on aws
 
 ## Try it!
-[https://rev3rsi.fun] (https://rev3rsi.fun)
+https://rev3rsi.fun
