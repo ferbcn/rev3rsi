@@ -16,23 +16,16 @@ The Game has been implemented using Django as the backend where games, game stat
 ### Mobile responsive design:
 - using only CSS styling (no images).
 
-### Human vs Machine Game
-Players can select different machine players (difficulty) playing against different algorithms.
-Easy: Random
-Hard: Greedy 
-Harder: Greedy with heuristics
-Hardest: Minimax with alpha-beta pruning
-
-### Human vs Human Online Match
-Arena implements a chat room functionality where players can meet and initiate anew match against an other online player.
+### Machine Player:
+Players can select different machine players (difficulty) and therefore play against different algorithms.
 
 ### Game History:
 - Recover previously initiated games
+- Replay last move of finalized games
+- Delete own games
 
 ## Requirements
 - Django
-- PostgreSQL 
-- Redis (for caching matches waiting for opponent)
 
 ## Future improvements
 - implement alpha-beta algorithm for machine player (will yield a huge increase in performance, and defacto unbeatable by regular players)
@@ -41,9 +34,4 @@ Arena implements a chat room functionality where players can meet and initiate a
 - deploy inside a docker container on aws
 
 ## Try it!
-http://www.rev3rsi.fun
-
-### Deployment:
-- Cloud Instance 
-- Docker
-- uvicorn
+https://rev3rsi.fun
