@@ -1,8 +1,5 @@
 from django.urls import path
-
 from . import views
-
-from django.urls import include, path
 
 urlpatterns = [
     path("", views.index, name="index"),
@@ -12,7 +9,7 @@ urlpatterns = [
     path("register", views.register, name="register"),
     path("newgame", views.newgame, name="newgame"),
     path("move", views.move, name="move"),
-    path("queryboard", views.queryboard, name="queryboard"),
+    path("queryboard/", views.queryboard, name="queryboard"),
     path("savedgames", views.savedgames, name="savedgames"),
     path("loadgame", views.loadgame, name="loadgame"),
     path("deletegame", views.deletegame, name="deletegame"),

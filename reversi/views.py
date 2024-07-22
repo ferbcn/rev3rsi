@@ -19,10 +19,12 @@ from .game_levels import Levels
 
 from asgiref.sync import sync_to_async
 
+
 # default view which renders an animation
 
 async def index(request):
     return await sync_index(request)
+
 
 @sync_to_async
 def sync_index(request):
@@ -92,7 +94,8 @@ def newgame(request):
     scores = get_scores(new_game.board)
 
     # save game to DB
-    game_db_entry = GameDB(user=user, score_p1=scores[0], score_p2=scores[1], player1=player1_name, player2=player2_name, next_player=1, game_over=False)
+    game_db_entry = GameDB(user=user, score_p1=scores[0], score_p2=scores[1], player1=player1_name,
+                           player2=player2_name, next_player=1, game_over=False)
     game_db_entry.save()
 
     # Save Session variable
@@ -102,7 +105,6 @@ def newgame(request):
 
     # save gamestate to DB and session
     save_gamestate_db(new_game.board, game_db_entry.id, prev_state_id)
-
 
     return HttpResponseRedirect(reverse("reversi"))
 
@@ -114,8 +116,9 @@ def newmatch(request):
     else:
         level = request.GET["difficulty"]
         levels = Levels()
-        return render(request, "users/login.html", {"message": "Please login first to start a new game!", "user": False,
-                                                        "game_levels": levels.get_levels(), "level": level})
+        mes = "Please login first to start a new game!"
+        return render(request, "users/login.html", {"message": mes, "user": False,
+                                                    "game_levels": levels.get_levels(), "level": level})
 
     p1_name = request.GET["p1"]
     p2_name = request.GET["p2"]
@@ -143,7 +146,8 @@ def newmatch(request):
     # update scores
     scores = get_scores(new_game.board)
     # and save initial gamestate to DB and session
-    game_db_entry = GameDB(user=user, score_p1=scores[0], score_p2=scores[1], player1=player1_name, player2=player2_name,
+    game_db_entry = GameDB(user=user, score_p1=scores[0], score_p2=scores[1], player1=player1_name,
+                           player2=player2_name,
                            next_player=1, game_over=False)
     game_db_entry.save()
 
@@ -204,7 +208,7 @@ def reversi(request):
 
 
 # initial game view
-def reversimatch (request):
+def reversimatch(request):
     if request.user.is_authenticated:
         user = request.user
     else:
@@ -229,54 +233,56 @@ def reversimatch (request):
     user_color = "green" if user.username == green_player else "blue"
 
     return render(request, "reversimatch.html",
-                    {"username": user.username,
-                    "board": board,
-                    "player1_name": green_player,
-                    "player2_name": blue_player,
-                    "game_level": difficulty,
-                    "game_levels": game_levels,
-                    "game_id": game_id,
-                    "user_color": user_color
-                    })
+                  {"username": user.username,
+                   "board": board,
+                   "player1_name": green_player,
+                   "player2_name": blue_player,
+                   "game_level": difficulty,
+                   "game_levels": game_levels,
+                   "game_id": game_id,
+                   "user_color": user_color
+                   })
 
 
 # Query board status
-@method_decorator(csrf_exempt, name='dispatch')
+@require_http_methods(["GET"])
+# @method_decorator(csrf_exempt, name='dispatch')
 def queryboard(request):
     if request.user.is_authenticated:
         user = request.user
     else:
         return HttpResponseRedirect(reverse("login"))
 
-    if request.method == "GET":
-        # Restore gamestate from DB
-        game_id = request.session['game_id']
-        board, player1_name, player2_name, next_player, state_id = load_gamestate_db(game_id, user)
+    # Restore gamestate from DB
+    game_id = request.session['game_id']
+    board, player1_name, player2_name, next_player, state_id = load_gamestate_db(game_id, user)
 
-        if player1_name == "human":
-            machine_role = 2
-        elif player2_name == "human":
-            machine_role = 1
-        else:
-            machine_role = 0
+    if player1_name == "human":
+        machine_role = 2
+    elif player2_name == "human":
+        machine_role = 1
+    else:
+        machine_role = 0
 
-        possible_moves = get_possible_moves(board, next_player)
-        message = f"Player{next_player}'s turn"
+    possible_moves = get_possible_moves(board, next_player)
+    message = f"Player{next_player}'s turn"
 
-        print("Next player:", next_player)
-        board_color = 'green' if next_player == 1 else 'blue'
-        scores = get_scores(board)
+    print("Next player:", next_player)
+    board_color = 'green' if next_player == 1 else 'blue'
+    scores = get_scores(board)
 
-        data = {"board": board, "message": {"message": message, "color": board_color},
-                "next_player": next_player, "machine_role": machine_role,
-                "scores": scores, "possible_moves": possible_moves, "board_color": board_color}
-        return JsonResponse(data, safe=False)
+    data = {"board": board, "message": {"message": message, "color": board_color},
+            "next_player": next_player, "machine_role": machine_role,
+            "scores": scores, "possible_moves": possible_moves, "board_color": board_color}
+    return JsonResponse(data, safe=False)
 
 
 # Main Game Logic is executed in this view every time the current Player makes a move via browser input
 # returns a json data object to browser which updates game board, scores and infos with JS
-@method_decorator(csrf_exempt, name='dispatch')
+# @method_decorator(csrf_exempt, name='dispatch')
+# @method_decorator(csrf_exempt)
 @require_http_methods(["POST"])
+@csrf_exempt
 def move(request):
     if request.user.is_authenticated:
         user = request.user
@@ -329,8 +335,8 @@ def move(request):
     else:
         machine_player = AiMiniMax(role=machine_role)
         print("Greedy Minimax Ai initiated")
-        #machine_player = AiGreedy(role=machine_role)
-        #print("Defaulting to Greedy Ai")
+        # machine_player = AiGreedy(role=machine_role)
+        # print("Defaulting to Greedy Ai")
 
     message = f""
     color = 'darkgrey'
@@ -439,7 +445,7 @@ def movematch(request):
             # switch to human player
             next_player = get_opponent(next_player)
         else:
-            #print("Illegal move!!!")
+            # print("Illegal move!!!")
             message = f"Illegal move!"
             color = 'red'
             # do nothing with board
@@ -458,7 +464,7 @@ def movematch(request):
 
     # Not your turn!
     else:
-        #print(f'Not your turn {user.username}')
+        # print(f'Not your turn {user.username}')
         scores = get_scores(board)
         message = f"Not your turn!"
         color = 'red'
@@ -516,6 +522,7 @@ def loadgame(request):
     else:
         return HttpResponseRedirect(reverse("reversimatch"))
 
+
 def load_prev_gamestate(request):
     if request.user.is_authenticated:
         user = request.user
@@ -539,6 +546,7 @@ def load_prev_gamestate(request):
         return HttpResponseRedirect(reverse("reversi"))
     else:
         return HttpResponseRedirect(reverse("reversimatch"))
+
 
 # return a list o saved games for the current user
 def savedgames(request):
