@@ -1,6 +1,9 @@
 Django
 gunicorn
 psycopg2-binary
-django_heroku
 whitenoise
-dj_database_url
+channels
+uvicorn[standard]
+redis[hiredis]
+channels-redis
+pymemcache

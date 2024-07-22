@@ -4,7 +4,7 @@ Django settings for rev3rsi project.
 """
 
 import os
-import dj_database_url
+# import dj_database_url
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -14,10 +14,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('SECRET_KEY')
-#SECRET_KEY = 'f0&iq9827r2lkjflefp0w9812346_$sdlsahejvhuewoegpo.d'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*', '127.0.0.1']
 
@@ -81,19 +80,6 @@ DATABASES = {
     }
 }
 
-"""
-# Heroku PostgreSQL Database
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'dbbedbjgkhjhf',
-        'USER': 'zxmstscabqxcxh',
-        'PASSWORD': '6f3731b07628e8caaf97782c1652931dedfa5143d67a8d231547783cf4cd5cc7',
-        'HOST': 'ec2-52-30-159-47.eu-west-1.compute.amazonaws.com',
-        'PORT': '5432',
-        }
-    }
-"""
 
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
