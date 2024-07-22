@@ -1,6 +1,3 @@
-import copy
-import random
-
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect, JsonResponse
 
@@ -11,310 +8,158 @@ from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 # from django.core import serializers
-
-from .models import GameDB, GameState
+from django.views.decorators.http import require_http_methods
 
 from reversi.test_games import *
+from reversi.game_logic import *
+from reversi.data_layer import *
 
-class Game():
-    def __init__(self):
-        self.board = [[0, 0, 0, 0, 0, 0, 0, 0] for x in range(8)]
-        self.board[3][3] = 2
-        self.board[4][4] = 2
-        self.board[3][4] = 1
-        self.board[4][3] = 1
+# Game difficulties and which are available
+from .game_levels import Levels
 
-        self.player1 = "human"
-        self.player2 = "machine"
-        self.machine_type = "greedy"
-        self.human_player = 1
+from asgiref.sync import sync_to_async
 
-
-# checks for a legal move by going in the direction determined by col_dir and row_dir
-def check_dir(board, player, oponent, row, col, row_dir, col_dir):
-    oponent_inside = False
-    col_iter = col + col_dir
-    row_iter = row + row_dir
-    while col_iter >= 0 and col_iter <= 7 and row_iter >= 0 and row_iter <= 7:
-        # print(col_iter, row_iter, board[row_iter][col_iter], oponent_inside)
-        if oponent_inside and board[row_iter][col_iter] == player:
-            return True
-        elif board[row_iter][col_iter] == oponent:
-            oponent_inside = True
-            col_iter = col_iter + col_dir
-            row_iter = row_iter + row_dir
-        else:
-            return False
-
-
-def fill_dir(board, player, oponent, row, col, row_dir, col_dir):
-    oponent_inside = False
-    col_iter = col + col_dir
-    row_iter = row + row_dir
-    while col_iter >= 0 and col_iter <= 7 and row_iter >= 0 and row_iter <= 7:
-        # print("iterating:", col_iter, row_iter)
-        if oponent_inside and board[row_iter][col_iter] == player:
-            # bingo! fill this direction
-            # print("filling dir found! (col/row):", col_dir, row_dir)
-            col_fill = col + col_dir
-            row_fill = row + row_dir
-            while board[row_fill][col_fill] == oponent:
-                board[row_fill][col_fill] = player
-                col_fill = col_fill + col_dir
-                row_fill = row_fill + row_dir
-            board[row][col] = player
-            # print("dir filled succsfully!")
-            break
-        elif board[row_iter][col_iter] == oponent:
-            oponent_inside = True
-        col_iter = col_iter + col_dir
-        row_iter = row_iter + row_dir
-    return board
-
-
-def set_oponent(player):
-    if player == 1:
-        return 2
-    else:
-        return 1
-
-
-def is_legal_move(board, player, move):
-    # print(f"Player: {player}, move: {move} is legal?")
-    row, col = move
-    if not board[row][col] == 0:
-        return False
-
-    oponent = set_oponent(player)
-
-    # try west, east, nort, sout, northwest, ...
-    col_row_dir = [(-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (1, -1), (1, 1), (-1, 1)]
-    for col_row in col_row_dir:
-        col_dir, row_dir = col_row
-        if check_dir(board, player, oponent, row, col, row_dir, col_dir):
-            # print(f"Legal move.")
-            return True
-    # print(f"Illegal move.")
-    return False
-
-
-def make_move(board, player, move):
-    # print(f"Player: {player}, makes move: {move}")
-    row, col = move
-
-    oponent = set_oponent(player)
-
-    # try west, east, nort, sout, northwest, ...
-    col_row_dir = [(-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (1, -1), (1, 1), (-1, 1)]
-
-    for col_row in col_row_dir:
-        col_dir, row_dir = col_row
-        # print("filling dir... ", col_row)
-        board = fill_dir(board, player, oponent, row, col, row_dir, col_dir)
-
-    return board
-
-
-def get_scores(board):
-    p1 = 0
-    p2 = 0
-    for r in range(8):
-        for c in range(8):
-            if board[r][c] == 1:
-                p1 += 1
-            elif board[r][c] == 2:
-                p2 += 1
-    return p1, p2
-
-
-def get_possible_moves(board, player):
-    possible_moves = []
-    for r in range(8):
-        for c in range(8):
-            move = (r, c)
-            if is_legal_move(board, player, move):
-                possible_moves.append(move)
-    return possible_moves
-
-
-# return one list of links (and if they are disabled) for the base html navbar
-def make_difficulties():
-    options = difficulty_options.keys()
-    disabled = [difficulty_options[key]["disabled"] for key in options]
-    return zip(disabled, options)
-
-
-def print_board(board):
-    for line in board:
-        print(line)
-
-
-def build_end_message(scores):
-    score1, score2 = scores
-    # Build End message and scores
-    if score1 > score2:
-        message = f"Game Over: Player #1 wins!"
-        winning_player = 1
-    elif score1 < score2:
-        message = f"Game Over: Player #2 wins!"
-        winning_player = 2
-    else:
-        message = f"Game Over: Draw!"
-        winning_player = 0
-    return message, winning_player
-
-
-#####################
-### DB operations ###
-#####################
-
-def save_gamestate(board, game_id):
-    flat_board = [item for row in board for item in row]
-    board_string = ""
-    for num in flat_board:
-        board_string += str(num)
-    print(board_string)
-    gameDB_object = GameDB.objects.get(pk=game_id)
-    game_state_entry = GameState(game_id=gameDB_object, board=board_string)
-    game_state_entry.save()
-
-
-def save_game(game_id, score_p1, score_p2, end):
-    gameDB_object = GameDB.objects.get(pk=game_id)
-    gameDB_object.game_over = end
-    gameDB_object.score_p1 = score_p1
-    gameDB_object.score_p2 = score_p2
-    gameDB_object.save()
-    return True
-
-
-def removegame_db(game_id, user):
-    gameDB_object = GameDB.objects.get(pk=game_id)
-    if gameDB_object.user == user:
-        gameDB_object.delete()
-        return True
-    else:
-        return False
-
-
-##################################
-### machine player definitions ###
-##################################
-
-def random_machine_move(board, player):
-    print("random move ...")
-    possible_moves = get_possible_moves(board, player)
-    l = len(possible_moves)
-    return possible_moves[random.randint(0, l - 1)]
-
-
-def greedy_machine_move(board, player, possible_moves=None):
-    print("greedy move ...")
-    if not possible_moves:
-        possible_moves = get_possible_moves(board, player)
-    # print("Possible moves: ", possible_moves)
-    top_move_score = 0
-    top_move = 0
-    for move in possible_moves:
-        new_board = make_move(copy.deepcopy(board), player, move)
-        score_p1, score_p2 = get_scores(new_board)
-        if player == 1:
-            move_score = score_p1
-        else:
-            move_score = score_p2
-        if move_score > top_move_score:
-            top_move = move
-    return top_move
-
-
-def greedy_machine_move_plus(board, player):
-    print("greedy plus move ...")
-    power_spots = [(0, 0), (0, 7), (7, 0), (7, 7), (0, 2), (0, 5), (7, 2), (7, 5), (5, 7), (2, 7), (5, 0), (2, 0)]
-    bad_spots = [(0, 1), (0, 6), (1, 7), (6, 7), (7, 6), (7, 1), (6, 0), (1, 0), (1, 1), (1, 6), (6, 6), (6, 1)]
-    possible_moves = get_possible_moves(board, player)
-    # checks for power moves in ordered way
-    for pow_move in power_spots:
-        for pos_move in possible_moves:
-            if pow_move == pos_move:
-                print("POWER MOVE: ", pos_move)
-                return pos_move
-
-    better_moves = []
-    for move in possible_moves:
-        if not move in bad_spots:
-            better_moves.append(move)
-    # make a greedy move with the remaining possible, moves
-    move = greedy_machine_move(board, player, possible_moves=better_moves)
-
-    # in case all moves are bad and where elminated
-    if not move:
-        print("No moves left after bad moves clean up! Regular greedy move.")
-        move = greedy_machine_move(board, player)
-    # No power moves, just go for greedy
-    return move
-
-
-# dictionary used for navbar and redirection of used method to the game logic loop
-difficulty_options = {
-    "easy": {"name": "easy", "type": "random", "method": random_machine_move, "disabled": ""},
-    "medium": {"name": "medium", "type": "greedy", "method": greedy_machine_move, "disabled": ""},
-    "hard": {"name": "hard", "type": "greedy plus", "method": greedy_machine_move_plus, "disabled": ""},
-    "harder": {"name": "harder", "type": "alpha-beta", "method": greedy_machine_move_plus, "disabled": "disabled"},
-}
-
-
-####################
-### DJANGO VIEWS ###
-####################
 
 # default view which renders an animation
-def index(request):
+
+async def index(request):
+    return await sync_index(request)
+
+
+@sync_to_async
+def sync_index(request):
+    lev = Levels()
     if request.user.is_authenticated:
         user = request.user
+        if user.is_superuser:
+            levels = lev.get_admin_levels()
+        else:
+            levels = lev.get_levels()
     else:
         user = False
+        levels = lev.get_levels()
 
-    return render(request, "index.html", {"user": user, "difficulties": make_difficulties()})
+    return render(request, "index.html", {"user": user, "game_levels": levels})
 
 
-# game board initialization
+# game board initialization (player vs machine)
 def newgame(request):
+    levels = Levels()
     if request.user.is_authenticated:
         user = request.user
     else:
+        level = request.GET["difficulty"]
         return render(request, "users/login.html", {"message": "Please login first to start a new game!", "user": False,
-                                                    "difficulties": make_difficulties()})
+                                                    "game_levels": levels.get_levels(), "level": level})
 
+    # Game level is passed as url parameter http://localhost/newgame?difficulty=...
     difficulty = request.GET["difficulty"]
 
-    newgame = Game()
+    # Define random role of players
+    human_is_player1 = random.choice([True, False])
+    if human_is_player1 == 1:
+        player1_name = "human"
+        player2_name = difficulty
+        request.session["machine_role"] = 2
+    else:
+        player1_name = difficulty
+        player2_name = "human"
+        request.session["machine_role"] = 1
 
-    # Test boards
-    # newgame = TestGameP1LastMoveToDraw()
-    # newgame = TestGameP1LastMoveToWin()
-    # newgame = TestGameP1LastMoveToLose()
-    # newgame = TestGameP1MoveP2LastMoveToWin()
-    # newgame = TestGameP1MoveP2LastMoveToLose()
-
-    newgame.machine_type = difficulty
+    # Launch a test game
+    if user.is_superuser:
+        if difficulty == "P1-Draw":
+            new_game = TestGameP1LastMoveToDraw(player1_name, player2_name, difficulty)
+        elif difficulty == "P1-Win":
+            new_game = TestGameP1LastMoveToWin(player1_name, player2_name, difficulty)
+        elif difficulty == "P1-Lose":
+            new_game = TestGameP1LastMoveToLose(player1_name, player2_name, difficulty)
+        elif difficulty == "P2-Win":
+            new_game = TestGameP1MoveP2LastMoveToWin(player1_name, player2_name, difficulty)
+        elif difficulty == "P2-Lose":
+            new_game = TestGameP1MoveP2LastMoveToLose(player1_name, player2_name, difficulty)
+        elif difficulty == "JumpCheck":
+            new_game = TestGameJumpCheck(player1_name, player2_name, difficulty)
+        else:
+            new_game = Game(player1_name, player2_name, difficulty, board=None)
+    else:
+        # Launch a real new game
+        # New Game and board initialization
+        new_game = Game(player1_name, player2_name, difficulty, board=None)
 
     print("NEW GAME STARTED! Difficulty: ", difficulty)
-    print_board(newgame.board)
+    for line in new_game.board:
+        print(line)
 
-    # save game state variables to session variables
-    request.session['board'] = newgame.board
-    request.session['human_player'] = newgame.human_player
-    request.session['machine_type'] = newgame.machine_type
+    scores = get_scores(new_game.board)
 
     # save game to DB
-    game_db_entry = GameDB(user=user, player1="human", player2=newgame.machine_type, game_over=False)
+    game_db_entry = GameDB(user=user, score_p1=scores[0], score_p2=scores[1], player1=player1_name,
+                           player2=player2_name, next_player=1, game_over=False)
     game_db_entry.save()
+
+    # Save Session variable
+    request.session["game_id"] = game_db_entry.id
+    prev_state_id = 0
+    request.session['prev_state_id'] = prev_state_id
+
+    # save gamestate to DB and session
+    save_gamestate_db(new_game.board, game_db_entry.id, prev_state_id)
+
+    return HttpResponseRedirect(reverse("reversi"))
+
+
+# game board initialization for match (player vs player)
+def newmatch(request):
+    if request.user.is_authenticated:
+        user = request.user
+    else:
+        level = request.GET["difficulty"]
+        levels = Levels()
+        mes = "Please login first to start a new game!"
+        return render(request, "users/login.html", {"message": mes, "user": False,
+                                                    "game_levels": levels.get_levels(), "level": level})
+
+    p1_name = request.GET["p1"]
+    p2_name = request.GET["p2"]
+    difficulty = "match"
+
+    # Define random role of players
+    p1_is_player1 = random.choice([True, False])
+
+    if p1_is_player1 == 1:
+        player1_name = p1_name
+        player2_name = p2_name
+    else:
+        player1_name = p2_name
+        player2_name = p1_name
+
+    # Launch a real new game
+    # New Game and board initialization
+    new_game = Game(player1_name, player2_name, difficulty, board=None)
+
+    print("NEW MATCH STARTED!")
+    print(f'Player1: {player1_name} vs Player2: {player2_name}')
+    for line in new_game.board:
+        print(line)
+
+    # update scores
+    scores = get_scores(new_game.board)
+    # and save initial gamestate to DB and session
+    game_db_entry = GameDB(user=user, score_p1=scores[0], score_p2=scores[1], player1=player1_name,
+                           player2=player2_name,
+                           next_player=1, game_over=False)
+    game_db_entry.save()
+
+    # save game state variables to session variables
     request.session["game_id"] = game_db_entry.id
 
     # save game to DB
-    save_gamestate(newgame.board, game_db_entry.id)
+    save_gamestate_db(new_game.board, game_db_entry.id, 0)
 
-    return HttpResponseRedirect(reverse("reversi"))
+    json_response = {"game_id": game_db_entry.id}
+
+    return JsonResponse(json_response, safe=False)
 
 
 # initial game view
@@ -324,165 +169,383 @@ def reversi(request):
     else:
         return HttpResponseRedirect(reverse("login"))
 
-    board = request.session['board']
-    player = 1
-    machine = request.session['machine_type']
+    # Restore Gamestate from DB
+    game_id = request.session['game_id']
 
-    return render(request, "reversi.html", {"user": user, "board": board, "player": player, "machine_type": machine,
-                                            "difficulties": make_difficulties(),
-                                            "possible_moves": get_possible_moves(board, player)})
+    try:
+        board, green_player, blue_player, next_player, state_id = load_gamestate_db(game_id, user)
+    # Something went wrong retrieving board (db error or cheating)
+    except Exception as e:
+        print(e)
+        return render(request, "index.html", {"user": user})
+
+    if green_player == "human":
+        print("Green Player is human.")
+        difficulty = blue_player
+        player_color = 'green'
+    elif blue_player == "human":
+        print("Blue Player is human.")
+        difficulty = green_player
+        player_color = 'blue'
+    else:
+        difficulty = "match"
+        print(f"Match: Green is {green_player} and Blue is {blue_player}.")
+
+    lev = Levels()
+    if user.is_superuser:
+        levels = lev.get_admin_levels()
+    else:
+        levels = lev.get_levels()
+
+    return render(request, "reversi.html", {"user": user,
+                                            "board": board,
+                                            "player1_name": green_player,
+                                            "player2_name": blue_player,
+                                            "game_level": difficulty,
+                                            "game_levels": levels,
+                                            "user_color": player_color,
+                                            })
 
 
-# Main Game Logic is executed in this view every time Player1 makes a move via browser input
+# initial game view
+def reversimatch(request):
+    if request.user.is_authenticated:
+        user = request.user
+    else:
+        return HttpResponseRedirect(reverse("login"))
+
+    # Restore Gamestate from DB
+    # Read GameId from session variable
+    game_id = request.session['game_id']
+
+    try:
+        board, green_player, blue_player, next_player, state_id = load_gamestate_db(game_id, user)
+    # Something went wrong retrieving board (db error or cheating)
+    except Exception as e:
+        print(e)
+        return render(request, "index.html", {"user": user})
+
+    difficulty = "match"
+    print(f"Match: Green is {green_player} and Blue is {blue_player}.")
+
+    levels = Levels()
+    game_levels = levels.get_levels()
+    user_color = "green" if user.username == green_player else "blue"
+
+    return render(request, "reversimatch.html",
+                  {"username": user.username,
+                   "board": board,
+                   "player1_name": green_player,
+                   "player2_name": blue_player,
+                   "game_level": difficulty,
+                   "game_levels": game_levels,
+                   "game_id": game_id,
+                   "user_color": user_color
+                   })
+
+
+# Query board status
+@require_http_methods(["GET"])
+# @method_decorator(csrf_exempt, name='dispatch')
+def queryboard(request):
+    if request.user.is_authenticated:
+        user = request.user
+    else:
+        return HttpResponseRedirect(reverse("login"))
+
+    # Restore gamestate from DB
+    game_id = request.session['game_id']
+    board, player1_name, player2_name, next_player, state_id = load_gamestate_db(game_id, user)
+
+    if player1_name == "human":
+        machine_role = 2
+    elif player2_name == "human":
+        machine_role = 1
+    else:
+        machine_role = 0
+
+    possible_moves = get_possible_moves(board, next_player)
+    message = f"Player{next_player}'s turn"
+
+    print("Next player:", next_player)
+    board_color = 'green' if next_player == 1 else 'blue'
+    scores = get_scores(board)
+
+    data = {"board": board, "message": {"message": message, "color": board_color},
+            "next_player": next_player, "machine_role": machine_role,
+            "scores": scores, "possible_moves": possible_moves, "board_color": board_color}
+    return JsonResponse(data, safe=False)
+
+
+# Main Game Logic is executed in this view every time the current Player makes a move via browser input
 # returns a json data object to browser which updates game board, scores and infos with JS
-@method_decorator(csrf_exempt, name='dispatch')
+# @method_decorator(csrf_exempt, name='dispatch')
+# @method_decorator(csrf_exempt)
+@require_http_methods(["POST"])
+@csrf_exempt
 def move(request):
     if request.user.is_authenticated:
         user = request.user
     else:
         return HttpResponseRedirect(reverse("login"))
-    if request.method == "POST":
-        row = int(request.POST["row"])
-        col = int(request.POST["col"])
-        move = (row, col)
 
-        board = request.session['board']
-        machine_type = request.session['machine_type']
-        game_id = request.session['game_id']
-        player = 1
-        oponent = set_oponent(player)
-        machine_move = None
+    row = int(request.POST["row"])
+    col = int(request.POST["col"])
+    current_move = (row, col)
 
-        # no real move, just querying board status
-        if move == (-1, -1):
-            message = f""
-            scores = get_scores(board)
-            data = {"board": board, "message": {"message": message, "color": "white"}, "player": player,
-                    "scores": scores, "possible_moves": get_possible_moves(board, player)}
-            return JsonResponse(data, safe=False)
+    # Restore gamestate from DB
+    game_id = request.session['game_id']
+    board, player1_name, player2_name, next_player, state_id = load_gamestate_db(game_id, user)
 
-        # make a real move
+    game_over = False
+
+    # Something went wrong retrieving board (db error or cheating)
+    levels = Levels()
+    if board is None:
+        return render(request, "index.html", {"user": user, "game_levels": levels.get_levels()})
+
+    if player1_name == "human":
+        difficulty = player2_name
+        human_role = 1
+        machine_role = 2
+        human_color = 'green'
+        machine_color = 'blue'
+    elif player2_name == "human":
+        difficulty = player1_name
+        human_role = 2
+        machine_role = 1
+        human_color = 'blue'
+        machine_color = 'green'
+
+    # Define player1 (player) and player2 (opponent)
+    human_player = Player(role=human_role)
+
+    if difficulty == "easy":
+        machine_player = AiRandom(role=machine_role)
+        print("Random Ai initiated")
+    elif difficulty == "medium":
+        machine_player = AiGreedy(role=machine_role)
+        print("Greedy Ai initiated")
+    elif difficulty == "hard":
+        machine_player = AiGreedyPlus(role=machine_role)
+        print("Greedy Plus Ai initiated")
+    elif difficulty == "harder":
+        machine_player = AiMiniMax(role=machine_role)
+        print("Greedy Minimax Ai initiated")
+    else:
+        machine_player = AiMiniMax(role=machine_role)
+        print("Greedy Minimax Ai initiated")
+        # machine_player = AiGreedy(role=machine_role)
+        # print("Defaulting to Greedy Ai")
+
+    message = f""
+    color = 'darkgrey'
+
+    if next_player == human_player.role:
+        print("### Human Player possible moves:")
+    else:
+        print("### Machine Player possible moves:")
+    possible_moves = get_possible_moves(board, next_player)
+    print(possible_moves)
+
+    if next_player == human_player.role:
+        print(f"Human move: {move}")
+        if is_legal_move(board, human_player.role, current_move):
+            next_move, board = human_move(board, human_player, current_move)
+            r, c = next_move
+            message = f"Human move: row {r + 1}, col {c + 1}"
+            color = human_color
+            # switch to human player
+            next_player = machine_player.role
         else:
-            if is_legal_move(board, player, move):
-                # human players move
-                print("")
-                print("### HUMAN PLAYER ###")
-                print("Possible moves: ", get_possible_moves(board, player))
+            print("Illegal move!!!")
+            message = f"Illegal move!"
+            color = 'red'
+            # do nothing with board
+        # Check for Game Over
+        if len(get_possible_moves(board, next_player)) == 0:
+            next_player = get_opponent(next_player)
+            if len(get_possible_moves(board, next_player)) == 0:
+                game_over = True
 
-                # make move and save board
-                board = make_move(board, player, move)
+    elif next_player == machine_player.role:
+        print("Machine move...")
+        # Game Over?
+        if len(get_possible_moves(board, next_player)) > 0:
+            next_move, board = machine_move(board, machine_player)
+            r, c = next_move
+            message = f"Machine move: row {r + 1}, col {c + 1}"
+            color = machine_color
+            if next_move is None:
+                print("Machine can't move...")
+                message = f"AI can't move!"
+            # switch to human player
+            next_player = human_player.role
+        # Check for Game Over
+        if len(get_possible_moves(board, next_player)) == 0:
+            if len(get_possible_moves(board, get_opponent(next_player))) == 0:
+                game_over = True
 
-                request.session['board'] = board
-                print("New board state:")
-                print_board(board)
+    scores = get_scores(board)
+    # save gamestate to DB and session
+    save_game_db(game_id, scores[0], scores[1], next_player, game_over)
 
-                # switch to machine players after move is made
-                print("### MACHINE PLAYER ###")
-                print("Possible moves: ", get_possible_moves(board, oponent))
+    if not game_over:
+        save_gamestate_db(board, game_id, state_id)
 
-                # is able to move?
-                if len(get_possible_moves(board, oponent)) > 0:
-                    try:
-                        machine_move = difficulty_options[machine_type]["method"](board, oponent)
-                    except KeyError:
-                        print("ERROR: wrong machine player!")
-                    board = make_move(board, oponent, machine_move)
-                    print(f"AI ({machine_type}) MOVE: {machine_move}")
-                else:
-                    print("AI can't move")
+    request.session['prev_state_id'] = state_id
 
-                # is game over?
-                while len(get_possible_moves(board, player)) == 0:
-                    print("Human can't move")
-                    if len(get_possible_moves(board, oponent)) == 0:
-                        print("AI can't move either. Game Over!")
-                        scores = get_scores(board)
+    data = {"board": board, "message": {"message": message, "color": color},
+            "machine_role": machine_player.role, "next_player": next_player, "game_over": game_over,
+            "scores": scores, "possible_moves": get_possible_moves(board, next_player)}
 
-                        # save to DB:
-                        save_game(game_id, scores[0], scores[1], True)
+    return JsonResponse(data, safe=False)
 
-                        message, winning_player = build_end_message(scores)
 
-                        data = {"board": board, "message": {"message": message, "color": "orange"},
-                                "player": winning_player, "scores": scores, "game_over": True}
-                        return JsonResponse(data, safe=False)
-                    else:
-                        print("Human has to pass. Machine moves...")
-                        try:
-                            machine_move = difficulty_options[machine_type]["method"](board, oponent)
-                        except KeyError:
-                            print("ERROR: wrong machine player!")
-                        board = make_move(board, oponent, machine_move)
-                        print(f"AI ({machine_type}) MOVE: {machine_move}")
+# Main Game Logic is executed in this view every time the current Player makes a move via browser input
+# returns a json data object to browser which updates game board, scores and infos with JS
+@method_decorator(csrf_exempt, name='dispatch')
+@require_http_methods(["POST"])
+def movematch(request):
+    if request.user.is_authenticated:
+        user = request.user
+    else:
+        return HttpResponseRedirect(reverse("login"))
 
-                scores = get_scores(board)
+    row = int(request.POST["row"])
+    col = int(request.POST["col"])
+    current_move = (row, col)
 
-                # save gamestate to DB and session
-                save_game(game_id, scores[0], scores[1], False)
-                save_gamestate(board, request.session["game_id"])
-                request.session['board'] = board
+    # Restore gamestate from DB
+    game_id = request.session['game_id']
 
-                # return new board state to browser
-                if not machine_move:
-                    message = f"opponent had to pass!"
-                    color = "orange"
-                else:
-                    r, c = machine_move
-                    message = f"opponent move: row {r + 1}, col {c + 1}"
-                    color = "white"
+    board, player1_name, player2_name, next_player, state_id = load_gamestate_db(game_id, user)
 
-                # return data
-                data = {"board": board, "message": {"message": message, "color": color}, "player": player,
-                        "scores": scores, "possible_moves": get_possible_moves(board, player)}
-                return JsonResponse(data, safe=False)
+    if next_player == 1:
+        next_player_name = player1_name
+    else:
+        next_player_name = player2_name
 
-            # not a legal move
-            else:
-                message = f"illegal move!"
-                scores = get_scores(board)
-                data = {"board": board, "message": {"message": message, "color": "red"}, "player": player,
-                        "scores": scores, "possible_moves": get_possible_moves(board, player)}
-                return JsonResponse(data, safe=False)
+    game_over = False
+
+    if user.username == next_player_name:
+        levels = Levels()
+        # Something went wrong retrieving board (db error or cheating)
+        if board is None:
+            return render(request, "index.html", {"user": user, "game_levels": levels.get_levels()})
+
+        # Define player1 (player) and player2 (opponent)
+        human_player = Player(role=next_player)
+
+        if is_legal_move(board, next_player, current_move):
+            next_move, board = human_move(board, human_player, current_move)
+            r, c = next_move
+            message = f"Player{next_player} move: row {r + 1}, col {c + 1}"
+            color = 'lightgrey'
+            # switch to human player
+            next_player = get_opponent(next_player)
+        else:
+            # print("Illegal move!!!")
+            message = f"Illegal move!"
+            color = 'red'
+            # do nothing with board
+
+        # Check for Game Over
+        if len(get_possible_moves(board, next_player)) == 0:
+            next_player = get_opponent(next_player)
+            if len(get_possible_moves(board, next_player)) == 0:
+                game_over = True
+
+        scores = get_scores(board)
+        # save gamestate to DB and session
+        save_game_db(game_id, scores[0], scores[1], next_player, game_over)
+        if not game_over:
+            save_gamestate_db(board, game_id, None)
+
+    # Not your turn!
+    else:
+        # print(f'Not your turn {user.username}')
+        scores = get_scores(board)
+        message = f"Not your turn!"
+        color = 'red'
+
+    board_color = 'green' if next_player == 1 else 'blue'
+
+    data = {"board": board, "message": {"message": message, "color": color},
+            "next_player": next_player, "game_over": game_over,
+            "scores": scores, "possible_moves": get_possible_moves(board, next_player), "board_color": board_color}
+
+    return JsonResponse(data, safe=False)
+
+
+def human_move(board, human_player, move):
+    # make a human move
+    print("Human move: ", move)
+    # make move and save board
+    board = human_player.make_move(board, human_player.role, move)
+    return move, board
+
+
+def machine_move(board, machine_player):
+    # make a machine move
+    print("### Machine Player ###")
+    possible_moves = get_possible_moves(board, machine_player.role)
+    print(possible_moves)
+    next_move = machine_player.next_move(board, possible_moves)
+    print("Machine move: ", next_move)
+    board = machine_player.make_move(board, machine_player.role, next_move)
+    return next_move, board
 
 
 def loadgame(request):
     if request.user.is_authenticated:
         user = request.user
     else:
-        user = False
+        return HttpResponseRedirect(reverse("login"))
 
     game_id = int(request.GET["game_id"])
     request.session['game_id'] = game_id
     print("Game ID: ", game_id)
 
-    gameDB_object = GameDB.objects.get(pk=game_id)
-    print("Game object: ", gameDB_object)
+    try:
+        board, player1, player2, next_player, state_id = load_gamestate_db(game_id, user)
+    # Something went wrong retrieving board (db error or cheating)
+    except Exception as e:
+        print(f"DB Error: {e}")
+        levels = Levels()
+        return render(request, "index.html", {"user": user, "game_levels": levels.get_levels()})
 
-    # game_state_objects = GameState.objects.all().filter(game_id=gameDB_object)[::-1]
-    # game_state = game_state_objects[0]
-    game_state = GameState.objects.all().filter(game_id=gameDB_object).last()
-    print("Got GameState object from DB:", game_state)
+    for line in board: print(line)
 
-    # deserialize board and save it to session variable
-    board_string = game_state.board
-    print(board_string)
-    game_board = [[0, 0, 0, 0, 0, 0, 0, 0] for x in range(8)]
+    if "human" in [player1, player2]:
+        return HttpResponseRedirect(reverse("reversi"))
+    else:
+        return HttpResponseRedirect(reverse("reversimatch"))
 
-    cell = 0
-    for r in range(8):
-        for c in range(8):
-            game_board[r][c] = int(board_string[cell])
-            cell += 1
 
-    print("Game Board loaded!")
-    print_board(game_board)
+def load_prev_gamestate(request):
+    if request.user.is_authenticated:
+        user = request.user
+    else:
+        return HttpResponseRedirect(reverse("login"))
 
-    # save game state variables to session variables
-    request.session['board'] = game_board
-    request.session['human_player'] = gameDB_object.player1
-    request.session['machine_type'] = gameDB_object.player2
+    game_id = request.session['game_id']
+    print("Game ID: ", game_id)
 
-    return HttpResponseRedirect(reverse("reversi"))
+    try:
+        board, player1, player2, next_player, state_id = load_gamestate_db(game_id, user, prev=1)
+    # Something went wrong retrieving board (db error or cheating)
+    except Exception as e:
+        print(f"DB Error: {e}")
+        levels = Levels()
+        return render(request, "index.html", {"user": user, "game_levels": levels.get_levels()})
+
+    for line in board: print(line)
+
+    if "human" in [player1, player2]:
+        return HttpResponseRedirect(reverse("reversi"))
+    else:
+        return HttpResponseRedirect(reverse("reversimatch"))
 
 
 # return a list o saved games for the current user
@@ -490,23 +553,29 @@ def savedgames(request):
     if request.user.is_authenticated:
         user = request.user
     else:
-        user = False
+        return HttpResponseRedirect(reverse("login"))
 
-    saved_games = reversed(GameDB.objects.all().filter(user=user)[:100])
+    saved_games = get_saved_games_for_user(user)
+
+    levels = Levels()
+    if user.is_superuser:
+        levels = levels.get_admin_levels()
+    else:
+        levels = levels.get_levels()
 
     return render(request, "savedgames.html",
-                  {"user": user, "difficulties": make_difficulties(), "saved_games": saved_games})
+                  {"user": user, "game_levels": levels, "saved_games": saved_games})
 
 
 def deletegame(request):
     if request.user.is_authenticated:
         user = request.user
     else:
-        user = False
+        return HttpResponseRedirect(reverse("login"))
 
     game_id = request.GET["game_id"]
 
-    if removegame_db(game_id, user):
+    if remove_game_db(game_id, user):
         print(f"Game with id #{game_id} deleted!")
     else:
         print(f"Error deleting game with id #{game_id}")
@@ -516,18 +585,29 @@ def deletegame(request):
 
 def login_view(request):
     if request.method == "GET":
+        levels = Levels()
         return render(request, "users/login.html",
                       {"message": "Please enter your username and password.", "user": False,
-                       "difficulties": make_difficulties()})
+                       "game_levels": levels.get_levels()})
+
     username = request.POST["username"]
     password = request.POST["password"]
+    redirect = request.POST["redirect"]
+
     user = authenticate(request, username=username, password=password)
     if user is not None:
         login(request, user)
+        # if user selects level and is not logged in he is redirected to login page,
+        # where a hidden value is saved in the form and send together with login data
+        # in order to redirect the user after a successful login... hacky? yes, sir!
+        if len(redirect) > 0:
+            redirect = "newgame?difficulty=" + redirect
+            return HttpResponseRedirect(redirect)
         return HttpResponseRedirect(reverse("index"))
     else:
+        levels = Levels()
         return render(request, "users/login.html",
-                      {"message": "Invalid credentials.", "user": False, "difficulties": make_difficulties()})
+                      {"message": "Invalid credentials.", "user": False, "game_levels": levels.get_levels()})
 
 
 def logout_view(request):
@@ -536,20 +616,25 @@ def logout_view(request):
 
 
 def register(request):
+    levels = Levels()
     if request.user.is_authenticated:
         return HttpResponseRedirect(reverse("index"))
 
     if request.method == "GET":
         return render(request, "users/register.html",
-                      {"message": "Please choose a username and password to register a new player.", "user": False,
-                       "difficulties": make_difficulties()})
+                      {"message": "Please choose a username and password.", "user": False,
+                       "game_levels": levels.get_levels()})
 
     if request.method == "POST":
         username = request.POST["username"]
         password = request.POST["password"]
 
         if len(User.objects.all().filter(username=username)) > 0:
-            return render(request, "users/register.html", {"message": "Username already in use.", "user": False})
+            return render(request, "users/register.html", {"message": "Username already in use!", "user": False})
+        elif len(username) < 3:
+            return render(request, "users/register.html", {"message": "Username too short!", "user": False})
+        elif len(password) < 3:
+            return render(request, "users/register.html", {"message": "Password too short!", "user": False})
         else:
             new_user = User.objects.create_user(username=username, password=password)
             new_user.save()

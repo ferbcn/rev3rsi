@@ -1,10 +1,18 @@
 """
-Django settings for rev3rsi project.
+Django settings for rev3rsi project
+PRODUCTION SETTINGS !!!
+
+Environmental Variables that are needed to run:
+SECRET KEY
+DB_NAME
+DB_USER
+DB_PASSWORD
+DB_URL
+DB_PORT
+REDIS_HOST
 
 """
-
 import os
-# import dj_database_url
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -15,6 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
@@ -24,7 +33,9 @@ ALLOWED_HOSTS = ['*', '127.0.0.1']
 # Application definition
 
 INSTALLED_APPS = [
-    'reversi.apps.ReversiConfig',
+    #'daphne',
+    'arena',
+    'reversi',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -73,13 +84,23 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 # Get DB URL from config vars
 #DATABASES['default'] = dj_database_url.config(conn_max_age=600)
 
+DB_PASSWORD = os.environ.get('DB_PASSWORD')
+DB_URL = os.environ.get('DB_URL')
+DB_USER = os.environ.get('DB_USER')
+DB_NAME = os.environ.get('DB_NAME')
+DB_PORT = os.environ.get('DB_PORT')
+
+# Heroku PostgreSQL Database
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': DB_NAME,
+        'USER': DB_USER,
+        'PASSWORD': DB_PASSWORD,
+        'HOST': DB_URL,
+        'PORT': DB_PORT,
+        }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
@@ -119,11 +140,36 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-STATICFILES_DIRS = (os.path.join(BASE_DIR, 'reversi/static'),)
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'reversi/static'), os.path.join(BASE_DIR, 'arena/static')]
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# Activate Django-Heroku.
-#django_heroku.settings(locals())
-
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
+# Channels
+ASGI_APPLICATION = "mysite.asgi.application"
+
+
+REDIS_HOST = os.environ.get('REDIS_HOST')
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [(REDIS_HOST, 6379)],
+        },
+    },
+}
+
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': 'redis://' + REDIS_HOST + ':6379',
+        'OPTIONS': {
+            'db': '10',
+            #'parser_class': 'redis.connection.PythonParser',
+            'pool_class': 'redis.BlockingConnectionPool',
+        }
+    }
+}

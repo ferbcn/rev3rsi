@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block heading %}
+
+{% endblock %}
+
+{% load static %}
+
+{% block body %}
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Chat Arena</title>
+    <link rel="stylesheet" href="{% static 'arena.css' %}" type="text/css">
+</head>
+<body>
+    <div class="container">
+
+        {{ username|json_script:"json-username" }}
+        <div class="create-game-submit-container">
+            <button class="btn btn-outline-success" id="create-game-submit">Request New Match</button>
+        </div>
+
+        <div class="flex-container">
+
+            <div class="flex-container-left">
+                <div class="user-list" id="user-list">
+                    <div class="section-title">Online Players</div>
+                    {% for user in online_users %}
+                        <div class="online-user" id="{{ user }}"><span class="oi oi-people oi-people-green"></span>{{ user }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="flex-container-right">
+
+            <div class="match-list" id="match-list">
+                <div class="section-title">Match requests</div>
+                {% for name, host in open_matches %}
+                    {% if username == host %}
+                        <div class="flex-container match-container match-container-me" id="{{ name }}">
+                    {% else %}
+                        <div class="flex-container match-container match-container-others" id="{{ name }}">
+                    {% endif %}
+                    <div class="flex-item-game">
+                         <i class="oi oi-puzzle-piece"></i>
+                    </div>
+                    <div class="flex-item-user" id="hostName">
+                        {{ host }}
+                    </div>
+                    {% if username == host %}
+                        <div class="wave-box">
+                            <div class="wave"></div>
+                            <div class="wave"></div>
+                            <div class="wave"></div>
+                            <div class="wave"></div>
+                            <div class="wave"></div>
+                            <div class="wave"></div>
+                        </div>
+                    {% else %}
+                        <a href="javascript:handleSelectGame('{{ name }}')">
+                        <div class="wave-box">
+                            <div class="wave-good"></div>
+                            <div class="wave-good"></div>
+                            <div class="wave-good"></div>
+                            <div class="wave-good"></div>
+                            <div class="wave-good"></div>
+                            <div class="wave-good"></div>
+                        </div>
+                        </a>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+
+            </div>
+
+        </div>
+
+        <div class="section-title">Messages</div>
+        <div class="arena-chat-log" id="chat-log"></div>
+        <!--<textarea class="form-control" id="arena-log" rows="10"></textarea><br>-->
+        <div class="chat-message-input-container">
+            <input id="chat-message-input" placeholder="Write a message here...">
+        </div>
+
+    </div>
+
+</body>
+
+<script src="{% static 'arena.js' %}"></script>
+
+{% endblock %}
