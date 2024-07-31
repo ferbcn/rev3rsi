@@ -1,5 +1,5 @@
 """
-ASGI config for mysiteChat project.
+ASGI config for rev3rsi project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 
