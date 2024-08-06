@@ -469,3 +469,11 @@ a.divlink:hover {
    width: 100%;
    height: auto;
 }
+
+.m2m-select-container{
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-evenly;
+}

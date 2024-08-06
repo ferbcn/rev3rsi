@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block body %}
+
+{% csrf_token %}
+<div class="container">
+
+    <div class="m2m-container">
+        <h2>Machine2Machine Game!</h2>
+        {% if message %}
+          {{ message }}
+        {% endif %}
+        <br>
+
+        <div class="m2m-select-container">
+            <label for="ai1">Choose AI 1</label>
+            <select type="text" id="ai1" name="colorSelect">
+                {% for dis, ai in game_levels %}
+                    <option>{{ ai }}</option>
+                {% endfor %}
+             </select>
+            <br>
+            <label for="ai2">Choose AI 2</label>
+            <select type="text" id="ai2" name="colorSelect">
+            {% for dis, ai in game_levels %}
+                <option>{{ ai }}</option>
+            {% endfor %}
+            </select>
+            <br>
+            <button id="run-button" class="btn btn-outline-success">Start</button>
+        </div>
+    </div>
+
+    <div id="board_parent">
+        <div id="board_child">
+          <div class="container board_glow_blue" id="board">
+          {% for line in board %}
+              <div class="row" style="height: 12%">
+              {% for cell in line %}
+                  <div class="col padding-0">
+                  <span class="dot_empty" id="{{forloop.parentloop.counter0}}{{forloop.counter0}}"></span>
+                  </div>
+              {% endfor %}
+              </div>
+          {% endfor %}
+          </div>
+      </div>
+    </div>
+
+    <div>
+        <div id="win-score"></div>
+        <div id="win-message"></div>
+    </div>
+
+
+</div>
+
+
+<script src="{% static 'm2m.js' %}"></script>
+
+{% endblock %}

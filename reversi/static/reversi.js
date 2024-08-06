@@ -8,11 +8,11 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 function queryBoard(){
-    console.log("Querying board...");
+    console.log("Querying board now...");
     // Open new request to get new posts.
     const request = new XMLHttpRequest();
     request.open('GET', '/queryboard');
-    let game_over = false;
+    game_over = false;
     request.onload = () => {
         const data = JSON.parse(request.responseText);
         console.log(data);
@@ -74,11 +74,17 @@ function move(row, col){
 
 
 function check_for_and_make_auto_machine_move(data){
-    if (data["machine_role"] == data["next_player"]){
+    if (data["machine_role"] === data["next_player"]){
         // dummy move --> machine move (includes delay for better visualization)
         setTimeout(function() {
             move(-1, -1);}, 1);
     }
+    if (data["auto_match"]){
+        console.log("AUTO-Match Move!");
+        setTimeout(function() {
+            move(10, 10);}, 1);
+    }
+
 }
 
 
