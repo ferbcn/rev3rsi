@@ -22,13 +22,13 @@ from .game_levels import Levels
 from asgiref.sync import sync_to_async
 
 
-# default view which renders an animation
-async def index(request):
-    return await sync_index(request)
+# # default view which renders an animation
+# async def index(request):
+#     return await sync_index(request)
 
 
 @sync_to_async
-def sync_index(request):
+def index(request):
     lev = Levels()
     if request.user.is_authenticated:
         user = request.user
@@ -45,18 +45,20 @@ def sync_index(request):
 
 @require_http_methods(["GET"])
 def auto_game(request):
-    if request.user.is_authenticated:
+    if request.user is None or not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("login"))
+    else:
         user = request.user
         levels = Levels()
         game_levels = levels.get_levels()
-        message = "Select machine opponents..."
         dummy_game = Game(difficulty="auto_game", player1=None, player2=None)
         board = dummy_game.board
         board_color = "green"
 
-        return render(request, "autogame.html", {"message": message, "user": user, "board": board,
+        return render(request, "autogame.html", {"user": user, "board": board,
                                                  "game_levels": game_levels, "level": "auto-match",
                                                  "board_color": board_color})
+
 
 @require_http_methods(["POST"])
 def run_auto_game(request):
@@ -72,27 +74,27 @@ def run_auto_game(request):
     except (KeyError, json.JSONDecodeError) as e:
         return JsonResponse({"error": str(e)}, status=400)
 
-    difficulty = "auto-match"
-
     # New Game and board initialization
+    difficulty = "auto-match"
     new_game = Game(player1, player2, difficulty, board=None)
-
-    print("NEW GAME STARTED! Difficulty: ", difficulty)
-    for line in new_game.board: print(line)
     scores = get_scores(new_game.board)
+    print("NEW GAME STARTED! Difficulty: ", difficulty)
 
     # save game to DB
     game_db_entry = GameDB(user=user, score_p1=scores[0], score_p2=scores[1], player1=player1,
                            player2=player2, next_player=1, game_over=False)
     game_db_entry.save()
-    print("GAME Entry: ", game_db_entry.id)
+    game_id = game_db_entry.id
+    print("GAME Entry: ", game_id)
 
     # Save Session variable
     prev_state_id = 0
 
-    # save gamestate to DB and session
-    save_gamestate_db(new_game.board, game_db_entry.id, prev_state_id)
-    board, player1_name, player2_name, next_player, state_id = load_gamestate_db(game_db_entry.id, user)
+    # save gamestate to DB
+    save_gamestate_db(new_game.board, game_id, prev_state_id)
+
+    # Load gamestate from db
+    board, player1_name, player2_name, next_player, state_id = load_gamestate_db(game_id, user)
 
     game_over = False
     player1_maker = AiMachinePlayerMaker(player1_name, 1)
@@ -115,8 +117,8 @@ def run_auto_game(request):
         print(message)
         next_player = get_opponent(next_player)
 
-        # save state to DB
-        save_gamestate_db(board, game_db_entry.id, state_id)
+        # save gamestate to DB
+        save_gamestate_db(board, game_id, state_id)
 
         # Check for Game Over
         if len(get_possible_moves(board, next_player)) == 0:
@@ -124,20 +126,26 @@ def run_auto_game(request):
             if len(get_possible_moves(board, next_player)) == 0:
                 game_over = True
 
-    game_over = True
-    save_game_db(game_db_entry.id, scores[0], scores[1], next_player, game_over)
-
     scores = get_scores(board)
+
     if scores[0] == scores[1]:
         message = "It's a draw!"
         winner = "draw"
+        winner_role = 0
+        board_color = 'lightgrey'
     else:
         winner = player1_name if scores[0] > scores[1] else player2_name
         winner_role = 1 if scores[0] > scores[1] else 2
         message = f"Player{winner_role} ({winner}) has won!"
+        board_color = 'green' if winner_role == 1 else 'blue'
+
+    print(f"### Game ended, winner is player{winner_role} ({winner})! ###")
+    print(f"Final Score: {scores[0]} - {scores[1]}")
+    # Save final scores and winner to DB
+    save_game_db(game_id, scores[0], scores[1], winner_role, game_over)
 
     data = {"board": board, "player1_name": player1_name, "player2_name": player2_name,
-            "message": {"message": message}, winner: winner, "scores": scores}
+            "message": {"message": message}, winner: winner, "scores": scores, "board_color": board_color}
 
     return JsonResponse(data)
 
@@ -212,7 +220,6 @@ def newgame(request):
     save_gamestate_db(new_game.board, game_db_entry.id, prev_state_id)
 
     return HttpResponseRedirect(reverse("reversi"))
-
 
 
 # game board initialization for match (player vs player)

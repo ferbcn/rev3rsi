@@ -9,9 +9,6 @@
 
     <div class="m2m-container">
         <h2>Machine2Machine Game!</h2>
-        {% if message %}
-          {{ message }}
-        {% endif %}
         <br>
 
         <div class="m2m-select-container">
@@ -29,13 +26,15 @@
             {% endfor %}
             </select>
             <br>
-            <button id="run-button" class="btn btn-outline-success">Start</button>
+            <button id="run-button" class="btn btn-outline-success">Run</button>
         </div>
     </div>
 
+    <div class="spacer"></div>
+
     <div id="board_parent">
         <div id="board_child">
-          <div class="container board_glow_blue" id="board">
+          <div class="container board_glow_green" id="board">
           {% for line in board %}
               <div class="row" style="height: 12%">
               {% for cell in line %}
@@ -53,6 +52,12 @@
         <div id="win-score"></div>
         <div id="win-message"></div>
     </div>
+
+<div class="spin-container" id="spinner">
+    <div class="spinner-border text-light" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
 
 
 </div>

@@ -1,6 +1,7 @@
 const run_button = document.getElementById("run-button");
 const winScore = document.getElementById("win-score");
 const winMessage = document.getElementById("win-message");
+const spinner = document.getElementById("spinner");
 
 let game_over = false;
 
@@ -12,7 +13,7 @@ run_button.addEventListener("click", function(){
     const text2 = ai2_name.options[ai2_name.selectedIndex].text;
 
     console.log("M2M Game started!")
-    //console.log(text1, text2);
+    spinner.style.display = "block";
 
     const request = new XMLHttpRequest();
     request.open('POST', '/runautogame');
@@ -28,11 +29,19 @@ run_button.addEventListener("click", function(){
         winScore.innerHTML = data["scores"];
         winMessage.innerHTML = data["message"]["message"];
         update_board(data["board"], data["possible_moves"]);
+        update_color(data["board_color"]);
+        spinner.style.display = "none";
     };
 
     request.send(JSON.stringify({ "ai1_name": text1, "ai2_name": text2 }));
 });
 
+function update_color(board_color){
+    const board = document.getElementById("board");
+    board.classList.remove("board_glow_green");
+    board.classList.remove("board_glow_blue");
+    board.classList.add("board_glow_" + board_color);
+}
 
 function update_board(board, possible_moves){
     for (var r=0; r<8; r++){
