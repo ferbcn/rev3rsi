@@ -1,10 +1,12 @@
 import copy
 import random
+import sys
 import time
 
 
-# maximum time the AI is allowed to think
-MAX_TIME = 5
+# maximum time the AI is allowed to think (seconds)
+MAX_TIME = 3
+MAX_DEPTH = 30
 
 ###############################
 ### GAME AND PLAYER CLASSES ###
@@ -17,10 +19,8 @@ class Player:
         self.move = None
 
     def get_opponent(self, player):
-        if player == 1:
-            return 2
-        else:
-            return 1
+        op = 2 if player == 1 else 1
+        return op
 
     def next_move(self):
         return self.move
@@ -158,14 +158,14 @@ class AiGreedyPlus(AiGreedy):
 
 
 class AiMiniMax(AiGreedyPlus):
-    def __init__(self, is_human=False, role=None):
+    def __init__(self, is_human=False, role=None, max_time=MAX_TIME, max_depth=MAX_DEPTH):
+        self.max_time = max_time
         self.is_human = is_human
         self.role = role
         print("Minimax is player", self.role)
         self.start_time = 0
-        self.max_depth = 8
+        self.max_depth = max_depth
         self.max_depth_reached = 0
-
 
     def next_move(self, board, possible_moves):
         scores = self.get_scores(board)
@@ -176,7 +176,7 @@ class AiMiniMax(AiGreedyPlus):
     # Implementation of the Minimax algorithm
     def minimax_move(self, board):
         depth = 1
-        print(f"Minimax move limited to {MAX_TIME} seconds...")
+        print(f"Minimax move limited to {self.max_time} seconds...")
         possible_moves = get_possible_moves(board, self.role)
         player = self.role
         minimax_moves = []
@@ -197,12 +197,13 @@ class AiMiniMax(AiGreedyPlus):
 
         if depth > self.max_depth_reached:
             self.max_depth_reached = depth
-            print(f"Current depth: {depth}")
+            # print by substitution of the print statement below
+            # print(f"Max depth reached: {depth}")
+            sys.stdout.write(f"\rMax depth reached: {depth}")
+            sys.stdout.flush()
 
-        #print(time.time()-self.start_time)
-        if depth > self.max_depth or self.game_over_position(board, player) or time.time()-self.start_time > MAX_TIME:
+        if depth > self.max_depth or self.game_over_position(board, player) or time.time()-self.start_time > self.max_time:
             abs_score = self.get_abs_score(board, self.role)
-            #print("Returning board with ABS score:", abs_score, "at depth:", 4-depth)
             return abs_score
 
         possible_moves = get_possible_moves(board, player)
@@ -247,6 +248,22 @@ class AiMiniMax(AiGreedyPlus):
         return False
 
 
+class AiMachinePlayerMaker:
+    def __init__(self, level_name, role):
+        self.machine_player = None
+        if level_name == "easy":
+            self.machine_player = AiRandom(level_name, role)
+        elif level_name == "medium":
+            self.machine_player = AiGreedy(level_name, role)
+        elif level_name == "hard":
+            self.machine_player = AiGreedyPlus(level_name, role)
+        elif level_name == "harder":
+            self.machine_player = AiMiniMax(level_name, role)
+
+    def get_player(self):
+        return self.machine_player
+
+
 class Game:
     def __init__(self, player1, player2, difficulty, board=None):
         if board is None:
@@ -263,11 +280,15 @@ class Game:
         self.difficulty = difficulty
 
 
+# def get_opponent(player):
+#     if player == 1:
+#         return 2
+#     else:
+#         return 1
+
 def get_opponent(player):
-    if player == 1:
-        return 2
-    else:
-        return 1
+    op = 2 if player == 1 else 1
+    return op
 
 def get_scores(board):
     p1 = 0
@@ -304,6 +325,7 @@ def check_dir(board, player, opponent, row, col, row_dir, col_dir):
             row_iter = row_iter + row_dir
         else:
             return False
+
 
 def is_legal_move(board, player, move):
     # print(f"Player: {player}, move: {move} is legal?")
