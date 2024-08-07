@@ -32,7 +32,6 @@ run_button.addEventListener("click", function(){
         update_color(data["board_color"]);
         spinner.style.display = "none";
     };
-
     request.send(JSON.stringify({ "ai1_name": text1, "ai2_name": text2 }));
 });
 
@@ -44,12 +43,12 @@ function update_color(board_color){
 }
 
 function update_board(board, possible_moves){
-    for (var r=0; r<8; r++){
-      for (var c=0; c<8; c++){
-          var id = r.toString() + c.toString();
+    for (let r=0; r<8; r++){
+      for (let c=0; c<8; c++){
+          const id = r.toString() + c.toString();
 
           // remove current class
-          let curr_class = document.getElementById(id).classList;
+          const curr_class = document.getElementById(id).classList;
           document.getElementById(id).classList.remove(curr_class);
 
           // write new class as received from server
@@ -60,9 +59,9 @@ function update_board(board, possible_moves){
           else{
             document.getElementById(id).classList.add('dot_empty');
             if (typeof possible_moves != "undefined"){
-              for (var i=0; i<possible_moves.length; i++){
+              for (let i=0; i<possible_moves.length; i++){
                 //console.log(possible_moves[i], this_field);
-                if (possible_moves[i][0] == r && possible_moves[i][1] == c){
+                if (possible_moves[i][0] === r && possible_moves[i][1] === c){
                   document.getElementById(id).classList.remove(curr_class);
                   document.getElementById(id).classList.add('dot_possible');
                 }

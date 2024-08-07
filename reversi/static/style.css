@@ -35,34 +35,33 @@ a:hover {
 }
 
 #board_parent{
-   display: flex;
-   margin-top: 10px;
-   align-items: center;
-   justify-content: center;
-   position: relative;
-   width: 100%;
-   height: auto;
+    display: flex;
+    margin-top: 10px;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    width: 100%;
+    height: 60vh;
 }
 
 @media screen and (min-width: 800px) {
   #board_parent {
-     height: 700px;
   }
 }
 
 #board_child{
-   position: relative;
+    position: relative;
 }
 
 #board{
-   width: 70vw;
-   height: 70vw;
+   width: 60vw;
+   height: 60vw;
 }
 
 @media screen and (min-width: 800px) {
   #board{
-     width: 700px;
-     height: 700px;
+   width: 60vh;
+   height: 60vh;
   }
 }
 
@@ -481,5 +480,5 @@ a.divlink:hover {
 
 .spacer{
     width: 100%;
-    height: 10vh;
+    height: 1vw;
 }
