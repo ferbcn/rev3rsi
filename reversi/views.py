@@ -127,22 +127,46 @@ def run_auto_game(request):
                 game_over = True
 
     scores = get_scores(board)
-
     if scores[0] == scores[1]:
-        message = "It's a draw!"
         winner = "draw"
         winner_role = 0
         board_color = 'lightgrey'
+        message = "It's a draw!"
     else:
         winner = player1_name if scores[0] > scores[1] else player2_name
         winner_role = 1 if scores[0] > scores[1] else 2
         message = f"Player{winner_role} ({winner}) has won!"
         board_color = 'green' if winner_role == 1 else 'blue'
 
-    print(f"### Game ended, winner is player{winner_role} ({winner})! ###")
+    print(f"### Game ended, {message}!")
     print(f"Final Score: {scores[0]} - {scores[1]}")
+
     # Save final scores and winner to DB
     save_game_db(game_id, scores[0], scores[1], winner_role, game_over)
+
+    # Calculate elo rating
+    elo_player1 = get_rating_for_user(player1_name)
+    if elo_player1 is None:
+        create_base_rating_for_user(player1_name)
+        elo_player1 = get_rating_for_user(player1_name)
+    elo_player2 = get_rating_for_user(player2_name)
+    if elo_player2 is None:
+        create_base_rating_for_user(player2_name)
+        elo_player2 = get_rating_for_user(player1_name)
+    print(f"Current ELO-ratings: Player1 ({player1_name}): {elo_player1}, Player2 ({player2_name}): {elo_player2}")
+
+    new_elo_p1 = int(elo_player2 + (scores[0] - scores[1]) * (elo_player1/elo_player2))
+    new_elo_p2 = int(elo_player2 + (scores[1] - scores[0]) * (elo_player2/elo_player1))
+    print(f"New ELO-ratings: Player1 ({player1_name}): {new_elo_p1}, Player2 ({player2_name}): {new_elo_p2}")
+
+    # Update ratings in DB
+    if winner_role == 0:
+        update_ratings_for_user_game(player1_name, new_elo_p1, 0)
+        update_ratings_for_user_game(player2_name, new_elo_p2, 0)
+    else:
+        update_ratings_for_user_game(player1_name, new_elo_p1, 1 if winner_role == 1 else -1)
+        update_ratings_for_user_game(player2_name, new_elo_p2, 1 if winner_role == 2 else -1)
+
 
     data = {"board": board, "player1_name": player1_name, "player2_name": player2_name,
             "message": {"message": message}, winner: winner, "scores": scores, "board_color": board_color}
@@ -691,6 +715,24 @@ def savedgames(request):
 
     return render(request, "savedgames.html",
                   {"user": user, "game_levels": levels, "saved_games": saved_games})
+# return a list o saved games for the current user
+
+def savedratings(request):
+    if request.user.is_authenticated:
+        user = request.user
+    else:
+        return HttpResponseRedirect(reverse("login"))
+
+    saved_ratings = get_ratings_for_all_users()
+
+    levels = Levels()
+    if user.is_superuser:
+        levels = levels.get_admin_levels()
+    else:
+        levels = levels.get_levels()
+
+    return render(request, "ratingsusers.html",
+                  {"user": user, "game_levels": levels, "saved_ratings": saved_ratings})
 
 
 def deletegame(request):

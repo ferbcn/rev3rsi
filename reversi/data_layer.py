@@ -2,7 +2,7 @@
 ### DB operations ###
 #####################
 
-from .models import GameDB, GameState
+from .models import GameDB, GameState, Rating, User
 from django.core.exceptions import ObjectDoesNotExist  # Import the necessary exception
 
 
@@ -98,3 +98,56 @@ def load_gamestate_db(game_id, user, prev=False):
 
 def get_saved_games_for_user(user):
     return reversed(GameDB.objects.all().filter(user=user).order_by("id"))
+
+
+def get_rating_for_user(username):
+    try:
+        user = User.objects.get(username=username)
+        rating = Rating.objects.get(user=user)
+        return rating.elo
+    except ObjectDoesNotExist:
+        return None
+
+
+def create_base_rating_for_user(username):
+    try:
+        rating = Rating(user=User.objects.get(username=username))
+        rating.save()
+        print(f"Base rating for User {username} created!")
+    except ObjectDoesNotExist:
+        user = User.objects.create(username=username, password=username)
+        user.save()
+        rating = Rating(user=user)
+        rating.save()
+        print(f"User {username} created with base rating!")
+    return rating
+
+
+def get_ratings_for_all_users():
+    all_ratings = reversed(Rating.objects.all().order_by("elo"))
+    return all_ratings
+
+
+def update_ratings_for_user_game(player_name, new_elo, game_end_state):
+    try:
+        # user_id = User.objects.get(username=user_name).id
+        # rating_object = Rating.objects.get(pk=user_id)
+        rating_object = Rating.objects.get(user__username=player_name)
+        # Update the fields
+        rating_object.games_played += 1
+        if game_end_state == 1:
+            rating_object.wins += 1
+        elif game_end_state == -1:
+            rating_object.losses += 1
+        elif game_end_state == 0:
+            rating_object.draws = 1
+
+        rating_object.win_rate = (rating_object.wins / rating_object.games_played) * 100
+        rating_object.elo = new_elo
+
+        rating_object.save()  # Save the changes to the database
+        return True  # Return True if the function executed successfully
+    except ObjectDoesNotExist:
+        # You may want to log this exception, depending on your use case
+        return False  # Return False or appropriate response when the object doesn't exist
+

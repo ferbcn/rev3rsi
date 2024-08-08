@@ -5,7 +5,7 @@ import time
 
 
 # maximum time the AI is allowed to think (seconds)
-MAX_TIME = 3
+MAX_TIME = 1.5
 MAX_DEPTH = 30
 
 ###############################
@@ -279,12 +279,6 @@ class Game:
         self.player2_name = player2
         self.difficulty = difficulty
 
-
-# def get_opponent(player):
-#     if player == 1:
-#         return 2
-#     else:
-#         return 1
 
 def get_opponent(player):
     op = 2 if player == 1 else 1

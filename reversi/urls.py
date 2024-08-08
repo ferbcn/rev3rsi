@@ -13,6 +13,7 @@ urlpatterns = [
     path("move", views.move, name="move"),
     path("queryboard/", views.queryboard, name="queryboard"),
     path("savedgames", views.savedgames, name="savedgames"),
+    path("savedratings", views.savedratings, name="savedratings"),
     path("loadgame", views.loadgame, name="loadgame"),
     path("deletegame", views.deletegame, name="deletegame"),
     path("newmatch", views.newmatch, name="newmatch"),

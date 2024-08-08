@@ -17,3 +17,13 @@ class GameState(models.Model):
     #prev_state = models.ForeignKey("self", null=True, on_delete=models.CASCADE, related_name="prev_state")
     #prev_state = models.IntegerField(default=0, null=True)
     board = models.CharField(max_length=64)
+
+
+class Rating(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="elo_user")
+    elo = models.IntegerField(default=1000)
+    wins = models.IntegerField(default=0)
+    losses = models.IntegerField(default=0)
+    draws = models.IntegerField(default=0)
+    games_played = models.IntegerField(default=0)
+    win_rate = models.FloatField(default=0.0)
