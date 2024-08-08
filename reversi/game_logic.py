@@ -5,7 +5,7 @@ import time
 
 
 # maximum time the AI is allowed to think (seconds)
-MAX_TIME = 1.5
+MAX_TIME = 1
 MAX_DEPTH = 30
 
 ###############################

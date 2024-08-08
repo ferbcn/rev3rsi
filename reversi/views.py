@@ -155,7 +155,7 @@ def run_auto_game(request):
         elo_player2 = get_rating_for_user(player1_name)
     print(f"Current ELO-ratings: Player1 ({player1_name}): {elo_player1}, Player2 ({player2_name}): {elo_player2}")
 
-    new_elo_p1 = int(elo_player2 + (scores[0] - scores[1]) * (elo_player1/elo_player2))
+    new_elo_p1 = int(elo_player1 + (scores[0] - scores[1]) * (elo_player1/elo_player2))
     new_elo_p2 = int(elo_player2 + (scores[1] - scores[0]) * (elo_player2/elo_player1))
     print(f"New ELO-ratings: Player1 ({player1_name}): {new_elo_p1}, Player2 ({player2_name}): {new_elo_p2}")
 

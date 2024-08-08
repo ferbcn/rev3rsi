@@ -25,10 +25,10 @@
           <div class="col-2">
             Wins
           </div>
-          <div class="col-3">
+          <div class="col-2">
             Losses
           </div>
-          <div class="col-1">
+          <div class="col-2">
             Ratio
           </div>
       </div>
@@ -48,12 +48,12 @@
           <div class="col-2">
             {{ rating.wins }}
           </div>
-          <div class="col-3">
+          <div class="col-2">
             {{ rating.losses }}
           </div>
-            <div class="col-1">
-              {{ rating.losses }}
-              <!--<span class="oi oi-delete" title="delete game"></span>-->
+            <div class="col-2">
+                {{ rating.win_rate|floatformat:1 }} %
+                <!--<span class="oi oi-delete" title="delete game"></span>-->
             </div>
       </div>
 

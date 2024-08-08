@@ -19,7 +19,7 @@ def save_gamestate_db(board, game_id, prev_id):
         print(f"No GameDB object found with id: {game_id}")
         return False  # Indicate that the function did not execute successfully
 
-    game_state_entry = GameState(game_id=game_object, board=board_string) #, prev_state=prev_state_id)
+    game_state_entry = GameState(game_id=game_object, board=board_string)
     game_state_entry.save()
     return True
 
