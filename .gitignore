@@ -112,3 +112,5 @@ bin/
 
 #osX
 .DS_Store
+/cert/cert.pem
+/cert/key.pem

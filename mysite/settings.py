@@ -73,14 +73,14 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'mysite.wsgi.application'
+# WSGI_APPLICATION = 'mysite.wsgi.application'
+# ASGI_APPLICATION = 'mysite.asgi.application'
 
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 # default local db
-
 # Get DB URL from config vars
 #DATABASES['default'] = dj_database_url.config(conn_max_age=600)
 
@@ -148,7 +148,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 # Channels
 ASGI_APPLICATION = "mysite.asgi.application"
-
 
 REDIS_HOST = os.environ.get('REDIS_HOST')
 
