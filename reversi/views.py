@@ -69,8 +69,16 @@ def run_auto_game(request):
 
     try:
         data = json.loads(request.body)
-        player1 = data["ai1_name"]
-        player2 = data["ai2_name"]
+        ai1_name = data["ai1_name"]
+        ai2_name = data["ai2_name"]
+        if random.choice([True, False]):
+            player1, player2 = ai1_name, ai2_name
+            p1_color = 'green'
+            p2_color = 'blue'
+        else:
+            player1, player2 = ai2_name, ai1_name
+            p1_color = 'blue'
+            p2_color = 'green'
     except (KeyError, json.JSONDecodeError) as e:
         return JsonResponse({"error": str(e)}, status=400)
 
@@ -134,8 +142,11 @@ def run_auto_game(request):
         message = "It's a draw!"
     else:
         winner = player1_name if scores[0] > scores[1] else player2_name
-        winner_role = 1 if scores[0] > scores[1] else 2
-        message = f"Player{winner_role} ({winner}) has won!"
+        if ai1_name == player1_name:
+            winner_role = 1 if scores[0] > scores[1] else 2
+        else:
+            winner_role = 2 if scores[0] > scores[1] else 1
+        message = f"Machine{winner_role} ({winner}) has won!"
         board_color = 'green' if winner_role == 1 else 'blue'
 
     print(f"### Game ended, {message}!")
@@ -168,8 +179,9 @@ def run_auto_game(request):
         update_ratings_for_user_game(player2_name, new_elo_p2, 1 if winner_role == 2 else -1)
 
 
-    data = {"board": board, "player1_name": player1_name, "player2_name": player2_name,
-            "message": {"message": message}, winner: winner, "scores": scores, "board_color": board_color}
+    data = {"board": board, "message": {"message": message}, winner: winner, "scores": scores,
+            "player1_name": player1_name, "player2_name": player2_name, "p1_color": p1_color, "p2_color": p2_color,
+            "board_color": board_color}
 
     return JsonResponse(data)
 
@@ -187,42 +199,36 @@ def newgame(request):
     # Game level is passed as url parameter http://localhost/newgame?difficulty=...
     difficulty = request.GET["difficulty"]
 
-    if difficulty == "auto-match":
-        print("Starting machine to machine game!")
-        player1_name = request.GET["p1_name"]
-        player2_name = request.GET["p2_name"]
+    # Define random role of players
+    human_is_player1 = random.choice([True, False])
+    if human_is_player1:
+        player1_name = "human"
+        player2_name = difficulty
+        request.session["machine_role"] = 2
     else:
-        # Define random role of players
-        human_is_player1 = random.choice([True, False])
-        if human_is_player1 == 1:
-            player1_name = "human"
-            player2_name = difficulty
-            request.session["machine_role"] = 2
+        player1_name = difficulty
+        player2_name = "human"
+        request.session["machine_role"] = 1
+
+    # Launch a test game
+    if user.is_superuser:
+        if difficulty == "P1-Draw":
+            new_game = TestGameP1LastMoveToDraw(player1_name, player2_name, difficulty)
+        elif difficulty == "P1-Win":
+            new_game = TestGameP1LastMoveToWin(player1_name, player2_name, difficulty)
+        elif difficulty == "P1-Lose":
+            new_game = TestGameP1LastMoveToLose(player1_name, player2_name, difficulty)
+        elif difficulty == "P2-Win":
+            new_game = TestGameP1MoveP2LastMoveToWin(player1_name, player2_name, difficulty)
+        elif difficulty == "P2-Lose":
+            new_game = TestGameP1MoveP2LastMoveToLose(player1_name, player2_name, difficulty)
+        elif difficulty == "JumpCheck":
+            new_game = TestGameJumpCheck(player1_name, player2_name, difficulty)
         else:
-            player1_name = difficulty
-            player2_name = "human"
-            request.session["machine_role"] = 1
-
-        # Launch a test game
-        if user.is_superuser:
-            if difficulty == "P1-Draw":
-                new_game = TestGameP1LastMoveToDraw(player1_name, player2_name, difficulty)
-            elif difficulty == "P1-Win":
-                new_game = TestGameP1LastMoveToWin(player1_name, player2_name, difficulty)
-            elif difficulty == "P1-Lose":
-                new_game = TestGameP1LastMoveToLose(player1_name, player2_name, difficulty)
-            elif difficulty == "P2-Win":
-                new_game = TestGameP1MoveP2LastMoveToWin(player1_name, player2_name, difficulty)
-            elif difficulty == "P2-Lose":
-                new_game = TestGameP1MoveP2LastMoveToLose(player1_name, player2_name, difficulty)
-            elif difficulty == "JumpCheck":
-                new_game = TestGameJumpCheck(player1_name, player2_name, difficulty)
-            else:
-                new_game = Game(player1_name, player2_name, difficulty, board=None)
-
-    # Launch a real new game
-    # New Game and board initialization
-    new_game = Game(player1_name, player2_name, difficulty, board=None)
+            new_game = Game(player1_name, player2_name, difficulty, board=None)
+    else:
+        # New Game and board initialization
+        new_game = Game(player1_name, player2_name, difficulty, board=None)
 
     print("NEW GAME STARTED! Difficulty: ", difficulty)
     for line in new_game.board: print(line)
@@ -470,23 +476,9 @@ def move(request):
     # Define player1 (player) and player2 (opponent)
     human_player = Player(role=human_role)
 
-    if difficulty == "easy":
-        machine_player = AiRandom(role=machine_role)
-        print("Random Ai initiated")
-    elif difficulty == "medium":
-        machine_player = AiGreedy(role=machine_role)
-        print("Greedy Ai initiated")
-    elif difficulty == "hard":
-        machine_player = AiGreedyPlus(role=machine_role)
-        print("Greedy Plus Ai initiated")
-    elif difficulty == "harder":
-        machine_player = AiMiniMax(role=machine_role)
-        print("Greedy Minimax Ai initiated")
-    else:
-        machine_player = AiMiniMax(role=machine_role)
-        print("Greedy Minimax Ai initiated")
-        # machine_player = AiGreedy(role=machine_role)
-        # print("Defaulting to Greedy Ai")
+    if difficulty is None: difficulty = "greedy"
+    machine_player_maker = AiMachinePlayerMaker(difficulty, machine_role)
+    machine_player = machine_player_maker.get_player()
 
     message = f""
     color = 'darkgrey'

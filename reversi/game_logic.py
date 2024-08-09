@@ -21,9 +21,9 @@ class Player:
     def get_opponent(self, player):
         op = 2 if player == 1 else 1
         return op
-
-    def next_move(self):
-        return self.move
+    #
+    # def next_move(self):
+    #     return self.move
 
     # method needed to calculate theoretical possible outcomes of every move
     def make_move(self, board, player, move):
@@ -77,8 +77,24 @@ class Player:
         return p1, p2
 
 
+class AiDumb(Player):
+    def __init__(self, is_human=False, role=None):
+        super().__init__(is_human, role)
+        self.is_human = is_human
+        self.role = role
+
+    def next_move(self, board, possible_moves):
+        return self.dumb_move(possible_moves)
+
+        # Random move
+    def dumb_move(self, possible_moves):
+        print("dumb move (first of list)...")
+        return possible_moves[0]
+
+
 class AiRandom(Player):
     def __init__(self, is_human=False, role=None):
+        super().__init__(is_human, role)
         self.is_human = is_human
         self.role = role
 
@@ -94,6 +110,7 @@ class AiRandom(Player):
 
 class AiGreedy(AiRandom):
     def __init__(self, is_human=False, role=None):
+        super().__init__(is_human, role)
         self.is_human = is_human
         self.role = role
 
@@ -159,6 +176,7 @@ class AiGreedyPlus(AiGreedy):
 
 class AiMiniMax(AiGreedyPlus):
     def __init__(self, is_human=False, role=None, max_time=MAX_TIME, max_depth=MAX_DEPTH):
+        super().__init__(is_human, role)
         self.max_time = max_time
         self.is_human = is_human
         self.role = role
@@ -251,13 +269,15 @@ class AiMiniMax(AiGreedyPlus):
 class AiMachinePlayerMaker:
     def __init__(self, level_name, role):
         self.machine_player = None
-        if level_name == "easy":
+        if level_name == "dumb":
+            self.machine_player = AiDumb(level_name, role)
+        elif level_name == "random":
             self.machine_player = AiRandom(level_name, role)
-        elif level_name == "medium":
+        elif level_name == "greedy":
             self.machine_player = AiGreedy(level_name, role)
-        elif level_name == "hard":
+        elif level_name == "greedy-plus":
             self.machine_player = AiGreedyPlus(level_name, role)
-        elif level_name == "harder":
+        elif level_name == "mini-max":
             self.machine_player = AiMiniMax(level_name, role)
 
     def get_player(self):

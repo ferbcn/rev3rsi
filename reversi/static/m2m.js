@@ -30,10 +30,18 @@ run_button.addEventListener("click", function(){
         winMessage.innerHTML = data["message"]["message"];
         update_board(data["board"], data["possible_moves"]);
         update_color(data["board_color"]);
+        update_player_colors(data["p1_color"], data["p2_color"]);
         spinner.style.display = "none";
     };
     request.send(JSON.stringify({ "ai1_name": text1, "ai2_name": text2 }));
 });
+
+function update_player_colors(player1_color, player2_color){
+    const player1_dot = document.getElementById("color_dot_player1");
+    const player2_dot = document.getElementById("color_dot_player2");
+    player1_dot.style.backgroundColor = player1_color;
+    player2_dot.style.backgroundColor = player2_color;
+}
 
 function update_color(board_color){
     const board = document.getElementById("board");

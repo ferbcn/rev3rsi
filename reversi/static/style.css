@@ -482,3 +482,18 @@ a.divlink:hover {
     width: 100%;
     height: 1vw;
 }
+
+.player-colors {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-evenly;
+    width: 100%;
+}
+
+.player-color-dot {
+    height: 50px;
+    width: 50px;
+    border-radius: 50%;
+    display: inline-block;
+}
