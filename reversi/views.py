@@ -188,7 +188,7 @@ def run_auto_game(request):
 
 
 # game board initialization (player vs machine)
-def newgame(request):
+def new_game(request):
     if request.user.is_authenticated:
         user = request.user
     else:
@@ -254,7 +254,7 @@ def newgame(request):
 
 
 # game board initialization for match (player vs player)
-def newmatch(request):
+def new_match(request):
     if request.user.is_authenticated:
         user = request.user
     else:
@@ -351,7 +351,7 @@ def reversi(request):
 
 
 # initial game view
-def reversimatch(request):
+def reversi_match(request):
     if request.user.is_authenticated:
         user = request.user
     else:
@@ -387,7 +387,7 @@ def reversimatch(request):
 # Query board status
 @require_http_methods(["GET"])
 # @method_decorator(csrf_exempt, name='dispatch')
-def queryboard(request):
+def query_board(request):
     if request.user.is_authenticated:
         user = request.user
     else:
@@ -538,7 +538,7 @@ def move(request):
 # returns a json data object to browser which updates game board, scores and infos with JS
 @method_decorator(csrf_exempt, name='dispatch')
 @require_http_methods(["POST"])
-def movematch(request):
+def move_match(request):
     if request.user.is_authenticated:
         user = request.user
     else:
@@ -629,7 +629,7 @@ def machine_move(board, machine_player):
     return next_move, board
 
 
-def loadgame(request):
+def load_game(request):
     if request.user.is_authenticated:
         user = request.user
     else:
@@ -679,7 +679,7 @@ def load_prev_gamestate(request):
 
 
 # return a list o saved games for the current user
-def savedgames(request):
+def saved_games(request):
     if request.user.is_authenticated:
         user = request.user
     else:
@@ -692,7 +692,7 @@ def savedgames(request):
 # return a list o saved games for the current user
 
 
-def savedratings(request):
+def saved_ratings(request):
     if request.user.is_authenticated:
         user = request.user
     else:
@@ -704,7 +704,7 @@ def savedratings(request):
                   {"user": user, "saved_ratings": saved_ratings})
 
 
-def deletegame(request):
+def delete_game(request):
     if request.user.is_authenticated:
         user = request.user
     else:
