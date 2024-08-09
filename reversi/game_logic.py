@@ -8,9 +8,10 @@ import time
 MAX_TIME = 1
 MAX_DEPTH = 30
 
-###############################
-### GAME AND PLAYER CLASSES ###
-###############################
+###########################
+# GAME AND PLAYER CLASSES #
+###########################
+
 
 class Player:
     def __init__(self, is_human=True, role=None):
@@ -18,18 +19,11 @@ class Player:
         self.role = role
         self.move = None
 
-    def get_opponent(self, player):
-        op = 2 if player == 1 else 1
-        return op
-    #
-    # def next_move(self):
-    #     return self.move
-
     # method needed to calculate theoretical possible outcomes of every move
     def make_move(self, board, player, move):
         # print(f"Player: {player}, makes move: {move}")
         row, col = move
-        opponent = self.get_opponent(player)
+        opponent = get_opponent(player)
 
         # try west, east, north, south, northwest, ...
         col_row_dir = [(-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (1, -1), (1, 1), (-1, 1)]
@@ -64,17 +58,6 @@ class Player:
             col_iter = col_iter + col_dir
             row_iter = row_iter + row_dir
         return board
-
-    def get_scores(self, board):
-        p1 = 0
-        p2 = 0
-        for r in range(8):
-            for c in range(8):
-                if board[r][c] == 1:
-                    p1 += 1
-                elif board[r][c] == 2:
-                    p2 += 1
-        return p1, p2
 
 
 class AiDumb(Player):
@@ -125,7 +108,7 @@ class AiGreedy(AiRandom):
         top_move = None
         for move in possible_moves:
             new_board = self.make_move(copy.deepcopy(board), self.role, move)
-            score_p1, score_p2 = self.get_scores(new_board)
+            score_p1, score_p2 = get_scores(new_board)
             if self.role == 1:
                 move_score = score_p1
             else:
@@ -139,6 +122,7 @@ class AiGreedy(AiRandom):
 
 class AiGreedyPlus(AiGreedy):
     def __init__(self, is_human=False, role=None):
+        super().__init__(is_human, role)
         self.is_human = is_human
         self.role = role
 
@@ -186,7 +170,7 @@ class AiMiniMax(AiGreedyPlus):
         self.max_depth_reached = 0
 
     def next_move(self, board, possible_moves):
-        scores = self.get_scores(board)
+        scores = get_scores(board)
         if scores[0] + scores[1] < 33:
             return self.greedy_plus_move(board, possible_moves)
         return self.minimax_move(board)
@@ -229,7 +213,7 @@ class AiMiniMax(AiGreedyPlus):
             max_eval = -65
             for move in possible_moves:
                 new_board = self.make_move(copy.deepcopy(board), player, move)
-                eval = self.minimax(new_board, self.get_opponent(player), depth+1, alpha, beta, False)
+                eval = self.minimax(new_board, get_opponent(player), depth+1, alpha, beta, False)
                 max_eval = max(max_eval, eval)
                 alpha = max(alpha, max_eval)
                 if beta <= alpha:
@@ -239,7 +223,7 @@ class AiMiniMax(AiGreedyPlus):
             min_eval = 65
             for move in possible_moves:
                 new_board = self.make_move(copy.deepcopy(board), player, move)
-                eval = self.minimax(new_board, self.get_opponent(player), depth+1, alpha, beta, True)
+                eval = self.minimax(new_board, get_opponent(player), depth+1, alpha, beta, True)
                 min_eval = min(min_eval, eval)
                 beta = min(beta, min_eval)
                 if beta <= alpha:
@@ -247,14 +231,14 @@ class AiMiniMax(AiGreedyPlus):
             return min_eval
 
     def get_abs_score(self, board, player):
-        score_p1, score_p2 = self.get_scores(board)
+        score_p1, score_p2 = get_scores(board)
         score = score_p1 - score_p2 if player == 1 else score_p2 - score_p1
         return score
 
     def game_over_position(self, board, player):
         possible_moves = get_possible_moves(board, player)
         if len(possible_moves) == 0:
-            next_possible_moves = get_possible_moves(board, self.get_opponent(player))
+            next_possible_moves = get_possible_moves(board, get_opponent(player))
             if len(next_possible_moves) == 0:
                 """
                 print("Game Over Position found!")
