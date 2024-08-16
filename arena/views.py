@@ -11,8 +11,9 @@ from reversi.game_levels import Levels
 levels_maker = Levels()
 user_levels = levels_maker.get_levels()
 
+
 @require_http_methods(["GET"])
-def arenaindex(request):
+def arena_index(request):
     if request.user.is_authenticated:
         username = request.user.username
 
