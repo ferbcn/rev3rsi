@@ -68,7 +68,7 @@ chatSocket.onmessage = function(e) {
 
         var newMesContainer = document.createElement('div')
         newMesContainer.classList.add("chat-entry-container");
-        if (userName == mesUserName){
+        if (userName === mesUserName){
             newMesContainer.classList.add("chat-entry-container-me");
         }
         else{
