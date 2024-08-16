@@ -5,8 +5,11 @@ from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 from django.core.cache import cache
 
-game_levels = [('', 'easy'), ('', 'hard'), ('', 'harder'), ('', 'hardest')]
+from reversi.game_levels import Levels
 
+# Create an instance of the Levels class
+levels_maker = Levels()
+user_levels = levels_maker.get_levels()
 
 @require_http_methods(["GET"])
 def arenaindex(request):
@@ -18,7 +21,7 @@ def arenaindex(request):
         online_users = cache.get("onlineUsers") if cache.get("onlineUsers") is not None else []
         #print(open_matches)
 
-        return render(request, "arena/arena.html", {"username": username, "game_levels": game_levels,
+        return render(request, "arena/arena.html", {"username": username, "game_levels": user_levels,
                                                     "open_matches": open_matches, "online_users": online_users})
     else:
         return HttpResponseRedirect(reverse("login"))
