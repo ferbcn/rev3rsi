@@ -12,11 +12,11 @@ run_button.addEventListener("click", function(){
     const text1 = ai1_name.options[ai1_name.selectedIndex].text;
     const text2 = ai2_name.options[ai2_name.selectedIndex].text;
 
-    console.log("M2M Game started!")
+    console.log("Starting M2M Game...")
     spinner.style.display = "block";
 
     const request = new XMLHttpRequest();
-    request.open('POST', '/runautogame');
+    request.open('POST', '/simulator/runautogame');
     request.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
     // Retrieve CSRF token from the HTML document
     const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;

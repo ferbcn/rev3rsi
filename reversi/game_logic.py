@@ -340,3 +340,22 @@ def is_legal_move(board, player, move):
             return True
     # print(f"Illegal move.")
     return False
+
+
+def human_move(board, human_player, move):
+    # make a human move
+    print("Human move: ", move)
+    # make move and save board
+    board = human_player.make_move(board, human_player.role, move)
+    return move, board
+
+
+def machine_move(board, machine_player):
+    # make a machine move
+    print("# Machine move #")
+    possible_moves = get_possible_moves(board, machine_player.role)
+    print(possible_moves)
+    next_move = machine_player.next_move(board, possible_moves)
+    print("Machine move: ", next_move)
+    board = machine_player.make_move(board, machine_player.role, next_move)
+    return next_move, board

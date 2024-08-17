@@ -79,7 +79,7 @@ function check_for_and_make_auto_machine_move(data){
         setTimeout(function() {
             move(-1, -1);}, 1);
     }
-    if (data["auto_match"]){
+    if (data["simulator"]){
         console.log("AUTO-Match Move!");
         setTimeout(function() {
             move(10, 10);}, 1);

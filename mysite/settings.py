@@ -29,11 +29,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*', '127.0.0.1']
 
-
 # Application definition
 
 INSTALLED_APPS = [
     #'daphne',
+    'simulator',
     'arena',
     'reversi',
     'django.contrib.admin',

@@ -3,8 +3,6 @@ from . import views
 
 urlpatterns = [
     path("", views.index, name="index"),
-    path("autogame", views.auto_game, name="autogame"),
-    path("runautogame", views.run_auto_game, name="runautogame"),
     path("login", views.login_view, name="login"),
     path("logout", views.logout_view, name="logout"),
     path("reversi", views.reversi, name="reversi"),
