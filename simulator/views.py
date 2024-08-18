@@ -56,7 +56,7 @@ def run_auto_game(request):
     }
     game_queue.put(game_data)
 
-    return JsonResponse({"message": "Game is being processed", "status": "Num. in queue: " + str(game_queue.qsize())})
+    return JsonResponse({"message": "Game is being processed, pos in queue: " + str(game_queue.qsize())})
 
 #
 # @require_http_methods(["POST"])
@@ -212,7 +212,7 @@ async def sse_stream(request):
                 board_data = await load_gamestate_db_async(new_game_id)
                 json_response = json.dumps({"player1:" : data.player1, "player2": data.player2,
                                  "score_p1": data.score_p1, "score_p2": data.score_p2,
-                                 "board": board_data, "game_over": data.game_over})
+                                 "board": board_data, "game_over": data.game_over, "queue_size": game_queue.qsize()})
                 if data.game_over:
                     last_game_id = new_game_id
                     yield f'data: {json_response} \n\n'

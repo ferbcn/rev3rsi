@@ -1,5 +1,5 @@
 const run_button = document.getElementById("run-button");
-const winScore = document.getElementById("win-score");
+const queueSize = document.getElementById("queue-size");
 const winMessage = document.getElementById("win-message");
 const spinner = document.getElementById("spinner");
 
@@ -26,7 +26,6 @@ run_button.addEventListener("click", function(){
         const data = JSON.parse(request.responseText);
         console.log(data);
 
-        winScore.innerHTML = data["status"];
         winMessage.innerHTML = data["message"];
         // update_board(data["board"], data["possible_moves"]);
         // update_color(data["board_color"]);
@@ -50,28 +49,43 @@ function update_color(board_color){
     board.classList.add("board_glow_" + board_color);
 }
 
+function clear_board(){
+    for (let r=0; r<8; r++){
+        for (let c=0; c<8; c++){
+            const id = r.toString() + c.toString();
+            const el = document.getElementById(id);
+            el.classList.remove(el.classList);
+            el.classList.add('dot_empty');
+            el.style.animation = 'none';
+            el.offsetHeight; /* trigger reflow */
+            el.style.animation = null;
+        }
+    }
+}
+
 function update_board(board, possible_moves){
     for (let r=0; r<8; r++){
       for (let c=0; c<8; c++){
           const id = r.toString() + c.toString();
 
           // remove current class
-          const curr_class = document.getElementById(id).classList;
-          document.getElementById(id).classList.remove(curr_class);
+          const dot = document.getElementById(id);
+          const curr_class = dot.classList;
+          dot.classList.remove(curr_class);
 
           // write new class as received from server
           if (board[r][c] === 1)
-            document.getElementById(id).classList.add('dot_p1');
+            dot.classList.add('dot_p1');
           else if (board[r][c] === 2)
-            document.getElementById(id).classList.add('dot_p2');
+            dot.classList.add('dot_p2');
           else{
-            document.getElementById(id).classList.add('dot_empty');
+            dot.classList.add('dot_empty');
             if (typeof possible_moves != "undefined"){
               for (let i=0; i<possible_moves.length; i++){
                 //console.log(possible_moves[i], this_field);
                 if (possible_moves[i][0] === r && possible_moves[i][1] === c){
-                  document.getElementById(id).classList.remove(curr_class);
-                  document.getElementById(id).classList.add('dot_possible');
+                  dot.classList.remove(curr_class);
+                  dot.classList.add('dot_possible');
                 }
               }
             }
@@ -91,6 +105,11 @@ document.addEventListener('DOMContentLoaded', () => {
     startSSE();
 });
 
+// close sse connection on page unload
+window.addEventListener('beforeunload', () => {
+    stopSSE();
+});
+
 function startSSE() {
     console.log("Starting Server Streamed Events (SSE)...")
     sseData.innerHTML = '';
@@ -103,7 +122,10 @@ function startSSE() {
         console.log("New Game ended: " + data);
         const board_data = data["board"];
         // update board with new data
+        clear_board();
         update_board(board_data, []);
+        // update queue size
+        queueSize.innerHTML = "Queue size: " + data["queue_size"];
     }
     // document.querySelector('button[onclick="startSSE()"]').disabled = true;
     // document.querySelector('button[onclick="stopSSE()"]').disabled = false;
