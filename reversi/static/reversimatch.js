@@ -158,10 +158,10 @@ function move(row, col){
     }
 
     // send web-socket notification to update gameboard
-        chatSocket.send(JSON.stringify({
-            'type': "match_turn",
-            'message': ""
-        }));
+    chatSocket.send(JSON.stringify({
+        'type': "match_turn",
+        'message': ""
+    }));
 
 };
 

@@ -6,10 +6,7 @@ from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 
-from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
-from django.utils.decorators import method_decorator
-# from django.core import serializers
 from django.views.decorators.http import require_http_methods
 
 from reversi.test_games import *
@@ -228,6 +225,9 @@ def reversi_match(request):
         return render(request, "index.html", {"user": user})
 
     difficulty = "match"
+    # set session difficulty
+    request.session["difficulty"] = difficulty
+
     print(f"Match: Green is {green_player} and Blue is {blue_player}.")
 
     user_color = "green" if user.username == green_player else "blue"
@@ -395,8 +395,8 @@ def move(request):
 
 # Main Game Logic is executed in this view every time the current Player makes a move via browser input
 # returns a json data object to browser which updates game board, scores and infos with JS
-@method_decorator(csrf_exempt, name='dispatch')
 @require_http_methods(["POST"])
+@csrf_exempt
 def move_match(request):
     if request.user.is_authenticated:
         user = request.user

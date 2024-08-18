@@ -5,7 +5,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from django.core.cache import cache
 
 
-class ArenaConsumer(AsyncWebsocketConsumer):
+class SimulatorConsumer(AsyncWebsocketConsumer):
     def __init__(self, *args, **kwargs):
         super().__init__(args, kwargs)
         self.room_group_name = None
@@ -13,7 +13,7 @@ class ArenaConsumer(AsyncWebsocketConsumer):
 
     async def connect(self):
         user = self.scope["user"].username
-        self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
+        self.room_name = "auto"  # self.scope["url_route"]["kwargs"]["sim_room_name"]
         print("User: ", user, "connected to: ", self.room_name)
         self.room_group_name = "arena_%s" % self.room_name
 
@@ -22,7 +22,7 @@ class ArenaConsumer(AsyncWebsocketConsumer):
         await self.accept()
 
         # Add users to onlineUsers only when connect to ARENA group
-        if self.room_name == "ARENA":
+        if self.room_name == "auto":
             online_users = cache.get("onlineUsers") if cache.get("onlineUsers") is not None else []
             if not user in online_users:
                 online_users.append(user)
