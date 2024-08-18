@@ -16,7 +16,6 @@ from channels.security.websocket import AllowedHostsOriginValidator
 from django.core.asgi import get_asgi_application
 
 from arena.routing import websocket_urlpatterns as arena_websocket_urlpatterns
-from simulator.routing import websocket_urlpatterns as simulator_websocket_urlpatterns
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mysite.settings")
 
@@ -27,7 +26,7 @@ django.setup()
 django_asgi_app = get_asgi_application()
 
 # Combine WebSocket URL patterns from both arena and simulator
-combined_websocket_urlpatterns = arena_websocket_urlpatterns + simulator_websocket_urlpatterns
+combined_websocket_urlpatterns = arena_websocket_urlpatterns
 
 application = ProtocolTypeRouter(
     {

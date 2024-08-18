@@ -89,15 +89,43 @@ def load_gamestate_db(game_id, user, prev=False):
     board_string = game_state.board
     game_board = [[int(board_string[8 * r + c]) for c in range(8)] for r in range(8)]
 
-    # Print the log message (consider changing this to a logger if you are using it in a larger application)
-    print("Game Board loaded!", game_state)
-
     # Return the necessary values directly, avoids redundant assignments
     return game_board, game_object.player1, game_object.player2, game_object.next_player, game_state.id
 
 
+def load_gamestate_board(game_id):
+    # Fetch the GameDB object directly, avoiding unnecessary logic
+    try:
+        game_state = GameState.objects.filter(game_id=game_id).last()
+    except GameDB.DoesNotExist:
+        return None
+
+    # Deserialize the board using list comprehension
+    board_string = game_state.board
+    game_board = [[int(board_string[8 * r + c]) for c in range(8)] for r in range(8)]
+
+    # Return the necessary values directly, avoids redundant assignments
+    return game_board
+
+
+def load_game_object_data(game_id):
+    try:
+        game_object = GameDB.objects.get(pk=game_id)
+    except GameDB.DoesNotExist:
+        return None
+    return game_object
+
+
 def get_saved_games_for_user(user):
     return reversed(GameDB.objects.all().filter(user=user).order_by("id"))
+
+
+def get_last_saved_game_id():
+    try:
+        game_object = GameDB.objects.filter(game_over=True).last()
+        return game_object.id
+    except ObjectDoesNotExist:
+        return None
 
 
 def get_rating_for_user(username):

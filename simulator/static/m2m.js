@@ -25,12 +25,12 @@ run_button.addEventListener("click", function(){
     request.onload = () => {
         const data = JSON.parse(request.responseText);
         console.log(data);
-        game_over = data["game_over"]
-        winScore.innerHTML = data["scores"];
-        winMessage.innerHTML = data["message"]["message"];
-        update_board(data["board"], data["possible_moves"]);
-        update_color(data["board_color"]);
-        update_player_colors(data["p1_color"], data["p2_color"]);
+
+        winScore.innerHTML = data["status"];
+        winMessage.innerHTML = data["message"];
+        // update_board(data["board"], data["possible_moves"]);
+        // update_color(data["board_color"]);
+        // update_player_colors(data["p1_color"], data["p2_color"]);
         spinner.style.display = "none";
     };
     request.send(JSON.stringify({ "ai1_name": text1, "ai2_name": text2 }));
@@ -80,153 +80,39 @@ function update_board(board, possible_moves){
     }
 }
 
+/*
+Server Streamed Events (SSE)
+ */
 
-var chatSocket;
-var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
+let eventSource;
+const sseData = document.getElementById('sse-data');
 
-openChatsocket();
+document.addEventListener('DOMContentLoaded', () => {
+    startSSE();
+});
 
-function openChatsocket(){
-    chatSocket = new WebSocket(
-        ws_scheme + '://'
-        + window.location.host + '/'
-        + 'ws/simulator/auto'
-    );
-};
-
-
-chatSocket.onopen = function(e) {
-    console.log('Chat socket connected!');
-
-    // document.querySelector('#chat-message-input').onkeyup = function(e) {
-    //     if (e.keyCode === 13) {  // enter, return
-    //         const messageInputDom = document.querySelector('#chat-message-input');
-    //         const message = messageInputDom.value;
-    //         if (message.length > 1){
-    //             chatSocket.send(JSON.stringify({
-    //                 'type': 'chat_text_message',
-    //                 'message': message
-    //             }));
-    //             messageInputDom.value = '';
-    //         }
-    //     }
-    // };
-    //
-    // document.querySelector('#create-game-submit').onclick = function(e) {
-    //     console.log("Sending create new match event...");
-    //     chatSocket.send(JSON.stringify({
-    //         'type': "new_match_create",
-    //         'message': ""
-    //     }));
-    // };
-};
-
-chatSocket.onclose = function(e) {
-    console.error('Chat socket closed unexpectedly', e);
-    chatSocket = null;
-    setTimeout(openChatsocket, 100);
-};
-
-chatSocket.onerror = function(e) {
-    console.error('Websocket Error:', e);
-};
-
-
-chatSocket.onmessage = function(e) {
-    const data = JSON.parse(e.data);
-    console.log("Simulator message received: ", data);
-    const mesUserName = data.username;
-
-    if (data.message_type == "chat"){
-        const data = JSON.parse(e.data);
-        //document.querySelector('#chat-log').value += (data.username + ": " + data.message + '\n');
-        var mesTime = document.createElement('div');
-        mesTime.classList.add("mesTime");
-        var timeString = document.createTextNode(new Date().toLocaleTimeString());
-        mesTime.appendChild(timeString);
-
-        var newMesContainer = document.createElement('div')
-        newMesContainer.classList.add("chat-entry-container");
-        if (userName === mesUserName){
-            newMesContainer.classList.add("chat-entry-container-me");
-        }
-        else{
-            newMesContainer.classList.add("chat-entry-container-other");
-        }
-
-        var newMes = document.createElement('div')
-        newMes.classList.add("chat-entry");
-
-        var mesAuthor = document.createElement('div');
-        mesAuthor.classList.add("mesAuthor");
-        var mesAuthorIcon = document.createElement('div');
-        mesAuthorIcon.classList.add("oi");
-        mesAuthorIcon.classList.add("oi-chat");
-        if (userName != mesUserName){
-            mesAuthorIcon.classList.add("oi-chat-green");
-            var author = document.createTextNode(mesUserName+":");
-        }
-        else {
-            var author = document.createTextNode("you:");
-        }
-
-        mesAuthor.appendChild(mesAuthorIcon);
-        mesAuthor.appendChild(author);
-
-        var mesContent = document.createElement('div');
-        mesContent.classList.add("mesContent");
-        var content = document.createTextNode(data.message);
-        mesContent.appendChild(content);
-
-
-        newMes.appendChild(mesTime);
-        newMes.appendChild(mesAuthor);
-        newMes.appendChild(mesContent);
-
-        newMesContainer.appendChild(mesAuthor);
-        newMesContainer.appendChild(newMes);
-
-        var chatLog = document.querySelector('#chat-log');
-        chatLog.appendChild(newMesContainer);
-        // scroll to bottom of div
-        chatLog.scrollTop = chatLog.scrollHeight;
-
+function startSSE() {
+    console.log("Starting Server Streamed Events (SSE)...")
+    sseData.innerHTML = '';
+    eventSource = new EventSource('/simulator/stream/');
+    eventSource.onmessage = event => {
+        sseData.innerHTML += "New Game ended: " + event.data + '<br>';
+        // scroll to bottom
+        sseData.scrollTop = sseData.scrollHeight;
+        const data = JSON.parse(event.data);
+        console.log("New Game ended: " + data);
+        const board_data = data["board"];
+        // update board with new data
+        update_board(board_data, []);
     }
-    else if (data.message_type == "user_online_status_message"){
-        user = data.username;
-        userConnected = data.user_connected;
-        deleteMatches = data.delete_matches;
+    // document.querySelector('button[onclick="startSSE()"]').disabled = true;
+    // document.querySelector('button[onclick="stopSSE()"]').disabled = false;
+}
 
-        // add user
-        var userList = document.getElementById("user-list");
-        if (userConnected && document.getElementById(user) == null){
-            var newUser = document.createElement("div");
-            newUser.setAttribute("id", user);
-            newUser.classList.add("online-user");
-
-            var newUserIcon = document.createElement("span");
-            newUserIcon.classList.add("oi");
-            newUserIcon.classList.add("oi-people");
-            newUserIcon.classList.add("oi-people-green");
-            var newUserText = document.createTextNode(user);
-
-            // newUser.appendChild(newUserIcon);
-            // newUser.appendChild(newUserText);
-            // userList.appendChild(newUser);
-            }
-        // remove user and user's games
-        }
-        if (!userConnected){
-            // remove games
-            if (deleteMatches.length > 0){
-                removeOpenMatchesDom(deleteMatches);
-            }
-            // remove user from user list
-            var userItem = document.getElementById(user);
-            userList.removeChild(userItem);
-            console.log("User item removed!")
-            // remove open match requests if any
-        }
-
-};
-
+function stopSSE() {
+    if (eventSource) {
+        eventSource.close();
+    }
+    // document.querySelector('button[onclick="startSSE()"]').disabled = false;
+    // document.querySelector('button[onclick="stopSSE()"]').disabled = true;
+}
