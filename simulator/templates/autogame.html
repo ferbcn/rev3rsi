@@ -8,38 +8,39 @@
 <div class="container">
 
     <div class="m2m-container">
-        <h2>Machine2Machine Game!</h2>
+        <h2>&#128421;-to-&#128421; Game</h2>
         <br>
 
         <div class="m2m-select-container">
-            <label for="ai1">Machine 1</label>
-            <select type="text" id="ai1" name="colorSelect">
+            <div class="label-select-container">
+                <label for="ai1">Machine 1</label>
+                <select type="text" id="ai1" name="colorSelect">
+                    {% for dis, ai in game_levels %}
+                        <option>{{ ai }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <br>
+            <div class="label-select-container">
+                <label for="ai2">Machine 2</label>
+                <select type="text" id="ai2" name="colorSelect">
                 {% for dis, ai in game_levels %}
                     <option>{{ ai }}</option>
                 {% endfor %}
-             </select>
-            <br>
-            <label for="ai2">Machine 2</label>
-            <select type="text" id="ai2" name="colorSelect">
-            {% for dis, ai in game_levels %}
-                <option>{{ ai }}</option>
-            {% endfor %}
-            </select>
+                </select>
+            </div>
             <br>
             <button id="run-button" class="btn btn-outline-success">Run</button>
         </div>
-        <div class="player-colors">
-            Player 1: <div class="player-color-dot">
-                <span class="dot_empty " id="color_dot_player1"></span>
-            </div>
-            Player 2: <div class="player-color-dot">
-                <span class="dot_empty" id="color_dot_player2"></span>
-            </div>
 
-        </div>
     </div>
 
     <div class="spacer"></div>
+    <br>
+    <div class="queue-info-container">
+        <div id="status-message"></div>
+        <div id="queue-size"></div>
+    </div>
 
     <div id="board_parent">
         <div id="board_child">
@@ -57,9 +58,15 @@
       </div>
     </div>
 
-    <div>
-        <div id="win-message"></div>
-        <div id="queue-size"></div>
+    <div class="scores-names-container">
+        <div id="name-score-p1">
+            <div id="name-p1"></div>
+            <div id="score-p1"></div>
+        </div>
+        <div id="name-score-p2">
+            <div id="name-p2"></div>
+            <div id="score-p2"></div>
+        </div>
     </div>
 
     <br>

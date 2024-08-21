@@ -60,7 +60,7 @@ class Player:
         return board
 
 
-class AiDumb(Player):
+class AiFirst(Player):
     def __init__(self, is_human=False, role=None):
         super().__init__(is_human, role)
         self.is_human = is_human
@@ -73,6 +73,50 @@ class AiDumb(Player):
     def dumb_move(self, possible_moves):
         print("dumb move (first of list)...")
         return possible_moves[0]
+
+
+class AiLast(Player):
+    def __init__(self, is_human=False, role=None):
+        super().__init__(is_human, role)
+        self.is_human = is_human
+        self.role = role
+
+    def next_move(self, board, possible_moves):
+        return self.dumb_move(possible_moves)
+
+        # Random move
+    def dumb_move(self, possible_moves):
+        print("dumb move (first of list)...")
+        return possible_moves[-1]
+
+
+class AiWorst(Player):
+    def __init__(self, is_human=False, role=None):
+        super().__init__(is_human, role)
+        self.is_human = is_human
+        self.role = role
+
+    def next_move(self, board, possible_moves):
+        return self.greedy_move(board, possible_moves)
+
+    # Greedy move
+    def greedy_move(self, board, possible_moves):
+        print("worst move ...")
+        # print("Possible moves: ", possible_moves)
+        worst_move_score = 0
+        worst_move = None
+        for move in possible_moves:
+            new_board = self.make_move(copy.deepcopy(board), self.role, move)
+            score_p1, score_p2 = get_scores(new_board)
+            if self.role == 1:
+                move_score = score_p2
+            else:
+                move_score = score_p1
+            if move_score > worst_move_score:
+                worst_move = move
+                worst_move_score = move_score
+        print("Worst move yields a score: ", worst_move_score)
+        return worst_move
 
 
 class AiRandom(Player):
@@ -253,16 +297,25 @@ class AiMiniMax(AiGreedyPlus):
 class AiMachinePlayerMaker:
     def __init__(self, level_name, role):
         self.machine_player = None
-        if level_name == "dumb":
-            self.machine_player = AiDumb(level_name, role)
+        if level_name == "first":
+            self.machine_player = AiFirst(level_name, role)
+        if level_name == "last":
+            self.machine_player = AiLast(level_name, role)
         elif level_name == "random":
             self.machine_player = AiRandom(level_name, role)
+        elif level_name == "worst":
+            self.machine_player = AiWorst(level_name, role)
         elif level_name == "greedy":
             self.machine_player = AiGreedy(level_name, role)
         elif level_name == "greedy-plus":
             self.machine_player = AiGreedyPlus(level_name, role)
         elif level_name == "mini-max":
             self.machine_player = AiMiniMax(level_name, role)
+        elif level_name == "mini-max-2s":
+            self.machine_player = AiMiniMax(level_name, role, max_time=2)
+        elif level_name == "mini-max-3s":
+            self.machine_player = AiMiniMax(level_name, role, max_time=3)
+
 
     def get_player(self):
         return self.machine_player

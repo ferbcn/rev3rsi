@@ -27,7 +27,7 @@ def process_game(game_data):
     player2 = player2_maker.get_player()
 
     while not game_over:
-        possible_moves = get_possible_moves(board, next_player)
+        # possible_moves = get_possible_moves(board, next_player)
         next_player_instance = player1 if next_player == 1 else player2
         next_move, board = machine_move(board, next_player_instance)
         next_player = get_opponent(next_player)
@@ -40,15 +40,28 @@ def process_game(game_data):
 
     scores = get_scores(board)
     winner_role = 0 if scores[0] == scores[1] else (1 if scores[0] > scores[1] else 2)
-    board_color = 'lightgrey' if winner_role == 0 else ('green' if winner_role == 1 else 'blue')
     message = "It's a draw!" if winner_role == 0 else f"Machine{winner_role} ({player1_name if winner_role == 1 else player2_name}) has won!"
 
     save_game_db(game_id, scores[0], scores[1], winner_role, game_over)
 
-    elo_player1 = get_rating_for_user(player1_name) or create_base_rating_for_user(player1_name) or get_rating_for_user(player1_name)
-    elo_player2 = get_rating_for_user(player2_name) or create_base_rating_for_user(player2_name) or get_rating_for_user(player2_name)
-    new_elo_p1 = int(elo_player1 + (scores[0] - scores[1]) * (elo_player1/elo_player2))
-    new_elo_p2 = int(elo_player2 + (scores[1] - scores[0]) * (elo_player2/elo_player1))
+    # Calculate elo rating
+    elo_player1 = get_rating_for_user(player1_name)
+    if elo_player1 is None:
+        create_base_rating_for_user(player1_name)
+        elo_player1 = get_rating_for_user(player1_name)
+    elo_player2 = get_rating_for_user(player2_name)
+    if elo_player2 is None:
+        create_base_rating_for_user(player2_name)
+        elo_player2 = get_rating_for_user(player1_name)
+
+    new_elo_p1 = max(1, int(elo_player1 + (scores[0] - scores[1]) * (elo_player2/elo_player1)))
+    new_elo_p2 = max(1, int(elo_player2 + (scores[1] - scores[0]) * (elo_player1/elo_player2)))
 
     update_ratings_for_user_game(player1_name, new_elo_p1, 1 if winner_role == 1 else -1)
     update_ratings_for_user_game(player2_name, new_elo_p2, 1 if winner_role == 2 else -1)
+
+    print(f"### Game ended, {message}!")
+    print(f"Final Score: {scores[0]} - {scores[1]}")
+    print(f"Current ELO-ratings: Player1 ({player1_name}): {elo_player1}, Player2 ({player2_name}): {elo_player2}")
+    print(f"New ELO-ratings: Player1 ({player1_name}): {new_elo_p1}, Player2 ({player2_name}): {new_elo_p2}")
+

@@ -13,15 +13,10 @@ from reversi.test_games import *
 from reversi.game_logic import *
 from reversi.data_layer import *
 
-# Game difficulties and which are available
-from .game_levels import Levels
-
 from asgiref.sync import sync_to_async
 
-
-# # default view which renders an animation
-# async def index(request):
-#     return await sync_index(request)
+# Game difficulties and which are available
+from .game_levels import Levels
 
 levels_maker = Levels()
 user_levels = levels_maker.get_levels()
@@ -169,7 +164,10 @@ def reversi(request):
 
     # Restore Gamestate from DB
     game_id = request.session['game_id']
-    difficulty = request.session['difficulty']
+    if "difficulty" in request.session:
+        difficulty = request.session['difficulty']
+    else:
+        difficulty = "auto-match"
 
     try:
         board, green_player, blue_player, next_player, state_id = load_gamestate_db(game_id, user)
@@ -321,11 +319,20 @@ def move(request):
         machine_role = 1
         human_color = 'blue'
         machine_color = 'green'
+    else:
+        message = "Game has ended!"
+        color = "red"
+        scores = get_scores(board)
+        data = {"board": board, "message": {"message": message, "color": color},
+                "machine_role": "", "next_player": next_player, "game_over": game_over,
+                "scores": scores, "possible_moves": get_possible_moves(board, next_player)}
+        return JsonResponse(data, safe=False)
 
     # Define player1 (player) and player2 (opponent)
     human_player = Player(role=human_role)
 
     if difficulty is None: difficulty = "greedy"
+
     machine_player_maker = AiMachinePlayerMaker(difficulty, machine_role)
     machine_player = machine_player_maker.get_player()
 
@@ -480,19 +487,21 @@ def load_game(request):
     request.session['game_id'] = game_id
     print("Game ID: ", game_id)
 
-    try:
-        board, player1, player2, next_player, state_id = load_gamestate_db(game_id, user)
-    # Something went wrong retrieving board (db error or cheating)
-    except Exception as e:
-        print(f"DB Error: {e}")
-        return render(request, "index.html", {"user": user})
-
-    for line in board: print(line)
-
-    if "human" in [player1, player2]:
-        return HttpResponseRedirect(reverse("reversi"))
-    else:
+    game = load_game_object_data(game_id)
+    print(game.player1, game.player2, user_levels)
+    # try:
+    #     board, player1, player2, next_player, state_id = load_gamestate_db(game_id, user)
+    # # Something went wrong retrieving board (db error or cheating)
+    # except Exception as e:
+    #     print(f"DB Error: {e}")
+    #     return render(request, "index.html", {"user": user})
+    #
+    # for line in board: print(line)
+    user_levels_list = [lev[1] for lev in user_levels]
+    if not game.player1 in user_levels_list and not game.player2 in user_levels_list:
         return HttpResponseRedirect(reverse("reversimatch"))
+    else:
+        return HttpResponseRedirect(reverse("reversi"))
 
 
 def load_prev_gamestate(request):
@@ -528,8 +537,8 @@ def saved_games(request):
 
     saved_games = get_saved_games_for_user(user)
 
-    return render(request, "savedgames.html",
-                  {"user": user, "saved_games": saved_games})
+    return render(request, "savedgames.html",{"user": user, "saved_games": saved_games,
+                                              "game_levels": user_levels})
 # return a list o saved games for the current user
 
 
@@ -541,7 +550,7 @@ def saved_ratings(request):
 
     saved_ratings = get_ratings_for_all_users()
 
-    return render(request, "ratingsusers.html",
+    return render(request, "eloratings.html",
                   {"user": user, "saved_ratings": saved_ratings})
 
 

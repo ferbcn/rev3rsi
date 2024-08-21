@@ -1,7 +1,13 @@
 const run_button = document.getElementById("run-button");
 const queueSize = document.getElementById("queue-size");
-const winMessage = document.getElementById("win-message");
+const statusMessage = document.getElementById("status-message");
 const spinner = document.getElementById("spinner");
+const scoreP1 = document.getElementById("score-p1");
+const scoreP2 = document.getElementById("score-p2");
+const nameP1 = document.getElementById("name-p1");
+const nameP2 = document.getElementById("name-p2");
+const nameScoreP1 = document.getElementById("name-score-p1");
+const nameScoreP2 = document.getElementById("name-score-p2");
 
 let game_over = false;
 
@@ -18,6 +24,7 @@ run_button.addEventListener("click", function(){
     const request = new XMLHttpRequest();
     request.open('POST', '/simulator/runautogame');
     request.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+
     // Retrieve CSRF token from the HTML document
     const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
     request.setRequestHeader('X-CSRFToken', csrftoken);
@@ -26,7 +33,11 @@ run_button.addEventListener("click", function(){
         const data = JSON.parse(request.responseText);
         console.log(data);
 
-        winMessage.innerHTML = data["message"];
+        // reset animation
+        statusMessage.style.animation = 'none';
+        statusMessage.offsetHeight; /* trigger reflow */
+        statusMessage.style.animation = null;
+        statusMessage.innerHTML = data["message"];
         // update_board(data["board"], data["possible_moves"]);
         // update_color(data["board_color"]);
         // update_player_colors(data["p1_color"], data["p2_color"]);
@@ -35,11 +46,20 @@ run_button.addEventListener("click", function(){
     request.send(JSON.stringify({ "ai1_name": text1, "ai2_name": text2 }));
 });
 
-function update_player_colors(player1_color, player2_color){
-    const player1_dot = document.getElementById("color_dot_player1");
-    const player2_dot = document.getElementById("color_dot_player2");
-    player1_dot.style.backgroundColor = player1_color;
-    player2_dot.style.backgroundColor = player2_color;
+function highlight_winner(score_p1, score_p2){
+    nameScoreP1.classList.remove("board_glow_green");
+    nameScoreP2.classList.remove("board_glow_blue");
+
+    if (score_p1 > score_p2){
+        nameScoreP1.classList.add("board_glow_green");
+    }
+    else if (score_p1 < score_p2){
+        nameScoreP2.classList.add("board_glow_blue");
+    }
+    else{
+        nameScoreP1.classList.add("board_glow_green");
+        nameScoreP2.classList.add("board_glow_blue");
+    }
 }
 
 function update_color(board_color){
@@ -115,26 +135,35 @@ function startSSE() {
     sseData.innerHTML = '';
     eventSource = new EventSource('/simulator/stream/');
     eventSource.onmessage = event => {
-        sseData.innerHTML += "New Game ended: " + event.data + '<br>';
+
+        // sseData.innerHTML += "New Game ended: " + event.data + '<br>';
         // scroll to bottom
-        sseData.scrollTop = sseData.scrollHeight;
+        // sseData.scrollTop = sseData.scrollHeight;
+
         const data = JSON.parse(event.data);
         console.log("New Game ended: " + data);
+
         const board_data = data["board"];
         // update board with new data
         clear_board();
         update_board(board_data, []);
         // update queue size
-        queueSize.innerHTML = "Queue size: " + data["queue_size"];
+        queueSize.innerHTML = "Games in queue: " + data["queue_size"];
+        // update scores
+        scoreP1.innerHTML = data["score_p1"];
+        scoreP2.innerHTML = data["score_p2"];
+        // update names
+        nameP1.innerHTML = data["player1"];
+        nameP2.innerHTML = data["player2"];
+        // Set board color
+        update_color(data["board_color"]);
+        // Highlight winner
+        highlight_winner(data["score_p1"], data["score_p2"]);
     }
-    // document.querySelector('button[onclick="startSSE()"]').disabled = true;
-    // document.querySelector('button[onclick="stopSSE()"]').disabled = false;
 }
 
 function stopSSE() {
     if (eventSource) {
         eventSource.close();
     }
-    // document.querySelector('button[onclick="startSSE()"]').disabled = false;
-    // document.querySelector('button[onclick="stopSSE()"]').disabled = true;
 }

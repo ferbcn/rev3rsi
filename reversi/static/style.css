@@ -44,28 +44,23 @@ a:hover {
     height: 60vh;
 }
 
-@media screen and (min-width: 800px) {
-  #board_parent {
-  }
-}
-
 #board_child{
     position: relative;
 }
 
 #board{
-   width: 60vw;
-   height: 60vw;
+    padding-top: 20px;
+    padding-left: 40px;
+    padding-right: 40px;
+    border-radius: 10px;
 }
 
 @media screen and (min-width: 800px) {
-  #board{
-   width: 60vh;
-   height: 60vh;
-  }
+    #board{
+        width: 50vh;
+        height: 50vh;
+    }
 }
-
-
 
 .board_glow_green{
     box-shadow: 0 0 8px 8px rgba(0, 225, 0, 0.2), 0 6px 20px 8px rgba(0, 225, 0, 0.19);
@@ -167,19 +162,25 @@ a:hover {
 }
 
 #savedgames {
-  margin-top: 1%;
-  color: white;
-  overflow: scroll;
-  height: 85vh;
+    color: white;
+    overflow: scroll;
+    height: 85vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
 }
 
 .savegamerow {
-  color: white;
-  background: rgba(255,255,255,0.1);
-  height: 50px;
-  text-align: center;
-  padding-top: 12px;
-  text-decoration: none;
+    color: white;
+    background: rgba(255,255,255,0.1);
+    height: 50px;
+    text-align: center;
+    padding-top: 12px;
+    text-decoration: none;
+    border-radius: 5px;
+    width: 95%;
+    margin-bottom: 5px;
 }
 
 .gameid_label {
@@ -192,18 +193,19 @@ a:hover {
   color: green;
   text-align: center;
   padding-top: 12px;
-  box-shadow: 0px 0px 8px 8px rgba(0, 225, 0, 0.2)
+  box-shadow: 0px 0px 4px 8px rgba(255, 255, 255, 0.5)
 }
 
 .savegameheader{
-  height: 50px;
-  padding-top: 12px;
-  background-color: lightgrey;
-  color: black;
-  font-weight: bold;
-  text-align: center;
-  font-size: min(4vw, 18px);
-  margin-bottom: 10px;
+    border-radius: 5px;
+    padding-top: 12px;
+    background-color: lightgrey;
+    color: black;
+    font-weight: bold;
+    text-align: center;
+    font-size: min(4vw, 18px);
+    margin-bottom: 10px;
+    width: 95%;
 }
 
 
@@ -476,6 +478,7 @@ a.divlink:hover {
     flex-direction: row;
     align-items: center;
     justify-content: space-evenly;
+    flex-wrap: wrap;
 }
 
 .spacer{
@@ -506,4 +509,83 @@ a.divlink:hover {
     width: 100%;
     max-height: 10vh;
     overflow: scroll;
+}
+
+/* fade out animation on message */
+#status-message{
+    margin-top: 10px;
+    animation: fade-out 1s 3s forwards; /* 3s delay before starting the 2s fade-out animation */
+    width: 75%;
+    font-size: 12px;
+}
+
+@keyframes fade-out {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+.scores-names-container{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-evenly;
+    width: 100%;
+    font-size: 20px;
+}
+
+#name-score-p1 {
+    text-align: center;
+    padding: 10px;
+    color: green;
+    width: 20vw;
+    border-radius: 10px;
+}
+
+#name-score-p2 {
+    text-align: center;
+    padding: 10px;
+    color: blue;
+    width: 20vw;
+    border-radius: 10px;
+}
+
+#queue-size{
+    color: orange;
+    font-size: 12px;
+    margin: 5px;
+}
+
+select {
+    /*background-color: rgba(50, 50, 50, 0.8); !* Dark and slightly transparent *!*/
+    background-color: var(--bg_color);
+    color: white; /* Text color */
+    border: 1px solid #444; /* Border color */
+    border-radius: 8px; /* Rounded corners */
+    padding: 8px; /* Padding inside the select box */
+    font-size: 16px; /* Font size */
+    outline: none; /* Remove default outline */
+    -webkit-appearance: none; /* Remove default arrow in WebKit browsers */
+    -moz-appearance: none; /* Remove default arrow in Firefox */
+    appearance: none; /* Remove default arrow in modern browsers */
+}
+
+select:focus {
+    border-color: #888; /* Border color on focus */
+}
+
+.queue-info-container{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-evenly;
+    width: 100%;
+    font-size: 20px;
+}
+
+h2{
+    text-align: center;
 }

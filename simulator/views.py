@@ -58,139 +58,16 @@ def run_auto_game(request):
 
     return JsonResponse({"message": "Game is being processed, pos in queue: " + str(game_queue.qsize())})
 
-#
-# @require_http_methods(["POST"])
-# def run_auto_game(request):
-#     if request.user.is_authenticated:
-#         user = request.user
-#     else:
-#         return HttpResponseRedirect(reverse("login"))
-#
-#     try:
-#         data = json.loads(request.body)
-#         ai1_name = data["ai1_name"]
-#         ai2_name = data["ai2_name"]
-#         if random.choice([True, False]):
-#             player1, player2 = ai1_name, ai2_name
-#             p1_color = 'green'
-#             p2_color = 'blue'
-#         else:
-#             player1, player2 = ai2_name, ai1_name
-#             p1_color = 'blue'
-#             p2_color = 'green'
-#     except (KeyError, json.JSONDecodeError) as e:
-#         return JsonResponse({"error": str(e)}, status=400)
-#
-#     # New Game and board initialization
-#     difficulty = "auto-match"
-#     new_game = Game(player1, player2, difficulty, board=None)
-#     scores = get_scores(new_game.board)
-#     print("NEW GAME STARTED! Difficulty: ", difficulty)
-#
-#     # save game to DB
-#     game_db_entry = GameDB(user=user, score_p1=scores[0], score_p2=scores[1], player1=player1,
-#                            player2=player2, next_player=1, game_over=False)
-#     game_db_entry.save()
-#     game_id = game_db_entry.id
-#     print("GAME Entry: ", game_id)
-#
-#     # Save Session variable
-#     prev_state_id = 0
-#
-#     # save gamestate to DB
-#     save_gamestate_db(new_game.board, game_id, prev_state_id)
-#
-#     # Load gamestate from db
-#     board, player1_name, player2_name, next_player, state_id = load_gamestate_db(game_id, user)
-#
-#     game_over = False
-#     player1_maker = AiMachinePlayerMaker(player1_name, 1)
-#     player1 = player1_maker.get_player()
-#
-#     player2_maker = AiMachinePlayerMaker(player2_name, 2)
-#     player2 = player2_maker.get_player()
-#
-#     while not game_over:
-#         # Player moves
-#         next_player_name = player1_name if next_player == 1 else player2_name
-#         print(f"### Player{next_player} {next_player_name} possible moves:")
-#         possible_moves = get_possible_moves(board, next_player)
-#         print(possible_moves)
-#
-#         next_player_instance = player1 if next_player == 1 else player2
-#         # Make a move
-#         next_move, board = machine_move(board, next_player_instance)
-#         message = f"Player{next_player} made move: row {next_move[0] + 1}, col {next_move[1] + 1}"
-#         print(message)
-#         next_player = get_opponent(next_player)
-#
-#         # save gamestate to DB
-#         save_gamestate_db(board, game_id, state_id)
-#
-#         # Check for Game Over
-#         if len(get_possible_moves(board, next_player)) == 0:
-#             next_player = get_opponent(next_player)
-#             if len(get_possible_moves(board, next_player)) == 0:
-#                 game_over = True
-#
-#     scores = get_scores(board)
-#     if scores[0] == scores[1]:
-#         winner = "draw"
-#         winner_role = 0
-#         board_color = 'lightgrey'
-#         message = "It's a draw!"
-#     else:
-#         winner = player1_name if scores[0] > scores[1] else player2_name
-#         if ai1_name == player1_name:
-#             winner_role = 1 if scores[0] > scores[1] else 2
-#         else:
-#             winner_role = 2 if scores[0] > scores[1] else 1
-#         message = f"Machine{winner_role} ({winner}) has won!"
-#         board_color = 'green' if winner_role == 1 else 'blue'
-#
-#     print(f"### Game ended, {message}!")
-#     print(f"Final Score: {scores[0]} - {scores[1]}")
-#
-#     # Save final scores and winner to DB
-#     save_game_db(game_id, scores[0], scores[1], winner_role, game_over)
-#
-#     # Calculate elo rating
-#     elo_player1 = get_rating_for_user(player1_name)
-#     if elo_player1 is None:
-#         create_base_rating_for_user(player1_name)
-#         elo_player1 = get_rating_for_user(player1_name)
-#     elo_player2 = get_rating_for_user(player2_name)
-#     if elo_player2 is None:
-#         create_base_rating_for_user(player2_name)
-#         elo_player2 = get_rating_for_user(player1_name)
-#     print(f"Current ELO-ratings: Player1 ({player1_name}): {elo_player1}, Player2 ({player2_name}): {elo_player2}")
-#
-#     new_elo_p1 = int(elo_player1 + (scores[0] - scores[1]) * (elo_player1/elo_player2))
-#     new_elo_p2 = int(elo_player2 + (scores[1] - scores[0]) * (elo_player2/elo_player1))
-#     print(f"New ELO-ratings: Player1 ({player1_name}): {new_elo_p1}, Player2 ({player2_name}): {new_elo_p2}")
-#
-#     # Update ratings in DB
-#     if winner_role == 0:
-#         update_ratings_for_user_game(player1_name, new_elo_p1, 0)
-#         update_ratings_for_user_game(player2_name, new_elo_p2, 0)
-#     else:
-#         update_ratings_for_user_game(player1_name, new_elo_p1, 1 if winner_role == 1 else -1)
-#         update_ratings_for_user_game(player2_name, new_elo_p2, 1 if winner_role == 2 else -1)
-#
-#
-#     data = {"board": board, "message": {"message": message}, winner: winner, "scores": scores,
-#             "player1_name": player1_name, "player2_name": player2_name, "p1_color": p1_color, "p2_color": p2_color,
-#             "board_color": board_color}
-#
-#     return JsonResponse(data)
 
 @sync_to_async
 def get_last_saved_game_id_async():
     return get_last_saved_game_id()
 
+
 @sync_to_async
 def load_game_object_data_async(game_id):
     return load_game_object_data(game_id)
+
 
 @sync_to_async
 def load_gamestate_db_async(game_id):
@@ -201,6 +78,7 @@ async def sse_stream(request):
     """
     Sends server-sent events to the client.
     """
+
     async def event_stream():
         # yield finished game data
         last_game_id = await get_last_saved_game_id_async()
@@ -210,18 +88,17 @@ async def sse_stream(request):
             if not new_game_id == last_game_id:
                 data = await load_game_object_data_async(new_game_id)
                 board_data = await load_gamestate_db_async(new_game_id)
-                json_response = json.dumps({"player1:" : data.player1, "player2": data.player2,
-                                 "score_p1": data.score_p1, "score_p2": data.score_p2,
-                                 "board": board_data, "game_over": data.game_over, "queue_size": game_queue.qsize()})
+                winner_role = 0 if data.score_p1 == data.score_p2 else (1 if data.score_p1 > data.score_p2 else 2)
+                board_color = 'lightgrey' if winner_role == 0 else ('green' if winner_role == 1 else 'blue')
+                json_response = json.dumps({"player1": data.player1, "player2": data.player2,
+                                            "score_p1": data.score_p1, "score_p2": data.score_p2,
+                                            "board": board_data, "game_over": data.game_over,
+                                            "board_color": board_color,
+                                            "queue_size": game_queue.qsize()})
                 if data.game_over:
                     last_game_id = new_game_id
+                    await asyncio.sleep(1)
                     yield f'data: {json_response} \n\n'
             await asyncio.sleep(1)
 
     return StreamingHttpResponse(event_stream(), content_type='text/event-stream')
-
-
-# Test Code
-@require_http_methods(["GET"])
-def stream_index(request):
-    return render(request, 'sse.html')
