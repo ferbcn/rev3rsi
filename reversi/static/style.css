@@ -553,6 +553,11 @@ a.divlink:hover {
     border-radius: 10px;
 }
 
+#elo-p1, #elo-p2 {
+    color: orange;
+    font-size: 12px;
+}
+
 #queue-size{
     color: orange;
     font-size: 12px;

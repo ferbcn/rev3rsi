@@ -2,7 +2,7 @@ class Levels:
     def __init__(self):
         self.game_levels = [('', 'first'), ('', 'last'), ('', 'random'), ('', 'worst'),
                             ('', 'greedy'), ('', 'greedy-plus'),
-                            ('', 'mini-max'), ('', 'mini-max-2s'), ('', 'mini-max-3s')]
+                            ('', 'mini-max'), ('', 'mini-max-2s'), ('', 'mini-max-3s'), ('', 'top')]
         self.admin_game_levels = (self.game_levels +
                                   [('', 'P1-Draw'), ('', 'P1-Win'), ('', 'P1-Lose'), ('', 'P2-Win'), ('', 'P2-Lose'),
                                     ('', 'JumpCheck')])

@@ -8,8 +8,9 @@ const nameP1 = document.getElementById("name-p1");
 const nameP2 = document.getElementById("name-p2");
 const nameScoreP1 = document.getElementById("name-score-p1");
 const nameScoreP2 = document.getElementById("name-score-p2");
+const eloP1 = document.getElementById("elo-p1");
+const eloP2 = document.getElementById("elo-p2");
 
-let game_over = false;
 
 run_button.addEventListener("click", function(){
     let ai1_name = document.getElementById("ai1");
@@ -136,15 +137,11 @@ function startSSE() {
     eventSource = new EventSource('/simulator/stream/');
     eventSource.onmessage = event => {
 
-        // sseData.innerHTML += "New Game ended: " + event.data + '<br>';
-        // scroll to bottom
-        // sseData.scrollTop = sseData.scrollHeight;
-
         const data = JSON.parse(event.data);
         console.log("New Game ended: " + data);
 
-        const board_data = data["board"];
         // update board with new data
+        const board_data = data["board"];
         clear_board();
         update_board(board_data, []);
         // update queue size
@@ -155,6 +152,9 @@ function startSSE() {
         // update names
         nameP1.innerHTML = data["player1"];
         nameP2.innerHTML = data["player2"];
+        // update elo
+        eloP1.innerHTML = "ELO: " + data["elo_p1"];
+        eloP2.innerHTML = "ELO: " + data["elo_p2"];
         // Set board color
         update_color(data["board_color"]);
         // Highlight winner

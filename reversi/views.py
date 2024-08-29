@@ -1,5 +1,3 @@
-import json
-
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect, JsonResponse
 
@@ -21,6 +19,7 @@ from .game_levels import Levels
 levels_maker = Levels()
 user_levels = levels_maker.get_levels()
 admin_levels = levels_maker.get_admin_levels()
+
 
 @sync_to_async
 def index(request):

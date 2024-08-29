@@ -1,7 +1,6 @@
 # simulator/views.py
 import asyncio
 import json
-
 from asgiref.sync import sync_to_async
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, JsonResponse, StreamingHttpResponse
@@ -9,10 +8,8 @@ from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 
 from reversi.game_levels import Levels
-
 from reversi.game_logic import *
 from reversi.data_layer import *
-
 from .queue_processor import game_queue
 
 # Create an instance of the Levels class
@@ -73,6 +70,10 @@ def load_game_object_data_async(game_id):
 def load_gamestate_db_async(game_id):
     return load_gamestate_board(game_id)
 
+@sync_to_async
+def get_ratings_for_user_async(user):
+    return get_ratings_for_user(user)
+
 
 async def sse_stream(request):
     """
@@ -87,6 +88,8 @@ async def sse_stream(request):
             new_game_id = await get_last_saved_game_id_async()
             if not new_game_id == last_game_id:
                 data = await load_game_object_data_async(new_game_id)
+                ratings1 = await get_ratings_for_user_async(data.player1)
+                ratings2 = await get_ratings_for_user_async(data.player2)
                 board_data = await load_gamestate_db_async(new_game_id)
                 winner_role = 0 if data.score_p1 == data.score_p2 else (1 if data.score_p1 > data.score_p2 else 2)
                 board_color = 'lightgrey' if winner_role == 0 else ('green' if winner_role == 1 else 'blue')
@@ -94,7 +97,8 @@ async def sse_stream(request):
                                             "score_p1": data.score_p1, "score_p2": data.score_p2,
                                             "board": board_data, "game_over": data.game_over,
                                             "board_color": board_color,
-                                            "queue_size": game_queue.qsize()})
+                                            "queue_size": game_queue.qsize(),
+                                            "elo_p1": ratings1.elo, "elo_p2": ratings2.elo,})
                 if data.game_over:
                     last_game_id = new_game_id
                     await asyncio.sleep(1)

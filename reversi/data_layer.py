@@ -156,6 +156,14 @@ def get_ratings_for_all_users():
     return all_ratings
 
 
+def get_ratings_for_user(player_name):
+    try:
+        rating = Rating.objects.get(user__username=player_name)
+        return rating
+    except ObjectDoesNotExist:
+        return None
+
+
 def update_ratings_for_user_game(player_name, new_elo, game_end_state):
     try:
         # user_id = User.objects.get(username=user_name).id

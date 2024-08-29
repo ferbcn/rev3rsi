@@ -294,6 +294,84 @@ class AiMiniMax(AiGreedyPlus):
         return False
 
 
+class AiTop(Player):
+    def __init__(self, is_human=False, role=None, max_time=MAX_TIME, max_depth=MAX_DEPTH):
+        super().__init__(is_human, role)
+        self.max_time = max_time
+        self.is_human = is_human
+        self.role = role
+        self.start_time = 0
+        self.max_depth = max_depth
+        self.max_depth_reached = 0
+
+    def next_move(self, board, possible_moves):
+        return self.minimax_move(board)
+
+    def minimax_move(self, board):
+        depth = 1
+        print(f"Minimax move limited to {self.max_time} seconds...")
+        possible_moves = get_possible_moves(board, self.role)
+        player = self.role
+        minimax_moves = []
+        self.start_time = time.time()
+        for move in possible_moves:
+            self.max_depth_reached = depth
+            new_board = self.make_move(copy.deepcopy(board), player, move)
+            score = self.minimax(new_board, self.role, depth, -65, 65, True)
+            minimax_moves.append((move, score))
+        minimax_moves = sorted(minimax_moves, key=lambda x: x[1], reverse=True)
+        print(minimax_moves)
+
+        return_move = minimax_moves[0][0]
+        print(f"Returning move: {return_move}")
+        return return_move
+
+    def minimax(self, board, player, depth, alpha, beta, maximizingPlayer):
+        if depth > self.max_depth_reached:
+            self.max_depth_reached = depth
+            sys.stdout.write(f"\rMax depth reached: {depth}")
+            sys.stdout.flush()
+
+        if depth > self.max_depth or self.game_over_position(board, player) or time.time() - self.start_time > self.max_time:
+            abs_score = self.get_abs_score(board, self.role)
+            return abs_score
+
+        possible_moves = get_possible_moves(board, player)
+        if maximizingPlayer:
+            max_eval = -65
+            for move in possible_moves:
+                new_board = self.make_move(copy.deepcopy(board), player, move)
+                eval = self.minimax(new_board, get_opponent(player), depth + 1, alpha, beta, False)
+                max_eval = max(max_eval, eval)
+                alpha = max(alpha, max_eval)
+                if beta <= alpha:
+                    break
+            return max_eval
+        else:
+            min_eval = 65
+            for move in possible_moves:
+                new_board = self.make_move(copy.deepcopy(board), player, move)
+                eval = self.minimax(new_board, get_opponent(player), depth + 1, alpha, beta, True)
+                min_eval = min(min_eval, eval)
+                beta = min(beta, min_eval)
+                if beta <= alpha:
+                    break
+            return min_eval
+
+    def get_abs_score(self, board, player):
+        score_p1, score_p2 = get_scores(board)
+        score = score_p1 - score_p2 if player == 1 else score_p2 - score_p1
+        return score
+
+    def game_over_position(self, board, player):
+        possible_moves = get_possible_moves(board, player)
+        if len(possible_moves) == 0:
+            next_possible_moves = get_possible_moves(board, get_opponent(player))
+            if len(next_possible_moves) == 0:
+                return True
+        return False
+
+
 class AiMachinePlayerMaker:
     def __init__(self, level_name, role):
         self.machine_player = None
@@ -315,7 +393,8 @@ class AiMachinePlayerMaker:
             self.machine_player = AiMiniMax(level_name, role, max_time=2)
         elif level_name == "mini-max-3s":
             self.machine_player = AiMiniMax(level_name, role, max_time=3)
-
+        elif level_name == "top":
+            self.machine_player = AiTop(level_name, role, max_time=3)
 
     def get_player(self):
         return self.machine_player
@@ -326,8 +405,8 @@ class Game:
         if board is None:
             self.board = [[0, 0, 0, 0, 0, 0, 0, 0] for x in range(8)]
             self.board[3][3] = 2
-            self.board[4][4] = 2
-            self.board[3][4] = 1
+            self.board[3][4] = 2
+            self.board[4][4] = 1
             self.board[4][3] = 1
         else:
             self.board = board
