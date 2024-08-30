@@ -8,10 +8,11 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 function queryBoard(){
-    console.log("Querying board...");
+    console.log("Querying board now...");
     // Open new request to get new posts.
     const request = new XMLHttpRequest();
     request.open('GET', '/queryboard');
+    game_over = false;
     request.onload = () => {
         const data = JSON.parse(request.responseText);
         console.log(data);
@@ -67,18 +68,23 @@ function move(row, col){
         if (!game_over){
             request.send(data);
         }
-
         // window.location.reload(true);
     }
 };
 
 
 function check_for_and_make_auto_machine_move(data){
-    if (data["machine_role"] == data["next_player"]){
+    if (data["machine_role"] === data["next_player"]){
         // dummy move --> machine move (includes delay for better visualization)
         setTimeout(function() {
             move(-1, -1);}, 1);
     }
+    if (data["simulator"]){
+        console.log("AUTO-Match Move!");
+        setTimeout(function() {
+            move(10, 10);}, 1);
+    }
+
 }
 
 
@@ -100,7 +106,7 @@ function update_board(board, possible_moves){
           var id = r.toString() + c.toString();
 
           // remove current class
-          curr_class = document.getElementById(id).classList;
+          let curr_class = document.getElementById(id).classList;
           document.getElementById(id).classList.remove(curr_class);
 
           // write new class as received from server
