@@ -431,6 +431,17 @@ def get_scores(board):
                 p2 += 1
     return p1, p2
 
+
+def get_scores_from_string(board):
+    p1 = 0
+    p2 = 0
+    for char in board:
+        if char == "1":
+            p1 += 1
+        elif char == "2":
+            p2 += 1
+    return p1, p2
+
 def get_possible_moves(board, player):
     possible_moves = []
     for r in range(8):
