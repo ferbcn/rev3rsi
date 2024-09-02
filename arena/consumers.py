@@ -6,6 +6,11 @@ from django.core.cache import cache
 
 
 class ArenaConsumer(AsyncWebsocketConsumer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(args, kwargs)
+        self.room_group_name = None
+        self.room_name = None
+
     async def connect(self):
         user = self.scope["user"].username
         self.room_name = self.scope["url_route"]["kwargs"]["room_name"]

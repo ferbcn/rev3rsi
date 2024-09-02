@@ -2,7 +2,7 @@
 ### DB operations ###
 #####################
 
-from .models import GameDB, GameState
+from .models import GameDB, GameState, Rating, User
 from django.core.exceptions import ObjectDoesNotExist  # Import the necessary exception
 
 
@@ -19,7 +19,7 @@ def save_gamestate_db(board, game_id, prev_id):
         print(f"No GameDB object found with id: {game_id}")
         return False  # Indicate that the function did not execute successfully
 
-    game_state_entry = GameState(game_id=game_object, board=board_string) #, prev_state=prev_state_id)
+    game_state_entry = GameState(game_id=game_object, board=board_string)
     game_state_entry.save()
     return True
 
@@ -89,12 +89,101 @@ def load_gamestate_db(game_id, user, prev=False):
     board_string = game_state.board
     game_board = [[int(board_string[8 * r + c]) for c in range(8)] for r in range(8)]
 
-    # Print the log message (consider changing this to a logger if you are using it in a larger application)
-    print("Game Board loaded!", game_state)
-
     # Return the necessary values directly, avoids redundant assignments
     return game_board, game_object.player1, game_object.player2, game_object.next_player, game_state.id
 
 
+def load_gamestate_board(game_id):
+    # Fetch the GameDB object directly, avoiding unnecessary logic
+    try:
+        game_state = GameState.objects.filter(game_id=game_id).last()
+    except GameDB.DoesNotExist:
+        return None
+
+    # Deserialize the board using list comprehension
+    board_string = game_state.board
+    game_board = [[int(board_string[8 * r + c]) for c in range(8)] for r in range(8)]
+
+    # Return the necessary values directly, avoids redundant assignments
+    return game_board
+
+
+def load_game_object_data(game_id):
+    try:
+        game_object = GameDB.objects.get(pk=game_id)
+    except GameDB.DoesNotExist:
+        return None
+    return game_object
+
+
 def get_saved_games_for_user(user):
     return reversed(GameDB.objects.all().filter(user=user).order_by("id"))
+
+
+def get_last_saved_game_id():
+    try:
+        game_object = GameDB.objects.filter(game_over=True).last()
+        return game_object.id
+    except ObjectDoesNotExist:
+        return None
+
+
+def get_rating_for_user(username):
+    try:
+        user = User.objects.get(username=username)
+        rating = Rating.objects.get(user=user)
+        return rating.elo
+    except ObjectDoesNotExist:
+        return None
+
+
+def create_base_rating_for_user(username):
+    try:
+        rating = Rating(user=User.objects.get(username=username))
+        rating.save()
+        print(f"Base rating for User {username} created!")
+    except ObjectDoesNotExist:
+        user = User.objects.create(username=username, password=username)
+        user.save()
+        rating = Rating(user=user)
+        rating.save()
+        print(f"User {username} created with base rating!")
+    return rating
+
+
+def get_ratings_for_all_users():
+    all_ratings = reversed(Rating.objects.all().order_by("elo"))
+    return all_ratings
+
+
+def get_ratings_for_user(player_name):
+    try:
+        rating = Rating.objects.get(user__username=player_name)
+        return rating
+    except ObjectDoesNotExist:
+        return None
+
+
+def update_ratings_for_user_game(player_name, new_elo, game_end_state):
+    try:
+        # user_id = User.objects.get(username=user_name).id
+        # rating_object = Rating.objects.get(pk=user_id)
+        rating_object = Rating.objects.get(user__username=player_name)
+        # Update the fields
+        rating_object.games_played += 1
+        if game_end_state == 1:
+            rating_object.wins += 1
+        elif game_end_state == -1:
+            rating_object.losses += 1
+        elif game_end_state == 0:
+            rating_object.draws = 1
+
+        rating_object.win_rate = (rating_object.wins / rating_object.games_played) * 100
+        rating_object.elo = new_elo
+
+        rating_object.save()  # Save the changes to the database
+        return True  # Return True if the function executed successfully
+    except ObjectDoesNotExist:
+        # You may want to log this exception, depending on your use case
+        return False  # Return False or appropriate response when the object doesn't exist
+

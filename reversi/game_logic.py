@@ -1,14 +1,17 @@
 import copy
 import random
+import sys
 import time
 
 
-# maximum time the AI is allowed to think
-MAX_TIME = 5
+# maximum time the AI is allowed to think (seconds)
+MAX_TIME = 1
+MAX_DEPTH = 30
 
-###############################
-### GAME AND PLAYER CLASSES ###
-###############################
+###########################
+# GAME AND PLAYER CLASSES #
+###########################
+
 
 class Player:
     def __init__(self, is_human=True, role=None):
@@ -16,20 +19,11 @@ class Player:
         self.role = role
         self.move = None
 
-    def get_opponent(self, player):
-        if player == 1:
-            return 2
-        else:
-            return 1
-
-    def next_move(self):
-        return self.move
-
     # method needed to calculate theoretical possible outcomes of every move
     def make_move(self, board, player, move):
         # print(f"Player: {player}, makes move: {move}")
         row, col = move
-        opponent = self.get_opponent(player)
+        opponent = get_opponent(player)
 
         # try west, east, north, south, northwest, ...
         col_row_dir = [(-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (1, -1), (1, 1), (-1, 1)]
@@ -65,20 +59,69 @@ class Player:
             row_iter = row_iter + row_dir
         return board
 
-    def get_scores(self, board):
-        p1 = 0
-        p2 = 0
-        for r in range(8):
-            for c in range(8):
-                if board[r][c] == 1:
-                    p1 += 1
-                elif board[r][c] == 2:
-                    p2 += 1
-        return p1, p2
+
+class AiFirst(Player):
+    def __init__(self, is_human=False, role=None):
+        super().__init__(is_human, role)
+        self.is_human = is_human
+        self.role = role
+
+    def next_move(self, board, possible_moves):
+        return self.dumb_move(possible_moves)
+
+        # Random move
+    def dumb_move(self, possible_moves):
+        print("dumb move (first of list)...")
+        return possible_moves[0]
+
+
+class AiLast(Player):
+    def __init__(self, is_human=False, role=None):
+        super().__init__(is_human, role)
+        self.is_human = is_human
+        self.role = role
+
+    def next_move(self, board, possible_moves):
+        return self.dumb_move(possible_moves)
+
+        # Random move
+    def dumb_move(self, possible_moves):
+        print("dumb move (first of list)...")
+        return possible_moves[-1]
+
+
+class AiWorst(Player):
+    def __init__(self, is_human=False, role=None):
+        super().__init__(is_human, role)
+        self.is_human = is_human
+        self.role = role
+
+    def next_move(self, board, possible_moves):
+        return self.greedy_move(board, possible_moves)
+
+    # Greedy move
+    def greedy_move(self, board, possible_moves):
+        print("worst move ...")
+        # print("Possible moves: ", possible_moves)
+        worst_move_score = 0
+        worst_move = None
+        for move in possible_moves:
+            new_board = self.make_move(copy.deepcopy(board), self.role, move)
+            score_p1, score_p2 = get_scores(new_board)
+            if self.role == 1:
+                move_score = score_p2
+            else:
+                move_score = score_p1
+            if move_score > worst_move_score:
+                worst_move = move
+                worst_move_score = move_score
+        print("Worst move yields a score: ", worst_move_score)
+        return worst_move
 
 
 class AiRandom(Player):
     def __init__(self, is_human=False, role=None):
+        super().__init__(is_human, role)
         self.is_human = is_human
         self.role = role
 
@@ -94,6 +137,7 @@ class AiRandom(Player):
 
 class AiGreedy(AiRandom):
     def __init__(self, is_human=False, role=None):
+        super().__init__(is_human, role)
         self.is_human = is_human
         self.role = role
 
@@ -108,7 +152,7 @@ class AiGreedy(AiRandom):
         top_move = None
         for move in possible_moves:
             new_board = self.make_move(copy.deepcopy(board), self.role, move)
-            score_p1, score_p2 = self.get_scores(new_board)
+            score_p1, score_p2 = get_scores(new_board)
             if self.role == 1:
                 move_score = score_p1
             else:
@@ -122,6 +166,7 @@ class AiGreedy(AiRandom):
 
 class AiGreedyPlus(AiGreedy):
     def __init__(self, is_human=False, role=None):
+        super().__init__(is_human, role)
         self.is_human = is_human
         self.role = role
 
@@ -158,17 +203,18 @@ class AiGreedyPlus(AiGreedy):
 
 
 class AiMiniMax(AiGreedyPlus):
-    def __init__(self, is_human=False, role=None):
+    def __init__(self, is_human=False, role=None, max_time=MAX_TIME, max_depth=MAX_DEPTH):
+        super().__init__(is_human, role)
+        self.max_time = max_time
         self.is_human = is_human
         self.role = role
         print("Minimax is player", self.role)
         self.start_time = 0
-        self.max_depth = 8
+        self.max_depth = max_depth
         self.max_depth_reached = 0
 
-
     def next_move(self, board, possible_moves):
-        scores = self.get_scores(board)
+        scores = get_scores(board)
         if scores[0] + scores[1] < 33:
             return self.greedy_plus_move(board, possible_moves)
         return self.minimax_move(board)
@@ -176,7 +222,7 @@ class AiMiniMax(AiGreedyPlus):
     # Implementation of the Minimax algorithm
     def minimax_move(self, board):
         depth = 1
-        print(f"Minimax move limited to {MAX_TIME} seconds...")
+        print(f"Minimax move limited to {self.max_time} seconds...")
         possible_moves = get_possible_moves(board, self.role)
         player = self.role
         minimax_moves = []
@@ -197,12 +243,13 @@ class AiMiniMax(AiGreedyPlus):
 
         if depth > self.max_depth_reached:
             self.max_depth_reached = depth
-            print(f"Current depth: {depth}")
+            # print by substitution of the print statement below
+            # print(f"Max depth reached: {depth}")
+            sys.stdout.write(f"\rMax depth reached: {depth}")
+            sys.stdout.flush()
 
-        #print(time.time()-self.start_time)
-        if depth > self.max_depth or self.game_over_position(board, player) or time.time()-self.start_time > MAX_TIME:
+        if depth > self.max_depth or self.game_over_position(board, player) or time.time()-self.start_time > self.max_time:
             abs_score = self.get_abs_score(board, self.role)
-            #print("Returning board with ABS score:", abs_score, "at depth:", 4-depth)
             return abs_score
 
         possible_moves = get_possible_moves(board, player)
@@ -210,7 +257,7 @@ class AiMiniMax(AiGreedyPlus):
             max_eval = -65
             for move in possible_moves:
                 new_board = self.make_move(copy.deepcopy(board), player, move)
-                eval = self.minimax(new_board, self.get_opponent(player), depth+1, alpha, beta, False)
+                eval = self.minimax(new_board, get_opponent(player), depth+1, alpha, beta, False)
                 max_eval = max(max_eval, eval)
                 alpha = max(alpha, max_eval)
                 if beta <= alpha:
@@ -220,7 +267,7 @@ class AiMiniMax(AiGreedyPlus):
             min_eval = 65
             for move in possible_moves:
                 new_board = self.make_move(copy.deepcopy(board), player, move)
-                eval = self.minimax(new_board, self.get_opponent(player), depth+1, alpha, beta, True)
+                eval = self.minimax(new_board, get_opponent(player), depth+1, alpha, beta, True)
                 min_eval = min(min_eval, eval)
                 beta = min(beta, min_eval)
                 if beta <= alpha:
@@ -228,14 +275,14 @@ class AiMiniMax(AiGreedyPlus):
             return min_eval
 
     def get_abs_score(self, board, player):
-        score_p1, score_p2 = self.get_scores(board)
+        score_p1, score_p2 = get_scores(board)
         score = score_p1 - score_p2 if player == 1 else score_p2 - score_p1
         return score
 
     def game_over_position(self, board, player):
         possible_moves = get_possible_moves(board, player)
         if len(possible_moves) == 0:
-            next_possible_moves = get_possible_moves(board, self.get_opponent(player))
+            next_possible_moves = get_possible_moves(board, get_opponent(player))
             if len(next_possible_moves) == 0:
                 """
                 print("Game Over Position found!")
@@ -247,13 +294,119 @@ class AiMiniMax(AiGreedyPlus):
         return False
 
 
+class AiTop(Player):
+    def __init__(self, is_human=False, role=None, max_time=MAX_TIME, max_depth=MAX_DEPTH):
+        super().__init__(is_human, role)
+        self.max_time = max_time
+        self.is_human = is_human
+        self.role = role
+        self.start_time = 0
+        self.max_depth = max_depth
+        self.max_depth_reached = 0
+
+    def next_move(self, board, possible_moves):
+        return self.minimax_move(board)
+
+    def minimax_move(self, board):
+        depth = 1
+        print(f"Minimax move limited to {self.max_time} seconds...")
+        possible_moves = get_possible_moves(board, self.role)
+        player = self.role
+        minimax_moves = []
+        self.start_time = time.time()
+        for move in possible_moves:
+            self.max_depth_reached = depth
+            new_board = self.make_move(copy.deepcopy(board), player, move)
+            score = self.minimax(new_board, self.role, depth, -65, 65, True)
+            minimax_moves.append((move, score))
+        minimax_moves = sorted(minimax_moves, key=lambda x: x[1], reverse=True)
+        print(minimax_moves)
+
+        return_move = minimax_moves[0][0]
+        print(f"Returning move: {return_move}")
+        return return_move
+
+    def minimax(self, board, player, depth, alpha, beta, maximizingPlayer):
+        if depth > self.max_depth_reached:
+            self.max_depth_reached = depth
+            sys.stdout.write(f"\rMax depth reached: {depth}")
+            sys.stdout.flush()
+
+        if depth > self.max_depth or self.game_over_position(board, player) or time.time() - self.start_time > self.max_time:
+            abs_score = self.get_abs_score(board, self.role)
+            return abs_score
+
+        possible_moves = get_possible_moves(board, player)
+        if maximizingPlayer:
+            max_eval = -65
+            for move in possible_moves:
+                new_board = self.make_move(copy.deepcopy(board), player, move)
+                eval = self.minimax(new_board, get_opponent(player), depth + 1, alpha, beta, False)
+                max_eval = max(max_eval, eval)
+                alpha = max(alpha, max_eval)
+                if beta <= alpha:
+                    break
+            return max_eval
+        else:
+            min_eval = 65
+            for move in possible_moves:
+                new_board = self.make_move(copy.deepcopy(board), player, move)
+                eval = self.minimax(new_board, get_opponent(player), depth + 1, alpha, beta, True)
+                min_eval = min(min_eval, eval)
+                beta = min(beta, min_eval)
+                if beta <= alpha:
+                    break
+            return min_eval
+
+    def get_abs_score(self, board, player):
+        score_p1, score_p2 = get_scores(board)
+        score = score_p1 - score_p2 if player == 1 else score_p2 - score_p1
+        return score
+
+    def game_over_position(self, board, player):
+        possible_moves = get_possible_moves(board, player)
+        if len(possible_moves) == 0:
+            next_possible_moves = get_possible_moves(board, get_opponent(player))
+            if len(next_possible_moves) == 0:
+                return True
+        return False
+
+
+class AiMachinePlayerMaker:
+    def __init__(self, level_name, role):
+        self.machine_player = None
+        if level_name == "first":
+            self.machine_player = AiFirst(level_name, role)
+        if level_name == "last":
+            self.machine_player = AiLast(level_name, role)
+        elif level_name == "random":
+            self.machine_player = AiRandom(level_name, role)
+        elif level_name == "worst":
+            self.machine_player = AiWorst(level_name, role)
+        elif level_name == "greedy":
+            self.machine_player = AiGreedy(level_name, role)
+        elif level_name == "greedy-plus":
+            self.machine_player = AiGreedyPlus(level_name, role)
+        elif level_name == "mini-max":
+            self.machine_player = AiMiniMax(level_name, role)
+        elif level_name == "mini-max-2s":
+            self.machine_player = AiMiniMax(level_name, role, max_time=2)
+        elif level_name == "mini-max-3s":
+            self.machine_player = AiMiniMax(level_name, role, max_time=3)
+        elif level_name == "top":
+            self.machine_player = AiTop(level_name, role, max_time=3)
+
+    def get_player(self):
+        return self.machine_player
+
+
 class Game:
     def __init__(self, player1, player2, difficulty, board=None):
         if board is None:
             self.board = [[0, 0, 0, 0, 0, 0, 0, 0] for x in range(8)]
             self.board[3][3] = 2
-            self.board[4][4] = 2
-            self.board[3][4] = 1
+            self.board[3][4] = 2
+            self.board[4][4] = 1
             self.board[4][3] = 1
         else:
             self.board = board
@@ -264,10 +417,8 @@ class Game:
 
 
 def get_opponent(player):
-    if player == 1:
-        return 2
-    else:
-        return 1
+    op = 2 if player == 1 else 1
+    return op
 
 def get_scores(board):
     p1 = 0
@@ -316,6 +467,7 @@ def check_dir(board, player, opponent, row, col, row_dir, col_dir):
         else:
             return False
 
+
 def is_legal_move(board, player, move):
     # print(f"Player: {player}, move: {move} is legal?")
     row, col = move
@@ -331,3 +483,22 @@ def is_legal_move(board, player, move):
             return True
     # print(f"Illegal move.")
     return False
+
+
+def human_move(board, human_player, move):
+    # make a human move
+    print("Human move: ", move)
+    # make move and save board
+    board = human_player.make_move(board, human_player.role, move)
+    return move, board
+
+
+def machine_move(board, machine_player):
+    # make a machine move
+    print("# Machine move #")
+    possible_moves = get_possible_moves(board, machine_player.role)
+    print(possible_moves)
+    next_move = machine_player.next_move(board, possible_moves)
+    print("Machine move: ", next_move)
+    board = machine_player.make_move(board, machine_player.role, next_move)
+    return next_move, board

@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block heading %}
+
+{% endblock %}
+
+{% block body %}
+<div class="container">
+
+    <br>
+    <h3>Ratings by User</h3>
+    <br>
+    <div class="container" id="savedgames">
+      <div class="row savegameheader">
+          <div class="col-4">
+            Username
+          </div>
+          <div class="col-2">
+            ELO
+          </div>
+          <div class="col-1">
+            Wins
+          </div>
+          <div class="col-1">
+            Losses
+          </div>
+          <div class="col-1">
+            Draws
+          </div>
+          <div class="col-3">
+            Ratio
+          </div>
+      </div>
+      <div class="row" style="height: 5px;"></div>
+
+      {% for rating in saved_ratings %}
+      <div class="row savegamerow">
+          <div class="col-4">
+            <div class="gameid_label"> {{ rating.user.username }}</div>
+          </div>
+          <div class="col-2">
+            {{ rating.elo }}
+          </div>
+          <div class="col-1">
+            {{ rating.wins }}
+          </div>
+          <div class="col-1">
+            {{ rating.losses }}
+          </div>
+          <div class="col-1">
+            {{ rating.draws }}
+          </div>
+            <div class="col-3">
+                {{ rating.win_rate|floatformat:1 }} %
+                <!--<span class="oi oi-delete" title="delete game"></span>-->
+            </div>
+      </div>
+
+      <div class="row" style="height: 5px;"></div>
+
+      {% endfor %}
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block body %}
+
+{% csrf_token %}
+<div class="container">
+
+    <div class="m2m-container">
+        <h2>&#128421;-to-&#128421; Game</h2>
+        <br>
+
+        <div class="m2m-select-container">
+            <div class="label-select-container">
+                <label for="ai1">Machine 1</label>
+                <select id="ai1" name="colorSelect">
+                    {% for dis, ai in game_levels %}
+                        <option>{{ ai }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <br>
+            <div class="label-select-container">
+                <label for="ai2">Machine 2</label>
+                <select id="ai2" name="colorSelect">
+                {% for dis, ai in game_levels %}
+                    <option>{{ ai }}</option>
+                {% endfor %}
+                </select>
+            </div>
+            <br>
+            <button id="run-button" class="btn btn-outline-success">Run</button>
+        </div>
+
+    </div>
+
+    <div class="spacer"></div>
+    <br>
+    <div class="queue-info-container">
+        <div id="status-message"></div>
+        <div id="queue-size"></div>
+    </div>
+
+    <div id="board_parent">
+        <div id="board_child">
+          <div class="container board_glow_green" id="board">
+          {% for line in board %}
+              <div class="row" style="height: 12%">
+              {% for cell in line %}
+                  <div class="col padding-0">
+                  <span class="dot_empty" id="{{forloop.parentloop.counter0}}{{forloop.counter0}}"></span>
+                  </div>
+              {% endfor %}
+              </div>
+          {% endfor %}
+          </div>
+      </div>
+    </div>
+
+    <div class="scores-names-container">
+        <div id="name-score-p1">
+            <div id="name-p1"></div>
+            <div id="score-p1"></div>
+            <div id="elo-p1"></div>
+        </div>
+        <div id="name-score-p2">
+            <div id="name-p2"></div>
+            <div id="score-p2"></div>
+            <div id="elo-p2"></div>
+        </div>
+    </div>
+
+    <br>
+    <div id="sse-data"></div>
+
+<div class="spin-container" id="spinner">
+    <div class="spinner-border text-light" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+
+
+</div>
+
+
+<script src="{% static 'simulator.js' %}"></script>
+
+{% endblock %}
