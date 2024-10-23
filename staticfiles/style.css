@@ -201,6 +201,7 @@ a:hover {
 .savegameheader{
     border-radius: 5px;
     padding-top: 12px;
+    padding-bottom: 12px;
     background-color: lightgrey;
     color: black;
     font-weight: bold;

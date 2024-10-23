@@ -15,7 +15,8 @@
         {% csrf_token %}
           Username:<input class="form-control" name="username" type="text" placeholder="username">
           Password:<input class="form-control" name="password" type="password" placeholder="password">
-          <input type="hidden" name="redirect" type="text" value="{{ level }}">
+          <!--hidden input field-->
+          <input type="hidden" name="redirect_link" type="text" value="{{ redirect_link }}">
           <br>
           <button class="btn btn-outline-success">Login</button>
       </form>
