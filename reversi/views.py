@@ -44,7 +44,7 @@ def new_game(request):
     else:
         level = request.GET["difficulty"]
         return render(request, "users/login.html",
-                      {"message": "Please login first to start a new game!", "user": False, "level": level,
+                      {"message": "Please login first to start a new game!", "user": False, "redirect_link": level,
                        "game_levels": user_levels})
 
     # Game level is passed as url parameter http://localhost/newgame?difficulty=...
@@ -571,14 +571,12 @@ def delete_game(request):
 
 def login_view(request):
     if request.method == "GET":
-
         return render(request, "users/login.html",
-                      {"message": "Please enter your username and password.", "user": False,
-                       })
+                      {"message": "Please enter your username and password.", "user": False, "redirect_link": "random"})
 
     username = request.POST["username"]
     password = request.POST["password"]
-    redirect = request.POST["redirect"]
+    redirect = request.POST["redirect_link"]
 
     user = authenticate(request, username=username, password=password)
     if user is not None:
