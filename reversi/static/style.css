@@ -222,9 +222,11 @@ a:hover {
 }
 
 #login_child{
-   margin: 5vh;
-   position: relative;
-   top: -10%;
+    min-width: 50vw;
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 20vh;
 }
 
 #spinner{
@@ -595,5 +597,5 @@ select:focus {
 }
 
 h2{
-    text-align: center;
+    /*text-align: center;*/
 }
