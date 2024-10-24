@@ -572,7 +572,8 @@ def delete_game(request):
 def login_view(request):
     if request.method == "GET":
         return render(request, "users/login.html",
-                      {"message": "Please enter your username and password.", "user": False, "redirect_link": "random"})
+                      {"message": "Please enter your username and password.", "user": False,
+                       "game_levels": user_levels, "redirect_link": "random"})
 
     username = request.POST["username"]
     password = request.POST["password"]
@@ -590,7 +591,7 @@ def login_view(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "users/login.html",
-                      {"message": "Invalid credentials.", "user": False})
+                      {"message": "Invalid credentials.", "game_levels": user_levels, "user": False})
 
 
 def logout_view(request):
