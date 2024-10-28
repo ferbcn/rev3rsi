@@ -226,6 +226,7 @@ a:hover {
 }
 
 #login_child{
+    text-align: left;
     min-width: 50vw;
     max-width: 1000px;
     margin-left: auto;
