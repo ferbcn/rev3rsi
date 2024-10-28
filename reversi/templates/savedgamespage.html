@@ -24,10 +24,9 @@
             X
           </div>
       </div>
-      <div class="row" style="height: 5px;"></div>
 
       {% for game in saved_games %}
-      <div class="row savegamerow">
+      <div class="row savegamerow fade-me-out" id="row{{ game.id }}">
           <div class="col-2">
             <a class="divlink" href="{% url 'loadgame'%}?game_id={{ game.id }}" title="{{ game.id }}">
                 <div class="gameid_label"> {{ game.id }}</span></div>
@@ -69,19 +68,21 @@
           </div>
           <div class="col-3">
             <a class="divlink" href="{% url 'loadgame'%}?game_id={{ game.id }}">
-                {{ game.score_p1 }} / {{ game.score_p2 }}
-              </a>
+              {{ game.score_p1 }} / {{ game.score_p2 }}
+            </a>
           </div>
-            <div class="col-1">
-              <a class="divlink" href="{% url 'deletegame' %}?game_id={{ game.id }}">
+          <div class="col-1">
+            <a class="divlink"
+               hx-delete="{% url 'deletegame' %}?game_id={{ game.id }}"
+               hx-swap="outerHTML swap:0.5s"
+               hx-target="#row{{ game.id }}"
+            >
               <span class="oi oi-delete" title="delete game"></span>
-              </a>
-            </div>
+            </a>
+        </div>
       </div>
-
-      <div class="row" style="height: 5px;"></div>
-
       {% endfor %}
+
     </div>
 
     <div class="row page-nav-box">

@@ -189,6 +189,11 @@ a:hover {
     margin-bottom: 5px;
 }
 
+.fade-me-out.htmx-swapping {
+  opacity: 0;
+  transition: opacity 0.5s ease-out;
+}
+
 .gameid_label {
     padding: 5px;
     margin-right: 5px;
@@ -618,4 +623,8 @@ h2{
 
 .nav-page-btn{
     width: 50px;
+}
+
+.oi-delete{
+    cursor: pointer;
 }

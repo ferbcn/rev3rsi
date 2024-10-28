@@ -1,5 +1,5 @@
 from django.contrib.auth import authenticate, login, logout
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 
 from django.shortcuts import render
 from django.urls import reverse
@@ -29,7 +29,6 @@ def index(request):
             levels = admin_levels
         else:
             levels = user_levels
-
     else:
         user = False
         levels = user_levels
@@ -487,14 +486,7 @@ def load_game(request):
 
     game = load_game_object_data(game_id)
     print(game.player1, game.player2, user_levels)
-    # try:
-    #     board, player1, player2, next_player, state_id = load_gamestate_db(game_id, user)
-    # # Something went wrong retrieving board (db error or cheating)
-    # except Exception as e:
-    #     print(f"DB Error: {e}")
-    #     return render(request, "index.html", {"user": user})
-    #
-    # for line in board: print(line)
+
     user_levels_list = [lev[1] for lev in user_levels]
     if not game.player1 in user_levels_list and not game.player2 in user_levels_list:
         return HttpResponseRedirect(reverse("reversimatch"))
@@ -561,7 +553,7 @@ def saved_ratings(request):
     return render(request, "eloratings.html",
                   {"user": user, "saved_ratings": saved_ratings, "game_levels": user_levels})
 
-
+@csrf_exempt
 def delete_game(request):
     if request.user.is_authenticated:
         user = request.user
@@ -572,10 +564,10 @@ def delete_game(request):
 
     if remove_game_db(game_id, user):
         print(f"Game with id #{game_id} deleted!")
+        return HttpResponse("", status=200)
     else:
         print(f"Error deleting game with id #{game_id}")
-
-    return HttpResponseRedirect(reverse("savedgames"))
+        return HttpResponse(status=204)
 
 
 def login_view(request):

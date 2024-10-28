@@ -79,7 +79,6 @@ async def sse_stream(request):
     """
     Sends server-sent events to the client.
     """
-
     async def event_stream():
         # yield finished game data
         last_game_id = await get_last_saved_game_id_async()

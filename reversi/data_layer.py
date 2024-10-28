@@ -122,7 +122,7 @@ def get_all_saved_games_for_user(user):
 
 
 def get_saved_games_for_user(user, page=1, page_size=10):
-    saved_games = GameDB.objects.all().filter(user=user).order_by("id")
+    saved_games = GameDB.objects.all().filter(user=user).order_by("id").reverse()
     paginator = Paginator(saved_games, page_size)
 
     try:
