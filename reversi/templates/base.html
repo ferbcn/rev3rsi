@@ -26,7 +26,7 @@
             <ul class="navbar-nav">
                 <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  New Game
+                  Single-Player
                 </a>
                 <div class="dropdown-menu bg-dark" aria-labelledby="navbarDropdownMenuLink">
                   {% for disabled, dif in game_levels %}
@@ -35,16 +35,16 @@
                 </div>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="/arena"><span class="oi oi-chat" title="login" aria-hidden="true"></span> Arena</a>
+                    <a class="nav-link" href="/arena"><span class="oi oi-chat" title="login" aria-hidden="true"></span> Multi-Player</a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="/simulator/autogame"><span class="oi oi-code" title="login" aria-hidden="true"></span> Simulator</a>
+                    <a class="nav-link" href="/simulator/autogame"><span class="oi oi-code" title="login" aria-hidden="true"></span> Machine-To-Machine</a>
                 </li>
 
                 {% if user %}
                   <li class="nav-item">
-                    <a class="nav-link" href="/savedgames"><span class="oi oi-people" title="savedgames" aria-hidden="true"></span> {{ user.username}}'s Games</a>
+                    <a class="nav-link" href="/savedgames"><span class="oi oi-people" title="savedgames" aria-hidden="true"></span> {{ user.username}}'s Game History</a>
                   </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/savedratings"><span class="oi oi-arrow-top" title="savedratings" aria-hidden="true"></span> ELO Ratings</a>
