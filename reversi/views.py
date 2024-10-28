@@ -574,8 +574,8 @@ def login_view(request):
     if request.method == "GET":
         return render(request, "users/login.html",
                       {"message": "Please enter your username and password.", "user": False,
-                       "game_levels": user_levels, "redirect_link": "random"})
-
+                       "game_levels": user_levels})
+    # POST Request
     username = request.POST["username"]
     password = request.POST["password"]
     redirect = request.POST["redirect_link"]
@@ -587,8 +587,8 @@ def login_view(request):
         # where a hidden value is saved in the form and send together with login data
         # in order to redirect the user after a successful login... hacky? yes, sir!
         if len(redirect) > 0:
-            redirect = "newgame?difficulty=" + redirect
-            return HttpResponseRedirect(redirect)
+            redirect_url = "newgame?difficulty=" + redirect
+            return HttpResponseRedirect(redirect_url)
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "users/login.html",
