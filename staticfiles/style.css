@@ -34,6 +34,10 @@ a:hover {
     color: lightgrey;
 }
 
+.container{
+    text-align: center;
+}
+
 #board_parent{
     display: flex;
     margin-top: 10px;
@@ -166,7 +170,7 @@ a:hover {
 #savedgames {
     color: white;
     overflow: scroll;
-    height: 85vh;
+    height: 80vh;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -598,4 +602,19 @@ select:focus {
 
 h2{
     /*text-align: center;*/
+}
+
+.page-nav-box{
+    display: flex;
+    margin-top: 10px;
+    margin-left: auto;
+    align-items: center;
+    justify-content: space-evenly;
+    position: relative;
+    width: 100%;
+    height: auto;
+}
+
+.nav-page-btn{
+    width: 50px;
 }

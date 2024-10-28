@@ -475,7 +475,6 @@ def move_match(request):
     return JsonResponse(data, safe=False)
 
 
-
 def load_game(request):
     if request.user.is_authenticated:
         user = request.user
@@ -527,18 +526,28 @@ def load_prev_gamestate(request):
         return HttpResponseRedirect(reverse("reversimatch"))
 
 
-# return a list o saved games for the current user
+# return the base view with a list o saved games for the current user
 def saved_games(request):
     if request.user.is_authenticated:
         user = request.user
     else:
         return HttpResponseRedirect(reverse("login"))
 
-    saved_games = get_saved_games_for_user(user)
+    return render(request, "savedgames.html", {"user": user, "page":1,
+                                               "game_levels": user_levels, "next_page":2})
 
-    return render(request, "savedgames.html",{"user": user, "saved_games": saved_games,
-                                              "game_levels": user_levels})
-# return a list o saved games for the current user
+
+# return a list of saved games for the current user to update the base view (htmx)
+@csrf_exempt
+def saved_games_page(request):
+    if request.user.is_authenticated:
+        user = request.user
+    else:
+        return HttpResponseRedirect(reverse("login"))
+    current_page = int(request.GET["page"])
+    saved_games = get_saved_games_for_user(user, current_page, 15)
+    return render(request, "savedgamespage.html", {"saved_games": saved_games, "page": current_page,
+                                                   "next_page":current_page+1, "prev_page":current_page-1})
 
 
 def saved_ratings(request):

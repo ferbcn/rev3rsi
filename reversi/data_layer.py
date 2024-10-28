@@ -4,6 +4,7 @@
 
 from .models import GameDB, GameState, Rating, User
 from django.core.exceptions import ObjectDoesNotExist  # Import the necessary exception
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
 def save_gamestate_db(board, game_id, prev_id):
@@ -116,8 +117,22 @@ def load_game_object_data(game_id):
     return game_object
 
 
-def get_saved_games_for_user(user):
+def get_all_saved_games_for_user(user):
     return reversed(GameDB.objects.all().filter(user=user).order_by("id"))
+
+
+def get_saved_games_for_user(user, page=1, page_size=10):
+    saved_games = GameDB.objects.all().filter(user=user).order_by("id")
+    paginator = Paginator(saved_games, page_size)
+
+    try:
+        paginated_saved_games = paginator.page(page)
+    except PageNotAnInteger:
+        paginated_saved_games = paginator.page(1)
+    except EmptyPage:
+        paginated_saved_games = paginator.page(paginator.num_pages)
+
+    return paginated_saved_games
 
 
 def get_last_saved_game_id():
