@@ -15,8 +15,8 @@ urlpatterns = [
     path("savedratings", views.saved_ratings, name="savedratings"),
     path("loadgame", views.load_game, name="loadgame"),
     path("deletegame", views.delete_game, name="deletegame"),
-    path("newmatch", views.new_match, name="newmatch"),
-    path("reversimatch", views.reversi_match, name="reversimatch"),
-    path("movematch", views.move_match, name="movematch"),
-    path("load_prev_gamestate", views.load_prev_gamestate, name="load_prev_gamestate"),
+    # path("newmatch", views.new_match, name="newmatch"),
+    # path("reversimatch", views.reversi_match, name="reversimatch"),
+    # path("movematch", views.move_match, name="movematch"),
+    # path("load_prev_gamestate", views.load_prev_gamestate, name="load_prev_gamestate"),
 ]

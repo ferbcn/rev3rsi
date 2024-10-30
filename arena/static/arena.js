@@ -241,7 +241,7 @@ function handleSelectGame(uuid){
     var host = gameRow.querySelector('#hostName').innerHTML;
     host = host.trim();
     var gameId;
-    var url = "/newmatch?p1="+host+"&p2="+userName;
+    var url = "/arena/newmatch?p1="+host+"&p2="+userName;
 
     // This initiates the game setup
     fetch(url)
