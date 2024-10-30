@@ -407,26 +407,29 @@ def delete_game(request):
 
 def login_view(request):
     if request.method == "GET":
+        if "redirect_link" in request.GET:
+            redirect_url = request.GET["redirect_link"]
+        else:
+            redirect_url = ""
         return render(request, "users/login.html",
                       {"message": "Please enter your username and password.", "user": False,
-                       "game_levels": user_levels})
+                       "game_levels": user_levels, "redirect_link": redirect_url})
     # POST Request
     username = request.POST["username"]
     password = request.POST["password"]
-    redirect = request.POST["redirect_link"]
-
+    redirect_url = request.POST["redirect_link"]
 
     user = authenticate(request, username=username, password=password)
     if user is None:
         return render(request, "users/login.html",
-                      {"message": "Invalid credentials.", "game_levels": user_levels, "user": False})
+                      {"message": "Invalid credentials.", "game_levels": user_levels, "user": False,
+                       "redirect_link": redirect_url})
     else:
         login(request, user)
         # if user selects level and is not logged in he is redirected to login page,
         # where a hidden value is saved in the form and send together with login data
         # in order to redirect the user after a successful login... hacky? yes, sir!
-        if len(redirect) > 0:
-            redirect_url = redirect
+        if len(redirect_url) > 0:
             return HttpResponseRedirect(redirect_url)
         return HttpResponseRedirect(reverse("index"))
 
@@ -441,12 +444,18 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
 
     if request.method == "GET":
+        if "redirect_link" in request.GET:
+            redirect_url = request.GET["redirect_link"]
+        else:
+            redirect_url = ""
         return render(request, "users/register.html",
-                      {"message": "Please choose a username and password.", "user": False})
+                      {"message": "Please choose a username and password.", "user": False,
+                       "redirect_link": redirect_url})
 
     if request.method == "POST":
         username = request.POST["username"]
         password = request.POST["password"]
+        redirect_url = request.POST["redirect_link"]
 
         if len(User.objects.all().filter(username=username)) > 0:
             return render(request, "users/register.html", {"message": "Username already in use!", "user": False})
@@ -462,4 +471,6 @@ def register(request):
             user = authenticate(request, username=username, password=password)
             login(request, user)
             # print(user)
+            if len(redirect_url) > 0:
+                return HttpResponseRedirect(redirect_url)
             return HttpResponseRedirect(reverse("index"))

@@ -15,11 +15,13 @@
           {% csrf_token %}
           Username: <input class="form-control" name="username" type="text" placeholder="username">
           Password: <input class="form-control" name="password" type="password" placeholder="password">
+          <!--hidden input field-->
+          <input type="hidden" name="redirect_link" type="text" value="{{ redirect_link }}">
           <br>
-          <button class="btn btn-outline-success">Register</button>
+          <button class="btn btn-outline-success">Sign-Up</button>
       </form>
       <br>
-      Already singed-up? <a href="{% url 'login' %}">Login here</a>
+      Already singed-up? <a href="{% url 'login' %}?redirect_link={{ redirect_link }}">Login</a>
     </div>
   </div>
 </div>
