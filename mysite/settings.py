@@ -32,7 +32,7 @@ ALLOWED_HOSTS = ['*', '127.0.0.1']
 # Application definition
 
 INSTALLED_APPS = [
-    'daphne',
+    # 'daphne',
     'simulator',
     'arena',
     'reversi',
@@ -76,11 +76,9 @@ TEMPLATES = [
 # WSGI_APPLICATION = 'mysite.wsgi.application'
 # ASGI_APPLICATION = 'mysite.asgi.application'
 
-
 # Database
-# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-
 # default local db
+
 # Get DB URL from config vars
 #DATABASES['default'] = dj_database_url.config(conn_max_age=600)
 
@@ -120,28 +118,16 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
-# https://docs.djangoproject.com/en/2.0/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'CET'
-
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/2.0/howto/static-files/
-
 STATIC_URL = '/static/'
-
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'reversi/static'), os.path.join(BASE_DIR, 'arena/static')]
-
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
