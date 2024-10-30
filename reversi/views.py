@@ -315,11 +315,9 @@ def load_game(request):
         return HttpResponseRedirect(reverse("login"))
 
     game_id = int(request.GET["game_id"])
-    request.session['game_id'] = game_id
-    print("Game ID: ", game_id)
-
     game = load_game_object_data(game_id)
-    print(game.player1, game.player2, user_levels)
+    print("Loading game with ID: ", game_id)
+    print("P1:", game.player1, "P2:", game.player2, user_levels)
 
     user_levels_list = [lev[1] for lev in user_levels]
     if not game.player1 in user_levels_list and not game.player2 in user_levels_list:
@@ -327,30 +325,30 @@ def load_game(request):
     else:
         return HttpResponseRedirect(reverse("reversi"))
 
-
-def load_prev_gamestate(request):
-    if request.user.is_authenticated:
-        user = request.user
-    else:
-        return HttpResponseRedirect(reverse("login"))
-
-    game_id = request.session['game_id']
-    print("Game ID: ", game_id)
-
-    try:
-        board, player1, player2, next_player, state_id = load_gamestate_db(game_id, user, prev=1)
-    # Something went wrong retrieving board (db error or cheating)
-    except Exception as e:
-        print(f"DB Error: {e}")
-        return render(request, "index.html", {"user": user})
-
-    for line in board: print(line)
-
-    if "human" in [player1, player2]:
-        return HttpResponseRedirect(reverse("reversi"))
-    else:
-        return HttpResponseRedirect(reverse("reversimatch"))
-
+#
+# def load_prev_gamestate(request):
+#     if request.user.is_authenticated:
+#         user = request.user
+#     else:
+#         return HttpResponseRedirect(reverse("login"))
+#
+#     game_id = request.session['game_id']
+#     print("Game ID: ", game_id)
+#
+#     try:
+#         board, player1, player2, next_player, state_id = load_gamestate_db(game_id, user, prev=1)
+#     # Something went wrong retrieving board (db error or cheating)
+#     except Exception as e:
+#         print(f"DB Error: {e}")
+#         return render(request, "index.html", {"user": user})
+#
+#     for line in board: print(line)
+#
+#     if "human" in [player1, player2]:
+#         return HttpResponseRedirect(reverse("reversi"))
+#     else:
+#         return HttpResponseRedirect(reverse("reversimatch"))
+#
 
 # return the base view with a list o saved games for the current user
 def saved_games(request):
@@ -375,17 +373,6 @@ def saved_games_page(request):
     return render(request, "savedgamespage.html", {"saved_games": saved_games, "page": current_page,
                                                    "next_page":current_page+1, "prev_page":current_page-1})
 
-
-def saved_ratings(request):
-    if request.user.is_authenticated:
-        user = request.user
-    else:
-        return HttpResponseRedirect(reverse("login"))
-
-    saved_ratings = get_ratings_for_all_users()
-
-    return render(request, "eloratings.html",
-                  {"user": user, "saved_ratings": saved_ratings, "game_levels": user_levels})
 
 
 # @csrf_exempt
@@ -432,7 +419,6 @@ def login_view(request):
         if len(redirect_url) > 0:
             return HttpResponseRedirect(redirect_url)
         return HttpResponseRedirect(reverse("index"))
-
 
 def logout_view(request):
     logout(request)

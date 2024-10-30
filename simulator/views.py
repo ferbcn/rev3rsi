@@ -107,3 +107,16 @@ async def sse_stream(request):
             await asyncio.sleep(1)
 
     return StreamingHttpResponse(event_stream(), content_type='text/event-stream')
+
+
+@require_http_methods(["GET"])
+def saved_elo_ratings(request):
+    if request.user.is_authenticated:
+        user = request.user
+    else:
+        return HttpResponseRedirect(reverse("login"))
+
+    saved_ratings = get_ratings_for_all_users()
+
+    return render(request, "eloratings.html",
+                  {"user": user, "saved_ratings": saved_ratings, "game_levels": user_levels})
