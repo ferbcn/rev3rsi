@@ -20,7 +20,9 @@ user_levels = levels_maker.get_levels()
 @require_http_methods(["GET"])
 def auto_game(request):
     if request.user is None or not request.user.is_authenticated:
-        return HttpResponseRedirect(reverse("login"))
+        return render(request, "users/login.html",
+                      {"message": "Please login first to start a new game!", "user": False,
+                       "redirect_link": "simulator", "game_levels": user_levels})
     else:
         user = request.user
         dummy_game = Game(difficulty="simulator", player1=None, player2=None)

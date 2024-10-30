@@ -137,7 +137,7 @@ function move(row, col){
 
     // Open new request to get new posts.
     const request = new XMLHttpRequest();
-    request.open('POST', '/movematch');
+    request.open('POST', '/arena/movematch');
     request.setRequestHeader('X-CSRFToken', csrftoken); // Corrected to use two arguments
     request.setRequestHeader('mode', 'same-origin'); // Corrected to use two arguments
     request.onload = () => {
