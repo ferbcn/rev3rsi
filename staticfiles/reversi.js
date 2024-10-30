@@ -1,7 +1,11 @@
+// CSRF Cookie
+const csrftoken = getCookie('csrftoken');
+
 var game_over = false;
+var score_p1;
+var score_p2;
+
 // begin by querying the board status and updating its elements
-
-
 document.addEventListener("DOMContentLoaded", function(){
     queryBoard();
 });
@@ -44,6 +48,8 @@ function move(row, col){
         // Open new request
         const request = new XMLHttpRequest();
         request.open('POST', '/move');
+        request.setRequestHeader('X-CSRFToken', csrftoken); // Corrected to use two arguments
+        request.setRequestHeader('mode', 'same-origin'); // Corrected to use two arguments
         request.onload = () => {
             const data = JSON.parse(request.responseText);
             console.log(data);

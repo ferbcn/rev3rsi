@@ -4,7 +4,7 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 
-from django.views.decorators.csrf import csrf_exempt
+#from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
 from reversi.test_games import *
@@ -241,7 +241,6 @@ def reversi_match(request):
 
 # Query board status
 @require_http_methods(["GET"])
-# @method_decorator(csrf_exempt, name='dispatch')
 def query_board(request):
     if request.user.is_authenticated:
         user = request.user
@@ -280,10 +279,9 @@ def query_board(request):
 
 # Main Game Logic is executed in this view every time the current Player makes a move via browser input
 # returns a json data object to browser which updates game board, scores and infos with JS
-# @method_decorator(csrf_exempt, name='dispatch')
 # @method_decorator(csrf_exempt)
 @require_http_methods(["POST"])
-@csrf_exempt
+# @csrf_exempt
 def move(request):
     if request.user.is_authenticated:
         user = request.user
@@ -401,7 +399,7 @@ def move(request):
 # Main Game Logic is executed in this view every time the current Player makes a move via browser input
 # returns a json data object to browser which updates game board, scores and infos with JS
 @require_http_methods(["POST"])
-@csrf_exempt
+# @csrf_exempt
 def move_match(request):
     if request.user.is_authenticated:
         user = request.user
@@ -414,7 +412,6 @@ def move_match(request):
 
     # Restore gamestate from DB
     game_id = request.session['game_id']
-
     board, player1_name, player2_name, next_player, state_id = load_gamestate_db(game_id, user)
 
     if next_player == 1:
@@ -530,7 +527,7 @@ def saved_games(request):
 
 
 # return a list of saved games for the current user to update the base view (htmx)
-@csrf_exempt
+# @csrf_exempt
 def saved_games_page(request):
     if request.user.is_authenticated:
         user = request.user
@@ -553,7 +550,8 @@ def saved_ratings(request):
     return render(request, "eloratings.html",
                   {"user": user, "saved_ratings": saved_ratings, "game_levels": user_levels})
 
-@csrf_exempt
+
+# @csrf_exempt
 def delete_game(request):
     if request.user.is_authenticated:
         user = request.user
@@ -581,7 +579,10 @@ def login_view(request):
     redirect = request.POST["redirect_link"]
 
     user = authenticate(request, username=username, password=password)
-    if user is not None:
+    if user is None:
+        return render(request, "users/login.html",
+                      {"message": "Invalid credentials.", "game_levels": user_levels, "user": False})
+    else:
         login(request, user)
         # if user selects level and is not logged in he is redirected to login page,
         # where a hidden value is saved in the form and send together with login data
@@ -590,9 +591,6 @@ def login_view(request):
             redirect_url = "newgame?difficulty=" + redirect
             return HttpResponseRedirect(redirect_url)
         return HttpResponseRedirect(reverse("index"))
-    else:
-        return render(request, "users/login.html",
-                      {"message": "Invalid credentials.", "game_levels": user_levels, "user": False})
 
 
 def logout_view(request):

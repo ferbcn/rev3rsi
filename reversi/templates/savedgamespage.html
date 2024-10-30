@@ -76,6 +76,7 @@
                hx-delete="{% url 'deletegame' %}?game_id={{ game.id }}"
                hx-swap="outerHTML swap:0.5s"
                hx-target="#row{{ game.id }}"
+               hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
             >
               <span class="oi oi-delete" title="delete game"></span>
             </a>

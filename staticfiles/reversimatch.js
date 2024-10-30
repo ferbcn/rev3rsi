@@ -4,7 +4,9 @@ const matchGameId = JSON.parse(document.getElementById('json-gameId').textConten
 var chatSocket;
 
 var game_over = false;
-// queryBoard();
+
+// CSRF Cookie
+const csrftoken = getCookie('csrftoken');
 
 var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
 
@@ -136,6 +138,8 @@ function move(row, col){
     // Open new request to get new posts.
     const request = new XMLHttpRequest();
     request.open('POST', '/movematch');
+    request.setRequestHeader('X-CSRFToken', csrftoken); // Corrected to use two arguments
+    request.setRequestHeader('mode', 'same-origin'); // Corrected to use two arguments
     request.onload = () => {
         //const data = request.responseText;
         const data = JSON.parse(request.responseText);

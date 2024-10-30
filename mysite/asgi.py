@@ -25,7 +25,7 @@ django.setup()
 # is populated before importing code that may import ORM models.
 django_asgi_app = get_asgi_application()
 
-# Combine WebSocket URL patterns from both arena and simulator
+# Combine WebSocket URL patterns from different apps (not in use)
 combined_websocket_urlpatterns = arena_websocket_urlpatterns
 
 application = ProtocolTypeRouter(
