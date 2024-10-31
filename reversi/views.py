@@ -1,10 +1,7 @@
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-
 from django.shortcuts import render
 from django.urls import reverse
-
-#from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
 from reversi.test_games import *
@@ -22,17 +19,19 @@ admin_levels = levels_maker.get_admin_levels()
 
 
 @sync_to_async
-def index(request):
+def get_auth_user(request):
     if request.user.is_authenticated:
-        user = request.user
-        if user.is_superuser:
-            levels = admin_levels
-        else:
-            levels = user_levels
+        return request.user
     else:
-        user = False
-        levels = user_levels
+        return False
 
+
+async def index(request):
+    user = await get_auth_user(request)
+    if user and user.is_superuser:
+        levels = admin_levels
+    else:
+        levels = user_levels
     return render(request, "index.html", {"user": user, "game_levels": levels})
 
 
@@ -41,16 +40,17 @@ def new_game(request):
     if request.user.is_authenticated:
         user = request.user
     else:
-        level = request.GET["difficulty"]
+        difficulty = request.GET["difficulty"]
         return render(request, "users/login.html",
                       {"message": "Please login first to start a new game!", "user": False,
-                       "redirect_link": "newgame?difficulty="+level, "game_levels": user_levels})
+                       "redirect_link": "newgame?difficulty="+difficulty, "game_levels": user_levels})
 
     # Game level is passed as url parameter http://localhost/newgame?difficulty=...
     difficulty = request.GET["difficulty"]
 
     # Define random role of players
     human_is_player1 = random.choice([True, False])
+
     if human_is_player1:
         player1_name = "human"
         player2_name = difficulty
@@ -355,11 +355,11 @@ def load_game(request):
 #         return HttpResponseRedirect(reverse("reversimatch"))
 #
 
+
 # return the base view with a list o saved games for the current user
-def saved_games(request):
-    if request.user.is_authenticated:
-        user = request.user
-    else:
+async def saved_games(request):
+    user = await get_auth_user(request)
+    if not user:
         return HttpResponseRedirect(reverse("login"))
 
     return render(request, "savedgames.html", {"user": user, "page":1,
