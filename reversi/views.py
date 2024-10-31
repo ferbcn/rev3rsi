@@ -116,6 +116,9 @@ def reversi(request):
     else:
         difficulty = "auto-match"
 
+    # set session difficulty
+    request.session["difficulty"] = difficulty
+
     try:
         board, green_player, blue_player, next_player, state_id = load_gamestate_db(game_id, user)
     # Something went wrong retrieving board (db error or cheating)
@@ -315,6 +318,8 @@ def load_game(request):
         return HttpResponseRedirect(reverse("login"))
 
     game_id = int(request.GET["game_id"])
+    request.session['game_id'] = game_id
+
     game = load_game_object_data(game_id)
     print("Loading game with ID: ", game_id)
     print("P1:", game.player1, "P2:", game.player2, user_levels)
