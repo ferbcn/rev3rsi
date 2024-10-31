@@ -110,7 +110,10 @@ def reversi(request):
         return HttpResponseRedirect(reverse("login"))
 
     # Restore Gamestate from DB
-    game_id = request.session['game_id']
+    if "game_id" in request.session:
+        game_id = request.session['game_id']
+    else:
+        return HttpResponseRedirect(reverse("index"))
     if "difficulty" in request.session:
         difficulty = request.session['difficulty']
     else:
@@ -399,6 +402,9 @@ def delete_game(request):
 
 def login_view(request):
     if request.method == "GET":
+        if request.user.is_authenticated:
+            return HttpResponseRedirect(reverse("index"))
+        # user not authenticated
         if "redirect_link" in request.GET:
             redirect_url = request.GET["redirect_link"]
         else:
@@ -406,6 +412,7 @@ def login_view(request):
         return render(request, "users/login.html",
                       {"message": "Please enter your username and password.", "user": False,
                        "game_levels": user_levels, "redirect_link": redirect_url})
+
     # POST Request
     username = request.POST["username"]
     password = request.POST["password"]
