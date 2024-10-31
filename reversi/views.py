@@ -110,7 +110,10 @@ def reversi(request):
         return HttpResponseRedirect(reverse("login"))
 
     # Restore Gamestate from DB
-    game_id = request.session['game_id']
+    if "game_id" in request.session:
+        game_id = request.session['game_id']
+    else:
+        return HttpResponseRedirect(reverse("index"))
     if "difficulty" in request.session:
         difficulty = request.session['difficulty']
     else:
