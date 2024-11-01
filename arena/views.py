@@ -121,7 +121,8 @@ def reversi_match(request):
                    "player2_name": blue_player,
                    "game_level": difficulty,
                    "game_id": game_id,
-                   "user_color": user_color
+                   "user_color": user_color,
+                   "game_levels": user_levels
                    })
 
 
